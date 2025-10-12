@@ -39,19 +39,19 @@ export function PostCard({ creator, content, isSubscribed = false }: PostCardPro
 
   return (
     <Card className="overflow-hidden border-[#D4AF37]/20 bg-black/50">
-  <CardHeader className="flex flex-row items-center gap-2 space-y-0 px-2 py-1">
+  <CardHeader className="flex flex-row items-center gap-2 space-y-0 px-2 py-0.5">
         <Link
           href={`/profile/${creator.username}`}
           className="flex items-center gap-3 flex-1 hover:opacity-80 transition-opacity"
         >
-          <Avatar className="h-7 w-7 border-2 border-[#D4AF37]/30">
+          <Avatar className="h-6 w-6 border-2 border-[#D4AF37]/30">
             <AvatarImage src={creator.avatar || "/placeholder.svg"} alt={creator.name} />
             <AvatarFallback className="bg-[#D4AF37]/20 text-[#D4AF37]">{creator.name[0]}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold text-[#D4AF37]">{creator.name}</p>
+            <p className="font-semibold text-sm text-[#D4AF37]">{creator.name}</p>
             <div className="flex items-center gap-2">
-              <p className="text-sm text-[#D4AF37]/60">@{creator.username}</p>
+              <p className="text-xs text-[#D4AF37]/60">@{creator.username}</p>
               {content.type === "locked" && (
                 <span className="rounded-md bg-[#D4AF37]/10 px-2 py-0.5 text-xs font-semibold text-[#D4AF37]">
                   Exclusivo
@@ -67,9 +67,9 @@ export function PostCard({ creator, content, isSubscribed = false }: PostCardPro
         )}
       </CardHeader>
       <CardContent className="p-0">
-        {content.type === "locked" ? (
-          <div className="relative">
-            <div className="flex items-center justify-center bg-gradient-to-br from-[#D4AF37]/8 to-black/40 py-10">
+  {content.type === "locked" ? (
+            <div className="relative">
+            <div className="flex items-center justify-center bg-gradient-to-br from-[#D4AF37]/8 to-black/40 py-6">
               <div className="text-center">
                 <Lock className="mx-auto mb-2 h-6 w-6 text-[#D4AF37]/60" />
                 <p className="mb-1 text-sm font-semibold text-[#D4AF37]">Contenido Exclusivo</p>
@@ -79,14 +79,33 @@ export function PostCard({ creator, content, isSubscribed = false }: PostCardPro
             </div>
             <div className="absolute inset-0 bg-black/30" />
           </div>
+        ) : content.type === "video" ? (
+          <div className="relative w-full overflow-hidden rounded-sm aspect-[16/9] bg-black">
+            <video
+              src={content.url}
+              controls
+              preload="metadata"
+              className="w-full h-full object-contain"
+              playsInline
+              muted
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
         ) : (
-          <div className="relative w-full max-h-56 overflow-hidden rounded-sm">
-            <Image src={content.url || "/placeholder.svg?height=600&width=600"} alt="Post content" width={800} height={450} className="object-cover w-full h-full" />
+          <div className="relative w-full overflow-hidden rounded-sm aspect-[4/3]">
+            <Image
+              src={content.url || "/placeholder.svg?height=600&width=600"}
+              alt="Post content"
+              fill
+              className="object-contain object-center"
+              sizes="(max-width: 640px) 100vw, 800px"
+            />
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 p-2">
-        <div className="flex w-full items-center gap-4">
+      <CardFooter className="flex-col items-start gap-1 p-1">
+        <div className="flex w-full items-center gap-3">
             <Button
             variant="ghost"
             size="sm"
@@ -104,7 +123,7 @@ export function PostCard({ creator, content, isSubscribed = false }: PostCardPro
             <Share2 className="h-4 w-4" />
           </Button>
         </div>
-        <p className="text-xs text-[#D4AF37]/80 line-clamp-3">{content.description}</p>
+        <p className="text-xs text-[#D4AF37]/80 line-clamp-2">{content.description}</p>
       </CardFooter>
     </Card>
   )

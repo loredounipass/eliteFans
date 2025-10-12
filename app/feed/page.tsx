@@ -107,7 +107,7 @@ export default async function FeedPage() {
           </div>
 
           {/* 3-column layout: left nav, main feed, right suggestions */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
             {/* Left - compact nav / filters */}
             <aside className="hidden lg:block lg:col-span-2">
               <div className="sticky top-24 space-y-4">
@@ -129,15 +129,19 @@ export default async function FeedPage() {
 
             {/* Main feed */}
             <section className="col-span-1 lg:col-span-7">
-              <div className="space-y-6">
+              <div className="space-y-3"> {/* menos espacio entre posts */}
                 {posts.map((post) => {
                   const showLocked = post.is_locked && !post.isSubscribed && !post.isOwn
                   return (
-                    <div key={post.id} className="mx-auto w-full max-w-2xl"> {/* Limita el ancho de cada post */}
+                    <div key={post.id} className="mx-auto w-full max-w-xl"> {/* Limita el ancho de cada post a max-w-xl */}
                       <PostCard
                         creator={{ name: post.full_name || post.username || "Creator", username: post.username || "", avatar: post.avatar_url || "/placeholder-user.jpg" }}
                         content={{
-                          type: showLocked ? "locked" : post.media_type === "image" ? "image" : "image",
+                          type: showLocked
+                            ? "locked"
+                            : post.media_type === "video"
+                            ? "video"
+                            : "image",
                           url: showLocked ? undefined : (post.media_urls && post.media_urls[0]) || undefined,
                           description: post.content || "",
                           likes: post.like_count || 0,
