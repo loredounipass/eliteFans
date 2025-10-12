@@ -26,6 +26,14 @@ interface CreatePostDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
+// CONSTANTES REUTILIZADAS
+const ALLOWED_IMAGE_EXTS = ["png", "jpg", "jpeg", "gif", "webp", "svg", "heic"]
+const ALLOWED_VIDEO_EXTS = ["mp4", "mov", "mkv", "webm", "mpg", "mpeg", "avi", "m4v", "ogv", "ogg"]
+const MAX_UPLOAD_SIZE = 250 * 1024 * 1024 // 250 MB CLIENT-SIDE
+const SERVER_UPLOAD_THRESHOLD = 50 * 1024 * 1024 // 50 MB
+const CHUNK_SIZE = 5 * 1024 * 1024 // 5 MB
+
+
 export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) {
   const [content, setContent] = useState("")
   const [files, setFiles] = useState<File[]>([])
@@ -41,18 +49,13 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || [])
-
-    // Validate file types — allow common video/image extensions even when MIME is missing
-    const allowedImageExts = ["png", "jpg", "jpeg", "gif", "webp", "svg", "heic"]
-    const allowedVideoExts = ["mp4", "mov", "mkv", "webm", "mpg", "mpeg", "avi", "m4v", "ogv", "ogg"]
-
+    // VALIDAR TIPOS DE ARCHIVO: PERMITIR EXTENSIONES COMUNES SI MIME NO ESTA
     const validFiles = selectedFiles.filter((file) => {
       const type = file.type || ""
       const name = file.name || ""
       const ext = (name.split(".").pop() || "").toLowerCase()
-
-      const isImage = type.startsWith("image/") || allowedImageExts.includes(ext)
-      const isVideo = type.startsWith("video/") || allowedVideoExts.includes(ext)
+      const isImage = type.startsWith("image/") || ALLOWED_IMAGE_EXTS.includes(ext)
+      const isVideo = type.startsWith("video/") || ALLOWED_VIDEO_EXTS.includes(ext)
       return isImage || isVideo
     })
 
@@ -63,11 +66,6 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
         variant: "destructive",
       })
     }
-
-  // Client-side max size (bytes). Adjust as needed. For ~5 minute videos a good default
-  // is around 250MB (depends on codec/bitrate). Change this value if your Supabase
-  // plan or bucket has a different maximum.
-  const MAX_UPLOAD_SIZE = 250 * 1024 * 1024 // 250 MB
 
     const oversized = validFiles.filter((f) => f.size > MAX_UPLOAD_SIZE)
     if (oversized.length > 0) {
@@ -108,10 +106,10 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
       return
     }
 
-    setUploading(true)
+  setUploading(true)
 
     try {
-      // Get current user
+      // OBTENER USUARIO ACTUAL
       const {
         data: { user },
       } = await supabase.auth.getUser()
@@ -122,7 +120,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
         throw new Error("No autenticado")
       }
 
-      // start simulated progress
+  // INICIAR PROGRESO SIMULADO
       setUploadProgress(2)
       progressIntervalRef.current = window.setInterval(() => {
         setUploadProgress((p) => {
@@ -134,11 +132,11 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
         })
       }, 800)
 
-      // Upload files to Blob
+      // SUBIR ARCHIVOS (BROWSER -> SUPABASE O SERVER CHUNKED SEGUN TAMAÑO)
       const mediaUrls: string[] = []
       let mediaType: "image" | "video" | "mixed" | null = null
 
-      // helper to add a timeout to uploads
+      // HELPER: AGREGAR TIMEOUT A PROMESAS DE UPLOAD
       const uploadWithTimeout = <T,>(p: Promise<T>, ms: number) => {
         let timer: ReturnType<typeof setTimeout>
         return Promise.race([
@@ -154,15 +152,13 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
         // Upload directly from browser to Supabase Storage
         const safeName = `${user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9_.-]/g, "_")}`
 
-        // If file is large, upload via server endpoint which may avoid browser/platform limits.
-        const SERVER_UPLOAD_THRESHOLD = 50 * 1024 * 1024 // 50 MB
+  // SI EL ARCHIVO ES GRANDE, USAR ENDPOINT SERVER (CHUNKED) PARA EVITAR LIMITES DEL NAVEGADOR
 
         let uploadResult
         try {
           if (file.size > SERVER_UPLOAD_THRESHOLD) {
-            console.log("Using server chunked upload for large file")
-            // upload by chunks
-            const CHUNK_SIZE = 5 * 1024 * 1024 // 5MB
+            console.log("USANDO UPLOAD CHUNKED EN SERVER PARA ARCHIVO GRANDE")
+            // SUBIDA POR CHUNKS
             const uploadId = `${user.id}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
 
             const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
@@ -198,7 +194,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
               setUploadProgress((p) => Math.max(p, Math.min(percent, 95)))
             }
 
-            // Use the response from the last chunk which should include the public URL
+            // USAR RESPUESTA DEL ULTIMO CHUNK (DEBE INCLUIR PUBLIC URL)
             const publicUrl = lastChunkJson?.url
             if (!publicUrl) throw new Error("No URL returned from server after chunked upload")
 
@@ -230,7 +226,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
           throw err
         }
 
-        // uploadResult may come from server path (custom shape) or Supabase client
+  // uploadResult PUEDE VENIR DEL SERVER (CUSTOM) O DEL CLIENTE DE SUPABASE
         // @ts-ignore
         const { data: uploadData, error: uploadError, publicUrl } = uploadResult
         console.log("Upload response:", { uploadData, uploadError, publicUrl })
@@ -240,7 +236,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
           throw uploadError
         }
 
-        // if server returned publicUrl use it, otherwise request from supabase client
+        // SI SERVER DEVOLVIO publicUrl USARLA, SINO OBTENER PUBLIC URL POR SUPABASE CLIENT
         if (publicUrl) {
           mediaUrls.push(publicUrl)
         } else {
@@ -261,7 +257,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
           mediaUrls.push(publicData.publicUrl)
         }
 
-        // Determine media type
+  // DETERMINAR TIPO DE MEDIA
         const isVideo = file.type.startsWith("video/")
         const isImage = file.type.startsWith("image/")
 
@@ -272,7 +268,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
         }
       }
 
-      // Create post in database
+      // CREAR POST EN LA BASE DE DATOS
       const { error } = await supabase.from("posts").insert({
         creator_id: user.id,
         content: content.trim() || null,
@@ -284,12 +280,9 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
 
       if (error) throw error
 
-      toast({
-        title: "¡Publicado!",
-        description: "Tu contenido ha sido publicado exitosamente",
-      })
+      toast({ title: "¡Publicado!", description: "Tu contenido ha sido publicado exitosamente" })
 
-  // Reset form
+      // RESET FORM
       setContent("")
       setFiles([])
       setPreviews([])
@@ -307,7 +300,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
         variant: "destructive",
       })
     } finally {
-      // finish simulated progress
+      // FINALIZAR PROGRESO SIMULADO
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current)
         progressIntervalRef.current = null

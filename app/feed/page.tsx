@@ -25,26 +25,29 @@ type PostRow = {
   isOwn?: boolean
 }
 
+// CONSTANTES
+const FEED_LIMIT = 20
+
 async function getFeedData() {
   const supabase = await createServerClient()
 
-  // Traer posts públicos y relacionados con perfiles (limit 20)
+  // TRAER POSTS PUBLICOS Y RELACIONADOS CON PERFILES (LIMIT)
   const { data: posts, error } = await supabase
     .from("posts")
     .select(`*, profiles:profiles(id, username, full_name, avatar_url)`)
     .order("created_at", { ascending: false })
-    .limit(20)
+    .limit(FEED_LIMIT)
 
   if (error) {
     console.error("Error fetching posts:", error)
     return { posts: [] as PostRow[], creators: [] }
   }
 
-  // Obtener usuario actual para verificar suscripciones
+  // OBTENER USUARIO ACTUAL PARA VERIFICAR SUSCRIPCIONES
   const { data: userData } = await supabase.auth.getUser()
   const currentUserId = userData?.user?.id
 
-  // Traer suscripciones activas del usuario actual
+  // TRAER SUSCRIPCIONES ACTIVAS DEL USUARIO ACTUAL
   let subscribedCreatorIds: string[] = []
   if (currentUserId) {
     const { data: subs } = await supabase
@@ -55,7 +58,7 @@ async function getFeedData() {
     subscribedCreatorIds = (subs || []).map((s: any) => s.creator_id)
   }
 
-  // Mapear posts al shape esperado por PostCard
+  // MAPEAR POSTS AL SHAPE ESPERADO POR PostCard
   const mapped = (posts as any[]).map((p) => ({
     id: p.id,
     creator_id: p.creator_id,
@@ -74,14 +77,18 @@ async function getFeedData() {
     isOwn: currentUserId ? currentUserId === p.creator_id : false,
   }))
 
-  // Priorizar posts de creadores suscritos: mover al tope
+  // PRIORITIZAR POSTS DE CREADORES SUSCRITOS: MOVER AL TOPE
   mapped.sort((a: any, b: any) => {
     if (a.isSubscribed === b.isSubscribed) return 0
     return a.isSubscribed ? -1 : 1
   })
 
-  // Traer creadores sugeridos
-  const { data: creators } = await supabase.from("profiles").select("username, full_name, avatar_url, cover_url, subscriber_count").eq("is_creator", true).limit(6)
+  // TRAER CREADORES SUGERIDOS
+  const { data: creators } = await supabase
+    .from("profiles")
+    .select("username, full_name, avatar_url, cover_url, subscriber_count")
+    .eq("is_creator", true)
+    .limit(6)
 
   return { posts: mapped as PostRow[], creators: creators || [] }
 }

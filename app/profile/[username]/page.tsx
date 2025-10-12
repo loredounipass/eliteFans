@@ -14,24 +14,24 @@ interface ProfilePageProps {
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const supabase = await createServerClient()
 
-  // Ensure params is resolved before using its properties (Next.js requirement)
-  const { username } = await params as ProfilePageProps["params"]
+  // ASEGURAR QUE params ESTE RESUELTO ANTES DE USAR SUS PROPIEDADES (REQUERIMIENTO DE NEXT.JS)
+  const { username } = (await params) as ProfilePageProps["params"]
 
-  // Fetch profile data
+  // OBTENER DATOS DEL PERFIL
   const { data: profile, error } = await supabase.from("profiles").select("*").eq("username", username).single()
 
   if (error || !profile) {
     notFound()
   }
 
-  // Fetch posts by this creator
+  // OBTENER PUBLICACIONES DEL CREADOR
   const { data: posts } = await supabase
     .from("posts")
     .select("*")
     .eq("creator_id", profile.id)
     .order("created_at", { ascending: false })
 
-  // Get current user to check if subscribed
+  // OBTENER USUARIO ACTUAL PARA VERIFICAR SUSCRIPCION
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -42,7 +42,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   if (user) {
     isOwnProfile = user.id === profile.id
 
-    // Check if current user is subscribed to this creator
+    // VERIFICAR SI EL USUARIO ACTUAL ESTA SUSCRITO A ESTE CREADOR
     const { data: subscription } = await supabase
       .from("subscriptions")
       .select("*")

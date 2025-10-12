@@ -1,5 +1,5 @@
 "use client"
-// use plain <img> for favicon in navbar
+// USAR <img> SIMPLE PARA EL FAVICON EN LA BARRA DE NAVEGACION
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -29,6 +29,7 @@ export function DashboardHeader() {
     router.push("/")
   }
 
+  // CABECERA FIJA CON NAVEGACION
   return (
     <header className="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-black/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">

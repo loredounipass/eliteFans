@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { LucideIcon } from "lucide-react"
 
+// COMPONENTE REUTILIZABLE DE TARJETA DE ESTADISTICAS
+
 interface StatsCardProps {
   title: string
   value: string | number
