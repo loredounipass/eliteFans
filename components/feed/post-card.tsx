@@ -50,7 +50,14 @@ export function PostCard({ creator, content, isSubscribed = false }: PostCardPro
           </Avatar>
           <div>
             <p className="font-semibold text-[#D4AF37]">{creator.name}</p>
-            <p className="text-sm text-[#D4AF37]/60">@{creator.username}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-[#D4AF37]/60">@{creator.username}</p>
+              {content.type === "locked" && (
+                <span className="rounded-md bg-[#D4AF37]/10 px-2 py-0.5 text-xs font-semibold text-[#D4AF37]">
+                  Exclusivo
+                </span>
+              )}
+            </div>
           </div>
         </Link>
         {!isSubscribed && (
@@ -61,13 +68,16 @@ export function PostCard({ creator, content, isSubscribed = false }: PostCardPro
       </CardHeader>
       <CardContent className="p-0">
         {content.type === "locked" ? (
-          <div className="flex items-center justify-center bg-gradient-to-br from-[#D4AF37]/10 to-transparent py-6">
-            <div className="text-center">
-              <Lock className="mx-auto mb-2 h-6 w-6 text-[#D4AF37]/50" />
-              <p className="mb-1 text-sm font-semibold text-[#D4AF37]">Contenido Exclusivo</p>
-              <p className="mb-2 text-xs text-[#D4AF37]/70">Suscríbete para desbloquear</p>
-              <Button className="bg-[#D4AF37] text-black hover:bg-[#C9A961] text-sm">Suscribirse</Button>
+          <div className="relative">
+            <div className="flex items-center justify-center bg-gradient-to-br from-[#D4AF37]/8 to-black/40 py-10">
+              <div className="text-center">
+                <Lock className="mx-auto mb-2 h-6 w-6 text-[#D4AF37]/60" />
+                <p className="mb-1 text-sm font-semibold text-[#D4AF37]">Contenido Exclusivo</p>
+                <p className="mb-2 text-xs text-[#D4AF37]/70">Suscríbete para desbloquear</p>
+                <Button className="bg-[#D4AF37] text-black hover:bg-[#C9A961] text-sm">Suscribirse</Button>
+              </div>
             </div>
+            <div className="absolute inset-0 bg-black/30" />
           </div>
         ) : (
           <div className="relative w-full max-h-56 overflow-hidden rounded-sm">

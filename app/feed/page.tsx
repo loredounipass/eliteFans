@@ -21,6 +21,8 @@ type PostRow = {
   username?: string
   full_name?: string
   avatar_url?: string
+  isSubscribed?: boolean
+  isOwn?: boolean
 }
 
 async function getFeedData() {
@@ -69,6 +71,7 @@ async function getFeedData() {
     full_name: p.profiles?.full_name,
     avatar_url: p.profiles?.avatar_url,
     isSubscribed: subscribedCreatorIds.includes(p.creator_id),
+    isOwn: currentUserId ? currentUserId === p.creator_id : false,
   }))
 
   // Priorizar posts de creadores suscritos: mover al tope
@@ -91,9 +94,10 @@ export default async function FeedPage() {
       <div className="min-h-screen bg-black">
         <DashboardHeader />
         <main className="container mx-auto px-4 py-8">
+          {/* Top search and title */}
           <div className="mb-6">
             <h1 className="mb-4 text-3xl font-bold text-[#D4AF37]">Explorar</h1>
-            <div className="relative">
+            <div className="relative max-w-xl">
               <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#D4AF37]/50" />
               <Input
                 placeholder="Buscar creadores..."
@@ -102,80 +106,88 @@ export default async function FeedPage() {
             </div>
           </div>
 
-          <Tabs defaultValue="feed" className="space-y-4">
-            <TabsList className="border-[#D4AF37]/20 bg-black/50">
-              <TabsTrigger
-                value="feed"
-                className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-[#D4AF37]"
-              >
-                Feed
-              </TabsTrigger>
-              <TabsTrigger
-                value="discover"
-                className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-[#D4AF37]"
-              >
-                Descubrir
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="feed" className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {posts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    creator={{ name: post.full_name || post.username || "Creator", username: post.username || "", avatar: post.avatar_url || "/placeholder-user.jpg" }}
-                    content={{
-                      type: post.is_locked ? "locked" : post.media_type === "image" ? "image" : "image",
-                      url: (post.media_urls && post.media_urls[0]) || undefined,
-                      description: post.content || "",
-                      likes: post.like_count || 0,
-                      comments: post.comment_count || 0,
-                    }}
-                    isSubscribed={false}
-                  />
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="discover" className="space-y-6">
-              <div>
-                <h2 className="mb-4 text-xl font-semibold text-[#D4AF37]">Creadores Sugeridos</h2>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {creators.map((creator: any, index: number) => (
-                    <CreatorCard
-                      key={index}
-                      name={creator.full_name || creator.username}
-                      username={creator.username}
-                      avatar={creator.avatar_url || "/placeholder-user.jpg"}
-                      coverImage={creator.cover_url || creator.avatar_url || "/placeholder.jpg"}
-                      subscribers={creator.subscriber_count || 0}
-                      isSubscribed={false}
-                    />
-                  ))}
+          {/* 3-column layout: left nav, main feed, right suggestions */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            {/* Left - compact nav / filters */}
+            <aside className="hidden lg:block lg:col-span-2">
+              <div className="sticky top-24 space-y-4">
+                <div className="rounded border border-[#D4AF37]/20 bg-black/50 p-3">
+                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Navegar</h3>
+                  <ul className="space-y-2 text-[#D4AF37]/80 text-sm">
+                    <li className="cursor-pointer hover:text-[#D4AF37]">Para ti</li>
+                    <li className="cursor-pointer hover:text-[#D4AF37]">Seguidos</li>
+                    <li className="cursor-pointer hover:text-[#D4AF37]">Populares</li>
+                    <li className="cursor-pointer hover:text-[#D4AF37]">Categorías</li>
+                  </ul>
+                </div>
+                <div className="rounded border border-[#D4AF37]/20 bg-black/50 p-3">
+                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Filtros</h3>
+                  <p className="text-xs text-[#D4AF37]/70">Mostrar solo imágenes</p>
                 </div>
               </div>
+            </aside>
 
-              <div>
-                <h2 className="mb-4 text-xl font-semibold text-[#D4AF37]">Contenido Popular</h2>
-                <div className="grid gap-4 lg:grid-cols-2">
-                  {posts.slice(0, 2).map((post) => (
-                    <PostCard
-                      key={post.id}
-                      creator={{ name: post.full_name || post.username || "Creator", username: post.username || "", avatar: post.avatar_url || "/placeholder-user.jpg" }}
-                      content={{
-                        type: post.is_locked ? "locked" : post.media_type === "image" ? "image" : "image",
-                        url: (post.media_urls && post.media_urls[0]) || undefined,
-                        description: post.content || "",
-                        likes: post.like_count || 0,
-                        comments: post.comment_count || 0,
-                      }}
-                      isSubscribed={false}
-                    />
-                  ))}
+            {/* Main feed */}
+            <section className="col-span-1 lg:col-span-7">
+              <div className="space-y-6">
+                {posts.map((post) => {
+                  const showLocked = post.is_locked && !post.isSubscribed && !post.isOwn
+                  return (
+                    <div key={post.id} className="mx-auto w-full max-w-2xl"> {/* Limita el ancho de cada post */}
+                      <PostCard
+                        creator={{ name: post.full_name || post.username || "Creator", username: post.username || "", avatar: post.avatar_url || "/placeholder-user.jpg" }}
+                        content={{
+                          type: showLocked ? "locked" : post.media_type === "image" ? "image" : "image",
+                          url: showLocked ? undefined : (post.media_urls && post.media_urls[0]) || undefined,
+                          description: post.content || "",
+                          likes: post.like_count || 0,
+                          comments: post.comment_count || 0,
+                        }}
+                        isSubscribed={post.isSubscribed}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+
+            {/* Right - suggestions */}
+            <aside className="col-span-1 lg:col-span-3">
+              <div className="sticky top-24 space-y-4">
+                <div className="rounded border border-[#D4AF37]/10 bg-black/50 p-4">
+                  <h3 className="mb-3 text-sm font-semibold text-[#D4AF37]">Sugerencias para ti</h3>
+                  <div className="space-y-3">
+                    {creators.map((creator: any, index: number) => (
+                      <CreatorCard
+                        key={index}
+                        name={creator.full_name || creator.username}
+                        username={creator.username}
+                        avatar={creator.avatar_url || "/placeholder-user.jpg"}
+                        coverImage={creator.cover_url || creator.avatar_url || "/placeholder.jpg"}
+                        subscribers={creator.subscriber_count || 0}
+                        isSubscribed={false}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded border border-[#D4AF37]/10 bg-black/50 p-4">
+                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Contenido Popular</h3>
+                  <div className="space-y-2">
+                    {posts.slice(0, 3).map((p) => (
+                      <div key={p.id} className="flex items-center gap-3">
+                        <img src={p.avatar_url || "/placeholder-user.jpg"} alt={p.username} className="h-10 w-10 rounded object-cover" />
+                        <div>
+                          <p className="text-sm text-[#D4AF37]">{p.full_name || p.username}</p>
+                          <p className="text-xs text-[#D4AF37]/70">{p.like_count} likes</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </TabsContent>
-          </Tabs>
+            </aside>
+          </div>
         </main>
       </div>
     </PrivateRoute>

@@ -41,27 +41,28 @@ export function ProfileTabs({ profile, posts, isSubscribed, isOwnProfile }: Prof
             <p className="text-[#D4AF37]/60">No hay publicaciones aún</p>
           </div>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-6">
             {posts.map((post) => {
               const showLocked = post.is_locked && !canViewContent
 
               return (
-                <PostCard
-                  key={post.id}
-                  creator={{
-                    name: profile.full_name || profile.username,
-                    username: profile.username,
-                    avatar: profile.avatar_url || "/placeholder.svg",
-                  }}
-                  content={{
-                    type: showLocked ? "locked" : post.media_type === "image" ? "image" : "video",
-                    url: showLocked ? undefined : post.media_urls?.[0],
-                    description: post.content || "",
-                    likes: post.like_count || 0,
-                    comments: post.comment_count || 0,
-                  }}
-                  isSubscribed={isSubscribed}
-                />
+                <div key={post.id} className="mx-auto w-full max-w-2xl">
+                  <PostCard
+                    creator={{
+                      name: profile.full_name || profile.username,
+                      username: profile.username,
+                      avatar: profile.avatar_url || "/placeholder.svg",
+                    }}
+                    content={{
+                      type: showLocked ? "locked" : post.media_type === "image" ? "image" : "video",
+                      url: showLocked ? undefined : post.media_urls?.[0],
+                      description: post.content || "",
+                      likes: post.like_count || 0,
+                      comments: post.comment_count || 0,
+                    }}
+                    isSubscribed={isSubscribed}
+                  />
+                </div>
               )
             })}
           </div>
