@@ -39,12 +39,12 @@ export function PostCard({ creator, content, isSubscribed = false }: PostCardPro
 
   return (
     <Card className="overflow-hidden border-[#D4AF37]/20 bg-black/50">
-      <CardHeader className="flex flex-row items-center gap-3 space-y-0">
+  <CardHeader className="flex flex-row items-center gap-2 space-y-0 px-2 py-1">
         <Link
           href={`/profile/${creator.username}`}
           className="flex items-center gap-3 flex-1 hover:opacity-80 transition-opacity"
         >
-          <Avatar className="h-10 w-10 border-2 border-[#D4AF37]/30">
+          <Avatar className="h-7 w-7 border-2 border-[#D4AF37]/30">
             <AvatarImage src={creator.avatar || "/placeholder.svg"} alt={creator.name} />
             <AvatarFallback className="bg-[#D4AF37]/20 text-[#D4AF37]">{creator.name[0]}</AvatarFallback>
           </Avatar>
@@ -61,45 +61,40 @@ export function PostCard({ creator, content, isSubscribed = false }: PostCardPro
       </CardHeader>
       <CardContent className="p-0">
         {content.type === "locked" ? (
-          <div className="flex aspect-square items-center justify-center bg-gradient-to-br from-[#D4AF37]/10 to-transparent">
+          <div className="flex items-center justify-center bg-gradient-to-br from-[#D4AF37]/10 to-transparent py-6">
             <div className="text-center">
-              <Lock className="mx-auto mb-4 h-16 w-16 text-[#D4AF37]/50" />
-              <p className="mb-2 text-lg font-semibold text-[#D4AF37]">Contenido Exclusivo</p>
-              <p className="mb-4 text-sm text-[#D4AF37]/70">Suscríbete para desbloquear</p>
-              <Button className="bg-[#D4AF37] text-black hover:bg-[#C9A961]">Suscribirse Ahora</Button>
+              <Lock className="mx-auto mb-2 h-6 w-6 text-[#D4AF37]/50" />
+              <p className="mb-1 text-sm font-semibold text-[#D4AF37]">Contenido Exclusivo</p>
+              <p className="mb-2 text-xs text-[#D4AF37]/70">Suscríbete para desbloquear</p>
+              <Button className="bg-[#D4AF37] text-black hover:bg-[#C9A961] text-sm">Suscribirse</Button>
             </div>
           </div>
         ) : (
-          <div className="relative aspect-square">
-            <Image
-              src={content.url || "/placeholder.svg?height=600&width=600"}
-              alt="Post content"
-              fill
-              className="object-cover"
-            />
+          <div className="relative w-full max-h-56 overflow-hidden rounded-sm">
+            <Image src={content.url || "/placeholder.svg?height=600&width=600"} alt="Post content" width={800} height={450} className="object-cover w-full h-full" />
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex-col items-start gap-3 p-4">
+      <CardFooter className="flex-col items-start gap-2 p-2">
         <div className="flex w-full items-center gap-4">
-          <Button
+            <Button
             variant="ghost"
             size="sm"
             onClick={handleLike}
             className={`gap-2 ${liked ? "text-red-500" : "text-[#D4AF37]"} hover:bg-[#D4AF37]/10`}
           >
-            <Heart className={`h-5 w-5 ${liked ? "fill-current" : ""}`} />
+            <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""}`} />
             <span>{likes}</span>
           </Button>
           <Button variant="ghost" size="sm" className="gap-2 text-[#D4AF37] hover:bg-[#D4AF37]/10">
-            <MessageCircle className="h-5 w-5" />
+            <MessageCircle className="h-4 w-4" />
             <span>{content.comments}</span>
           </Button>
           <Button variant="ghost" size="sm" className="ml-auto text-[#D4AF37] hover:bg-[#D4AF37]/10">
-            <Share2 className="h-5 w-5" />
+            <Share2 className="h-4 w-4" />
           </Button>
         </div>
-        <p className="text-sm text-[#D4AF37]/80">{content.description}</p>
+        <p className="text-xs text-[#D4AF37]/80 line-clamp-3">{content.description}</p>
       </CardFooter>
     </Card>
   )

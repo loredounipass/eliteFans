@@ -8,9 +8,14 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "ElitFans - Plataforma de Contenido Exclusivo",
+  title: "ElitFans",
   description: "Únete a la comunidad premium de creadores de contenido",
-  generator: "v0.app",
+  generator: "EliteFans",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 }
 
 export default function RootLayout({

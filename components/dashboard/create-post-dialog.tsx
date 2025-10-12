@@ -88,6 +88,8 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
         data: { user },
       } = await supabase.auth.getUser()
 
+      console.log("CreatePost: current user:", user)
+
       if (!user) {
         throw new Error("No autenticado")
       }
@@ -97,27 +99,30 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
       let mediaType: "image" | "video" | "mixed" | null = null
 
       for (const file of files) {
-        const formData = new FormData()
-        formData.append("file", file)
+        console.log(`Uploading file: name=${file.name} type=${file.type} size=${file.size}`)
+        // Upload directly from browser to Supabase Storage
+        const safeName = `${user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9_.-]/g, "_")}`
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("elitebucket")
+          .upload(safeName, file, { cacheControl: "3600", upsert: false })
 
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        })
+        console.log("Upload response:", { uploadData, uploadError })
 
-        if (!response.ok) {
-          throw new Error("Error al subir archivo")
+        if (uploadError) {
+          console.error("Upload error:", uploadError)
+          throw uploadError
         }
 
-        const data = await response.json()
-        mediaUrls.push(data.url)
+  const { data: publicData } = supabase.storage.from("elitebucket").getPublicUrl(safeName)
+  console.log("Public URL:", publicData)
+  mediaUrls.push(publicData.publicUrl)
 
         // Determine media type
         const isVideo = file.type.startsWith("video/")
         const isImage = file.type.startsWith("image/")
 
         if (!mediaType) {
-          mediaType = isVideo ? "video" : "image"
+          mediaType = isVideo ? "video" : isImage ? "image" : null
         } else if ((mediaType === "video" && isImage) || (mediaType === "image" && isVideo)) {
           mediaType = "mixed"
         }

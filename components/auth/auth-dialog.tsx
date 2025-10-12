@@ -1,8 +1,8 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useEffect, useState } from "react"
+import { useFormStatus } from "react-dom"
+import { useRouter } from "next/navigation"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -18,82 +18,114 @@ interface AuthDialogProps {
 }
 
 export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialogProps) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [username, setUsername] = useState("")
-  const [loading, setLoading] = useState(false)
   const { toast } = useToast()
-  const supabase = getSupabaseBrowserClient()
+  const router = useRouter()
+  const [loadingLogin, setLoadingLogin] = useState(false)
+  const [loginError, setLoginError] = useState<string | null>(null)
+  const [loadingSignup, setLoadingSignup] = useState(false)
+  const [signupError, setSignupError] = useState<string | null>(null)
+  const [signupMessage, setSignupMessage] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (loginError) {
+      toast({ title: "Error", description: loginError, variant: "destructive" })
+    }
+  }, [loginError, toast])
+
+  useEffect(() => {
+    if (signupError) {
+      toast({ title: "Error", description: signupError, variant: "destructive" })
+    } else if (signupMessage) {
+      toast({ title: "¡Bienvenido a ElitFans!", description: signupMessage, duration: 8000 })
+      onOpenChange(false)
+    }
+  }, [signupError, signupMessage, toast, onOpenChange])
+
+  async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
+    setLoadingSignup(true)
+
+    const form = new FormData(e.currentTarget)
+    const username = form.get("username") as string
+    const email = form.get("email") as string
+    const password = form.get("password") as string
+
+    if (!email || !password) {
+      toast({ title: "Error", description: "Email y contraseña son requeridos", variant: "destructive" })
+      setLoadingSignup(false)
+      return
+    }
 
     try {
-      if (mode === "signup") {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-            data: {
-              username,
-            },
-          },
-        })
-
-        if (error) throw error
-
-        // Check if email confirmation is required
-        if (data?.user && !data.session) {
-          toast({
-            title: "¡Cuenta creada exitosamente!",
-            description:
-              "Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.",
-            duration: 8000,
-          })
-        } else if (data?.session) {
-          // Email confirmation is disabled, user is logged in immediately
-          toast({
-            title: "¡Bienvenido a ElitFans!",
-            description: "Tu cuenta ha sido creada exitosamente.",
-          })
-          setTimeout(() => {
-            window.location.href = "/dashboard"
-          }, 1000)
-        }
-
-        onOpenChange(false)
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-
-        if (error) {
-          if (error.message.includes("Email not confirmed")) {
-            throw new Error(
-              "Tu correo electrónico aún no ha sido confirmado. Por favor revisa tu bandeja de entrada y haz clic en el enlace de confirmación.",
-            )
-          }
-          throw error
-        }
-
-        toast({
-          title: "¡Bienvenido de vuelta!",
-          description: "Has iniciado sesión exitosamente.",
-        })
-        onOpenChange(false)
-        window.location.href = "/dashboard"
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Ocurrió un error. Por favor intenta de nuevo.",
-        variant: "destructive",
+      const supabase = getSupabaseBrowserClient()
+      const origin = window.location.origin
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username },
+          emailRedirectTo: `${origin}/auth/callback`,
+        },
       })
+
+      if (error) {
+        setSignupError(error.message)
+      } else if (data?.user && !data?.session) {
+        setSignupMessage("Revisa tu correo para confirmar tu cuenta.")
+      } else if (data?.session) {
+        // Logged in directly
+        onOpenChange(false)
+      }
+    } catch (err: any) {
+      setSignupError(err?.message ?? String(err))
     } finally {
-      setLoading(false)
+      setLoadingSignup(false)
+    }
+  }
+
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setLoadingLogin(true)
+    setLoginError(null)
+
+    const form = new FormData(e.currentTarget)
+    const email = form.get("email") as string
+    const password = form.get("password") as string
+
+    if (!email || !password) {
+      setLoginError("Email y contraseña son requeridos")
+      setLoadingLogin(false)
+      return
+    }
+
+    try {
+      const supabase = getSupabaseBrowserClient()
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+      if (error) {
+        const msg = (error.message || "").toLowerCase()
+        if (msg.includes("invalid login credentials") || msg.includes("invalid password") || msg.includes("invalid email")) {
+          setLoginError("Credenciales incorrectas")
+        } else {
+          setLoginError(error.message)
+        }
+        return
+      }
+
+      if (data?.user && !data?.session) {
+        setLoginError("Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.")
+        return
+      }
+
+      if (data?.session) {
+        // Cerrar diálogo y navegar al dashboard
+        onOpenChange(false)
+        router.push("/dashboard")
+      }
+    } catch (err: any) {
+      setLoginError(err?.message ?? String(err))
+    } finally {
+      setLoadingLogin(false)
     }
   }
 
@@ -110,55 +142,84 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
               : "Únete a la comunidad exclusiva de ElitFans"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === "signup" && (
+        {mode === "login" ? (
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-[#D4AF37]">
+                Correo electrónico
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="tu@email.com"
+                required
+                className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-[#D4AF37]">
+                Contraseña
+              </Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
+              />
+            </div>
+            <Button type="submit" disabled={loadingLogin} className="w-full bg-[#D4AF37] text-black hover:bg-[#C9A961]">
+              {loadingLogin ? "Procesando..." : "Iniciar Sesión"}
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username" className="text-[#D4AF37]">
                 Nombre de usuario
               </Label>
               <Input
                 id="username"
+                name="username"
                 type="text"
                 placeholder="tu_usuario"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 required
                 className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
               />
             </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-[#D4AF37]">
-              Correo electrónico
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-[#D4AF37]">
-              Contraseña
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
-            />
-          </div>
-          <Button type="submit" disabled={loading} className="w-full bg-[#D4AF37] text-black hover:bg-[#C9A961]">
-            {loading ? "Procesando..." : mode === "login" ? "Iniciar Sesión" : "Crear Cuenta"}
-          </Button>
-        </form>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-[#D4AF37]">
+                Correo electrónico
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="tu@email.com"
+                required
+                className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-[#D4AF37]">
+                Contraseña
+              </Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
+              />
+            </div>
+            <Button type="submit" disabled={loadingSignup} className="w-full bg-[#D4AF37] text-black hover:bg-[#C9A961]">
+              {loadingSignup ? "Procesando..." : "Crear Cuenta"}
+            </Button>
+          </form>
+        )}
         <div className="text-center text-sm text-[#D4AF37]/70">
           {mode === "login" ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
           <button
@@ -171,5 +232,14 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function SubmitButton({ text, loadingText }: { text: string; loadingText: string }) {
+  const { pending } = useFormStatus()
+  return (
+    <Button type="submit" disabled={pending} className="w-full bg-[#D4AF37] text-black hover:bg-[#C9A961]">
+      {pending ? loadingText : text}
+    </Button>
   )
 }

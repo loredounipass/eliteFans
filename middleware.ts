@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
 
   // Skip Supabase initialization if env vars are not set
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn("[v0] Supabase environment variables not found in middleware")
+    console.warn("[EliteFans] Supabase environment variables not found in middleware")
     return supabaseResponse
   }
 

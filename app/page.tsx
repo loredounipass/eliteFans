@@ -25,24 +25,18 @@ export default function HomePage() {
         <header className="fixed top-0 z-50 w-full border-b border-[#D4AF37]/20 bg-black/80 backdrop-blur-sm">
           <div className="container mx-auto flex h-16 items-center justify-between px-4">
             <div className="flex items-center gap-3">
-              <Image
-                src="/icon.svg"
-                alt="ElitFans"
-                width={48}
-                height={48}
-                className="h-12 w-12 brightness-110"
-                priority
-              />
+              <img src="/favicon.ico?v=2" alt="ElitFans" width={56} height={56} className="h-14 w-14 brightness-110" />
+              <span className="text-2xl font-extrabold tracking-wide text-[#D4AF37]">ElitFans</span>
             </div>
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 onClick={() => openAuth("login")}
-                className="text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#D4AF37]"
+                className="text-[#D4AF37] font-semibold tracking-wide uppercase hover:bg-[#D4AF37]/10 hover:text-[#D4AF37]"
               >
                 Iniciar Sesión
               </Button>
-              <Button onClick={() => openAuth("signup")} className="bg-[#D4AF37] text-black hover:bg-[#C9A961]">
+              <Button onClick={() => openAuth("signup")} className="bg-[#D4AF37] text-black font-semibold tracking-wide uppercase hover:bg-[#C9A961]">
                 Registrarse
               </Button>
             </div>

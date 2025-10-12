@@ -1,5 +1,5 @@
 "use client"
-import Image from "next/image"
+// use plain <img> for favicon in navbar
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -33,17 +33,17 @@ export function DashboardHeader() {
     <header className="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-black/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <Image src="/icon.svg" alt="ElitFans" width={40} height={40} className="h-10 w-10 brightness-110" />
-          <span className="text-2xl font-bold text-[#D4AF37]">ElitFans</span>
+          <img src="/favicon.ico?v=2" alt="ElitFans" width={56} height={56} className="h-14 w-14 object-contain" />
+          <span className="text-2xl font-extrabold tracking-wide text-[#D4AF37]">ElitFans</span>
         </Link>
         <nav className="flex items-center gap-6">
           <Link
             href="/dashboard"
-            className="text-sm font-medium text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37]"
+            className="text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase"
           >
             Dashboard
           </Link>
-          <Link href="/feed" className="text-sm font-medium text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37]">
+          <Link href="/feed" className="text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
             Feed
           </Link>
           <DropdownMenu>
