@@ -103,11 +103,11 @@ export default async function FeedPage() {
         <main className="container mx-auto px-4 py-8">
           {/* Top search and title */}
           <div className="mb-6">
-            <h1 className="mb-4 text-3xl font-bold text-[#D4AF37]">Explorar</h1>
+            <h1 className="mb-4 text-3xl font-bold text-[#D4AF37]">Explore</h1>
             <div className="relative max-w-xl">
               <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#D4AF37]/50" />
-              <Input
-                placeholder="Buscar creadores..."
+                <Input
+                placeholder="Search creators..."
                 className="border-[#D4AF37]/30 bg-black/50 pl-10 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
               />
             </div>
@@ -119,28 +119,28 @@ export default async function FeedPage() {
             <aside className="hidden lg:block lg:col-span-2">
               <div className="sticky top-24 space-y-4">
                 <div className="rounded border border-[#D4AF37]/20 bg-black/50 p-3">
-                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Navegar</h3>
+                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Browse</h3>
                   <ul className="space-y-2 text-[#D4AF37]/80 text-sm">
-                    <li className="cursor-pointer hover:text-[#D4AF37]">Para ti</li>
-                    <li className="cursor-pointer hover:text-[#D4AF37]">Seguidos</li>
-                    <li className="cursor-pointer hover:text-[#D4AF37]">Populares</li>
-                    <li className="cursor-pointer hover:text-[#D4AF37]">Categorías</li>
+                      <li className="cursor-pointer hover:text-[#D4AF37]">For you</li>
+                      <li className="cursor-pointer hover:text-[#D4AF37]">Following</li>
+                      <li className="cursor-pointer hover:text-[#D4AF37]">Popular</li>
+                      <li className="cursor-pointer hover:text-[#D4AF37]">Categories</li>
                   </ul>
                 </div>
                 <div className="rounded border border-[#D4AF37]/20 bg-black/50 p-3">
-                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Filtros</h3>
-                  <p className="text-xs text-[#D4AF37]/70">Mostrar solo imágenes</p>
+                    <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Filters</h3>
+                    <p className="text-xs text-[#D4AF37]/70">Show images only</p>
                 </div>
               </div>
             </aside>
 
             {/* Main feed */}
             <section className="col-span-1 lg:col-span-7">
-              <div className="space-y-3"> {/* menos espacio entre posts */}
+              <div className="space-y-3"> {/* LESS SPACE BETWEEN POSTS */}
                 {posts.map((post) => {
                   const showLocked = post.is_locked && !post.isSubscribed && !post.isOwn
                   return (
-                    <div key={post.id} className="mx-auto w-full max-w-xl"> {/* Limita el ancho de cada post a max-w-xl */}
+                    <div key={post.id} className="mx-auto w-full max-w-xl"> {/* LIMIT EACH POST WIDTH TO max-w-xl */}
                       <PostCard
                         creator={{ name: post.full_name || post.username || "Creator", username: post.username || "", avatar: post.avatar_url || "/placeholder-user.jpg" }}
                         content={{
@@ -166,7 +166,7 @@ export default async function FeedPage() {
             <aside className="col-span-1 lg:col-span-3">
               <div className="sticky top-24 space-y-4">
                 <div className="rounded border border-[#D4AF37]/10 bg-black/50 p-4">
-                  <h3 className="mb-3 text-sm font-semibold text-[#D4AF37]">Sugerencias para ti</h3>
+                  <h3 className="mb-3 text-sm font-semibold text-[#D4AF37]">Suggestions for you</h3>
                   <div className="space-y-3">
                     {creators.map((creator: any, index: number) => (
                       <CreatorCard
@@ -182,8 +182,8 @@ export default async function FeedPage() {
                   </div>
                 </div>
 
-                <div className="rounded border border-[#D4AF37]/10 bg-black/50 p-4">
-                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Contenido Popular</h3>
+                  <div className="rounded border border-[#D4AF37]/10 bg-black/50 p-4">
+                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Popular Content</h3>
                   <div className="space-y-2">
                     {posts.slice(0, 3).map((p) => (
                       <div key={p.id} className="flex items-center gap-3">

@@ -34,10 +34,10 @@ export default function HomePage() {
                 onClick={() => openAuth("login")}
                 className="text-[#D4AF37] font-semibold tracking-wide uppercase hover:bg-[#D4AF37]/10 hover:text-[#D4AF37]"
               >
-                Iniciar Sesión
+                Sign In
               </Button>
               <Button onClick={() => openAuth("signup")} className="bg-[#D4AF37] text-black font-semibold tracking-wide uppercase hover:bg-[#C9A961]">
-                Registrarse
+                Sign Up
               </Button>
             </div>
           </div>
@@ -54,12 +54,12 @@ export default function HomePage() {
               <Image src="/elitfans-logo.png" alt="ElitFans Logo" width={300} height={300} className="h-48 w-auto" />
             </div>
             <h1 className="mb-6 text-balance text-5xl font-bold leading-tight text-[#D4AF37] md:text-7xl">
-              Contenido Exclusivo
+              Exclusive Content
               <br />
-              <span className="text-white">Para Fans de Élite</span>
+              <span className="text-white">For Elite Fans</span>
             </h1>
             <p className="mb-8 text-balance text-xl text-[#D4AF37]/80 md:text-2xl">
-              Conecta con tus creadores favoritos y accede a contenido premium que no encontrarás en ningún otro lugar
+              Connect with your favorite creators and access premium content you won't find anywhere else
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button
@@ -68,7 +68,7 @@ export default function HomePage() {
                 className="bg-[#D4AF37] px-8 text-lg text-black hover:bg-[#C9A961]"
               >
                 <Crown className="mr-2 h-5 w-5" />
-                Comenzar Ahora
+                Get Started
               </Button>
               <Button
                 size="lg"
@@ -76,7 +76,7 @@ export default function HomePage() {
                 onClick={() => openAuth("login")}
                 className="border-[#D4AF37] px-8 text-lg text-[#D4AF37] hover:bg-[#D4AF37]/10"
               >
-                Explorar Creadores
+                Explore Creators
               </Button>
             </div>
           </div>
@@ -85,37 +85,37 @@ export default function HomePage() {
         {/* Features Section */}
         <section className="border-t border-[#D4AF37]/20 bg-black py-24">
           <div className="container mx-auto px-4">
-            <h2 className="mb-16 text-center text-4xl font-bold text-[#D4AF37]">¿Por qué ElitFans?</h2>
+            <h2 className="mb-16 text-center text-4xl font-bold text-[#D4AF37]">Why ElitFans?</h2>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               <FeatureCard
                 icon={<Lock className="h-8 w-8" />}
-                title="Contenido Exclusivo"
-                description="Accede a contenido premium y exclusivo de tus creadores favoritos"
+                title="Exclusive Content"
+                description="Access premium and exclusive content from your favorite creators"
               />
               <FeatureCard
                 icon={<Users className="h-8 w-8" />}
-                title="Comunidad Élite"
-                description="Únete a una comunidad selecta de fans y creadores de contenido"
+                title="Elite Community"
+                description="Join a select community of fans and content creators"
               />
               <FeatureCard
                 icon={<Star className="h-8 w-8" />}
-                title="Experiencia Premium"
-                description="Disfruta de una plataforma diseñada para ofrecer la mejor experiencia"
+                title="Premium Experience"
+                description="Enjoy a platform designed to deliver the best experience"
               />
               <FeatureCard
                 icon={<TrendingUp className="h-8 w-8" />}
-                title="Monetiza tu Contenido"
-                description="Creadores: convierte tu pasión en ingresos sostenibles"
+                title="Monetize Your Content"
+                description="Creators: turn your passion into sustainable income"
               />
               <FeatureCard
                 icon={<Zap className="h-8 w-8" />}
-                title="Pagos Seguros"
-                description="Transacciones seguras y protegidas para tu tranquilidad"
+                title="Secure Payments"
+                description="Secure transactions for your peace of mind"
               />
               <FeatureCard
                 icon={<Crown className="h-8 w-8" />}
-                title="Soporte VIP"
-                description="Atención personalizada para creadores y suscriptores"
+                title="VIP Support"
+                description="Personalized support for creators and subscribers"
               />
             </div>
           </div>
@@ -124,24 +124,24 @@ export default function HomePage() {
         {/* CTA Section */}
         <section className="border-t border-[#D4AF37]/20 bg-gradient-to-b from-black to-[#D4AF37]/5 py-24">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="mb-6 text-4xl font-bold text-[#D4AF37] md:text-5xl">¿Listo para unirte a la élite?</h2>
+            <h2 className="mb-6 text-4xl font-bold text-[#D4AF37] md:text-5xl">Ready to join the elite?</h2>
             <p className="mb-8 text-xl text-[#D4AF37]/80">
-              Crea tu cuenta hoy y descubre un mundo de contenido exclusivo
+              Create your account today and discover a world of exclusive content
             </p>
             <Button
               size="lg"
               onClick={() => openAuth("signup")}
               className="bg-[#D4AF37] px-12 text-lg text-black hover:bg-[#C9A961]"
             >
-              Registrarse Gratis
+              Sign Up Free
             </Button>
           </div>
         </section>
 
         {/* Footer */}
         <footer className="border-t border-[#D4AF37]/20 bg-black py-8">
-          <div className="container mx-auto px-4 text-center text-[#D4AF37]/60">
-            <p>&copy; 2025 ElitFans. Todos los derechos reservados.</p>
+            <div className="container mx-auto px-4 text-center text-[#D4AF37]/60">
+            <p>© 2025 ElitFans. All rights reserved.</p>
           </div>
         </footer>
 

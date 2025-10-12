@@ -36,7 +36,7 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
     if (signupError) {
       toast({ title: "Error", description: signupError, variant: "destructive" })
     } else if (signupMessage) {
-      toast({ title: "¡Bienvenido a ElitFans!", description: signupMessage, duration: 8000 })
+      toast({ title: "Welcome to ElitFans!", description: signupMessage, duration: 8000 })
       onOpenChange(false)
     }
   }, [signupError, signupMessage, toast, onOpenChange])
@@ -51,7 +51,7 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
     const password = form.get("password") as string
 
     if (!email || !password) {
-      toast({ title: "Error", description: "Email y contraseña son requeridos", variant: "destructive" })
+      toast({ title: "Error", description: "Email and password are required", variant: "destructive" })
       setLoadingSignup(false)
       return
     }
@@ -71,7 +71,7 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
       if (error) {
         setSignupError(error.message)
       } else if (data?.user && !data?.session) {
-        setSignupMessage("Revisa tu correo para confirmar tu cuenta.")
+  setSignupMessage("Check your email to confirm your account.")
       } else if (data?.session) {
         // Logged in directly
         onOpenChange(false)
@@ -93,7 +93,7 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
     const password = form.get("password") as string
 
     if (!email || !password) {
-      setLoginError("Email y contraseña son requeridos")
+      setLoginError("Email and password are required")
       setLoadingLogin(false)
       return
     }
@@ -113,12 +113,12 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
       }
 
       if (data?.user && !data?.session) {
-        setLoginError("Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.")
+        setLoginError("You must confirm your email before signing in. Check your inbox.")
         return
       }
 
       if (data?.session) {
-        // Cerrar diálogo y navegar al dashboard
+        // Close dialog and navigate to dashboard
         onOpenChange(false)
         router.push("/dashboard")
       }
@@ -134,32 +134,32 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
       <DialogContent className="border-[#D4AF37] bg-black text-[#D4AF37] sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-[#D4AF37]">
-            {mode === "login" ? "Iniciar Sesión" : "Crear Cuenta"}
+            {mode === "login" ? "Sign In" : "Create Account"}
           </DialogTitle>
           <DialogDescription className="text-[#D4AF37]/70">
             {mode === "login"
-              ? "Ingresa tus credenciales para acceder a ElitFans"
-              : "Únete a la comunidad exclusiva de ElitFans"}
+              ? "Enter your credentials to access ElitFans"
+              : "Join the exclusive ElitFans community"}
           </DialogDescription>
         </DialogHeader>
         {mode === "login" ? (
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-[#D4AF37]">
-                Correo electrónico
+                Email
               </Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="tu@email.com"
+                placeholder="you@email.com"
                 required
                 className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" className="text-[#D4AF37]">
-                Contraseña
+                Password
               </Label>
               <Input
                 id="password"
@@ -171,40 +171,40 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
               />
             </div>
             <Button type="submit" disabled={loadingLogin} className="w-full bg-[#D4AF37] text-black hover:bg-[#C9A961]">
-              {loadingLogin ? "Procesando..." : "Iniciar Sesión"}
+              {loadingLogin ? "Processing..." : "Sign In"}
             </Button>
           </form>
         ) : (
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username" className="text-[#D4AF37]">
-                Nombre de usuario
+                Username
               </Label>
               <Input
                 id="username"
                 name="username"
                 type="text"
-                placeholder="tu_usuario"
+                placeholder="your_username"
                 required
                 className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email" className="text-[#D4AF37]">
-                Correo electrónico
+                Email
               </Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="tu@email.com"
+                placeholder="you@email.com"
                 required
                 className="border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" className="text-[#D4AF37]">
-                Contraseña
+                Password
               </Label>
               <Input
                 id="password"
@@ -216,18 +216,18 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }: AuthDialo
               />
             </div>
             <Button type="submit" disabled={loadingSignup} className="w-full bg-[#D4AF37] text-black hover:bg-[#C9A961]">
-              {loadingSignup ? "Procesando..." : "Crear Cuenta"}
+              {loadingSignup ? "Processing..." : "Create Account"}
             </Button>
           </form>
         )}
         <div className="text-center text-sm text-[#D4AF37]/70">
-          {mode === "login" ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
+          {mode === "login" ? "Don't have an account?" : "Already have an account?"} {" "}
           <button
             type="button"
             onClick={() => onModeChange(mode === "login" ? "signup" : "login")}
             className="font-semibold text-[#D4AF37] hover:underline"
           >
-            {mode === "login" ? "Regístrate" : "Inicia sesión"}
+            {mode === "login" ? "Sign Up" : "Sign In"}
           </button>
         </div>
       </DialogContent>
