@@ -8,6 +8,7 @@ export async function POST(req: Request) {
     const body = await req.json()
     const postId = body?.postId
     const text = (body?.text || "").toString().trim()
+    const parentId = body?.parentId || null
 
     if (!postId || !text) return NextResponse.json({ error: "postId and text are required" }, { status: 400 })
 
@@ -19,18 +20,75 @@ export async function POST(req: Request) {
 
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
 
-    const payload = {
+    const payload: any = {
       post_id: postId,
       user_id: user.id,
       content: text,
     }
+    if (parentId) payload.parent_id = parentId
 
-    const { data, error } = await supabase.from("comments").insert(payload).select().single()
+    const { data, error } = await supabase
+      .from("comments")
+      .insert(payload)
+      .select(`*, profiles:user_id(id, username, full_name, avatar_url)`)
+      .single()
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     return NextResponse.json({ ok: true, comment: data })
   } catch (err: any) {
     console.error("Comments API error:", err)
+    return NextResponse.json({ error: err?.message ?? String(err) }, { status: 500 })
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const url = new URL(req.url)
+    const commentId = url.searchParams.get("id")
+    if (!commentId) return NextResponse.json({ error: "id is required" }, { status: 400 })
+
+    const supabase = await createServerClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+
+    // Ensure the user is owner (RLS should also enforce this) then delete
+    const { error } = await supabase.from("comments").delete().eq("id", commentId).eq("user_id", user.id)
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    return NextResponse.json({ ok: true })
+  } catch (err: any) {
+    console.error("Comments DELETE error:", err)
+    return NextResponse.json({ error: err?.message ?? String(err) }, { status: 500 })
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const url = new URL(req.url)
+    const postId = url.searchParams.get("postId")
+    const limit = Number(url.searchParams.get("limit") || 20)
+    const offset = Number(url.searchParams.get("offset") || 0)
+
+    if (!postId) return NextResponse.json({ error: "postId is required" }, { status: 400 })
+
+    const supabase = await createServerClient()
+
+    // Join with profiles to get author info
+    const { data, error } = await supabase
+      .from("comments")
+      // Use relation by foreign key user_id to fetch profile fields
+      .select(`*, profiles:user_id(id, username, full_name, avatar_url)`)
+      .eq("post_id", postId)
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    return NextResponse.json({ ok: true, comments: data })
+  } catch (err: any) {
+    console.error("Comments GET error:", err)
     return NextResponse.json({ error: err?.message ?? String(err) }, { status: 500 })
   }
 }

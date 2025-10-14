@@ -32,6 +32,11 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
   const [commentText, setCommentText] = useState("")
   const [comments, setComments] = useState(content.comments)
   const [commenting, setCommenting] = useState(false)
+  const [showComments, setShowComments] = useState(false)
+  const [commentList, setCommentList] = useState<any[]>([])
+  const [loadingComments, setLoadingComments] = useState(false)
+  const [commentsOffset, setCommentsOffset] = useState(0)
+  const COMMENTS_PAGE = 10
 
   useEffect(() => {
     if (!postId) return
@@ -91,24 +96,123 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
     setCommenting(true)
     const prevComments = comments
     setComments((c) => c + 1)
+    // optimistic add to list if visible
+    const tempComment = {
+      id: `temp-${Date.now()}`,
+      content: commentText.trim(),
+      created_at: new Date().toISOString(),
+      profiles: { id: "me", name: "You", username: "you", avatar_url: "" },
+    }
+    if (showComments) setCommentList((l) => [tempComment, ...l])
 
     try {
       const res = await fetch("/api/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ postId: postId, text: commentText.trim() }),
+        body: JSON.stringify({ postId: postId, text: commentText.trim() }),
       })
       const json = await res.json()
       if (!res.ok) {
         setComments(prevComments)
+        if (showComments) setCommentList((l) => l.filter((c) => c.id !== tempComment.id))
       } else {
         setCommentText("")
-        // Optionally use returned comment (json.comment)
+        if (showComments && json?.comment) {
+          setCommentList((l) => [json.comment, ...l.filter((c) => c.id !== tempComment.id)])
+        }
       }
     } catch (err) {
       setComments(prevComments)
+      if (showComments) setCommentList((l) => l.filter((c) => c.id !== tempComment.id))
     } finally {
       setCommenting(false)
+    }
+  }
+
+  const loadComments = async (reset = false) => {
+    if (!postId) return
+    setLoadingComments(true)
+    try {
+      const offset = reset ? 0 : commentsOffset
+      const res = await fetch(`/api/comments?postId=${encodeURIComponent(postId)}&limit=${COMMENTS_PAGE}&offset=${offset}`)
+      const json = await res.json()
+      if (res.ok && json?.comments) {
+        const items = json.comments as any[]
+        if (reset) {
+          setCommentList(items)
+          setCommentsOffset(items.length)
+        } else {
+          setCommentList((l) => [...l, ...items])
+          setCommentsOffset((o) => o + items.length)
+        }
+      }
+    } catch (err) {
+      // ignore
+    } finally {
+      setLoadingComments(false)
+    }
+  }
+
+  const handleCommentLike = async (commentId: string) => {
+    try {
+      // optimistic UI: toggle locally
+      setCommentList((list) =>
+        list.map((c) => (c.id === commentId ? { ...c, liking: true } : c)),
+      )
+      const res = await fetch("/api/comment-likes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ commentId }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setCommentList((list) => list.map((c) => (c.id === commentId ? { ...c, liked: json.action === "liked", like_count: json.like_count ?? c.like_count } : c)))
+      }
+    } catch (err) {
+      // ignore
+    }
+  }
+
+  const handleCommentDelete = async (commentId: string) => {
+    try {
+      const res = await fetch(`/api/comments?id=${encodeURIComponent(commentId)}`, { method: "DELETE" })
+      if (res.ok) {
+        setCommentList((l) => l.filter((c) => c.id !== commentId))
+        setComments((c) => Math.max(0, c - 1))
+      }
+    } catch (err) {
+      // ignore
+    }
+  }
+
+  const [replyingTo, setReplyingTo] = useState<string | null>(null)
+  const [replyText, setReplyText] = useState("")
+
+  const handleReplySubmit = async (parentId: string) => {
+    if (!replyText.trim()) return
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId, text: replyText.trim(), parentId }),
+      })
+      const json = await res.json()
+      if (res.ok && json?.comment) {
+        // insert reply after parent
+        setCommentList((l) => {
+          const idx = l.findIndex((c) => c.id === parentId)
+          if (idx === -1) return [json.comment, ...l]
+          // insert right after parent
+          const copy = [...l]
+          copy.splice(idx + 1, 0, json.comment)
+          return copy
+        })
+        setReplyText("")
+        setReplyingTo(null)
+        setComments((c) => c + 1)
+      }
+    } catch (err) {
+      // ignore
     }
   }
 
@@ -190,7 +294,18 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
             <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""}`} />
             <span>{likes}</span>
           </Button>
-          <Button variant="ghost" size="sm" className="gap-2 text-[#D4AF37] hover:bg-[#D4AF37]/10">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2 text-[#D4AF37] hover:bg-[#D4AF37]/10"
+            onClick={async () => {
+              const next = !showComments
+              setShowComments(next)
+              if (next && commentList.length === 0) {
+                await loadComments(true)
+              }
+            }}
+          >
             <MessageCircle className="h-4 w-4" />
             <span>{comments}</span>
           </Button>
@@ -200,6 +315,92 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
         </div>
         <p className="text-xs text-[#D4AF37]/80 line-clamp-2">{content.description}</p>
       </CardFooter>
+      {showComments && (
+        <div className="w-full border-t border-[#D4AF37]/10 p-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleCommentSubmit()
+            }}
+            className="mb-2"
+          >
+            <div className="relative">
+              <input
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Escribe un comentario..."
+                className="w-full rounded-md bg-black/30 px-3 py-1 pr-20 text-sm text-white"
+              />
+              <button
+                type="submit"
+                disabled={commenting}
+                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md bg-[#D4AF37] px-3 py-0.5 text-xs font-semibold text-black disabled:opacity-50"
+              >
+                Enviar
+              </button>
+            </div>
+          </form>
+
+          <div className="flex flex-col gap-2 max-h-60 overflow-auto">
+            {loadingComments && commentList.length === 0 ? (
+              <p className="text-xs text-[#D4AF37]/60">Cargando...</p>
+            ) : commentList.length === 0 ? (
+              <p className="text-xs text-[#D4AF37]/60">Sin comentarios todavía</p>
+            ) : (
+              commentList.map((c) => (
+                <div key={c.id} className="flex flex-col gap-1">
+                  <div className="flex items-start gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={c.profiles?.avatar_url || "/placeholder.svg"} />
+                      <AvatarFallback>{(c.profiles?.full_name || `@${c.profiles?.username}` || "?")[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="text-sm flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-[#D4AF37] text-xs">{c.profiles?.full_name || `@${c.profiles?.username}`}</span>
+                        <span className="text-xs text-[#D4AF37]/60">{new Date(c.created_at).toLocaleString()}</span>
+                      </div>
+                      <div className="text-xs text-[#D4AF37]/80">{c.content}</div>
+                      <div className="mt-1 flex items-center gap-3 text-xs">
+                        <button
+                          className={`text-[#D4AF37] ${c.liked ? "font-semibold text-red-400" : ""}`}
+                          onClick={() => handleCommentLike(c.id)}
+                        >
+                          ❤️ {c.like_count ?? 0}
+                        </button>
+                        <button className="text-[#D4AF37]" onClick={() => setReplyingTo(c.id)}>
+                          Responder
+                        </button>
+                        {c.profiles?.id === "me" ? (
+                          <button className="text-red-500" onClick={() => handleCommentDelete(c.id)}>
+                            Eliminar
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+
+                  {replyingTo === c.id && (
+                    <div className="ml-8 mt-1 flex items-start gap-2">
+                      <input
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder="Escribe una respuesta..."
+                        className="flex-1 rounded-md bg-black/20 px-2 py-1 text-sm text-white"
+                      />
+                      <button className="rounded-md bg-[#D4AF37] px-3 py-0.5 text-xs text-black" onClick={() => handleReplySubmit(c.id)}>
+                        Responder
+                      </button>
+                      <button className="text-xs text-[#D4AF37]/60" onClick={() => setReplyingTo(null)}>
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </Card>
   )
 }
