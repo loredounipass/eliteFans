@@ -1,0 +1,2 @@
+ALTER TABLE photos
+ADD COLUMN data_base45 TEXT;

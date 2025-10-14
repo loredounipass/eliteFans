@@ -192,7 +192,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
           </Button>
           <Button variant="ghost" size="sm" className="gap-2 text-[#D4AF37] hover:bg-[#D4AF37]/10">
             <MessageCircle className="h-4 w-4" />
-            <span>{content.comments}</span>
+            <span>{comments}</span>
           </Button>
           <Button variant="ghost" size="sm" className="ml-auto text-[#D4AF37] hover:bg-[#D4AF37]/10">
             <Share2 className="h-4 w-4" />

@@ -56,6 +56,20 @@ export function DashboardHeader() {
             <DropdownMenuContent align="end" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
               <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-[#D4AF37]/20" />
+              <DropdownMenuItem
+                onClick={async () => {
+                  const { data: { user } } = await supabase.auth.getUser()
+                  if (user && (user.user_metadata as any)?.username) {
+                    router.push(`/profile/${(user.user_metadata as any).username}`)
+                  } else {
+                    toast({ title: "Perfil no disponible", description: "No se encontró el username" })
+                  }
+                }}
+                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
+              >
+                <User className="mr-2 h-4 w-4" />
+                Perfil
+              </DropdownMenuItem>
               <DropdownMenuItem className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
                 <Settings className="mr-2 h-4 w-4" />
                 Configuración

@@ -53,6 +53,7 @@ export function ProfileTabs({ profile, posts, isSubscribed, isOwnProfile }: Prof
                       username: profile.username,
                       avatar: profile.avatar_url || "/placeholder.svg",
                     }}
+                    postId={post.id}
                     content={{
                       type: showLocked ? "locked" : post.media_type === "image" ? "image" : "video",
                       url: showLocked ? undefined : post.media_urls?.[0],

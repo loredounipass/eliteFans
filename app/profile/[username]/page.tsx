@@ -31,6 +31,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     .eq("creator_id", profile.id)
     .order("created_at", { ascending: false })
 
+  // CALCULAR LIKES TOTALES SOBRE LAS PUBLICACIONES
+  const totalLikes = (posts || []).reduce((acc: number, p: any) => acc + (p.like_count ?? 0), 0)
+
+  // FORZAR EL CONTADOR DE PUBLICACIONES A 6 (SOLICITADO)
+  const forcedPostCount = 6
   // OBTENER USUARIO ACTUAL PARA VERIFICAR SUSCRIPCION
   const {
     data: { user },
@@ -76,8 +81,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
             {/* Main */}
             <section className="col-span-1 lg:col-span-7">
-              <ProfileHeader profile={profile} isSubscribed={isSubscribed} isOwnProfile={isOwnProfile} />
-              <ProfileTabs profile={profile} posts={posts || []} isSubscribed={isSubscribed} isOwnProfile={isOwnProfile} />
+              <ProfileHeader
+                profile={{ ...profile, post_count: forcedPostCount, likes: totalLikes }}
+                isSubscribed={isSubscribed}
+                isOwnProfile={isOwnProfile}
+              />
+              <ProfileTabs profile={{ ...profile, post_count: forcedPostCount, likes: totalLikes }} posts={posts || []} isSubscribed={isSubscribed} isOwnProfile={isOwnProfile} />
             </section>
 
             {/* Right suggestions */}

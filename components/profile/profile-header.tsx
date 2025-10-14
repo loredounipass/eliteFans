@@ -7,6 +7,9 @@ import { Crown, Calendar } from "lucide-react"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import dynamic from "next/dynamic"
+
+const EditProfileDialog = dynamic(() => import("./edit-profile-dialog"))
 
 interface ProfileHeaderProps {
   profile: {
@@ -16,8 +19,9 @@ interface ProfileHeaderProps {
     bio: string | null
     avatar_url: string | null
     cover_url: string | null
-    subscriber_count: number | null
-    post_count: number | null
+      subscriber_count: number | null
+      post_count: number | null
+      likes?: number | null
     subscription_price: number | null
     is_creator: boolean | null
     created_at: string
@@ -30,6 +34,7 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
   const router = useRouter()
   const [isSubscribed, setIsSubscribed] = useState(initialIsSubscribed)
   const [isLoading, setIsLoading] = useState(false)
+  const [showEdit, setShowEdit] = useState(false)
 
   const handleSubscribe = async () => {
     setIsLoading(true)
@@ -120,7 +125,10 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
                   <span className="font-semibold text-[#D4AF37]">{profile.subscriber_count || 0}</span> suscriptores
                 </div>
                 <div>
-                  <span className="font-semibold text-[#D4AF37]">{profile.post_count || 0}</span> publicaciones
+                  <span className="font-semibold text-[#D4AF37]">{profile.post_count ?? 0}</span> publicaciones
+                </div>
+                <div>
+                  <span className="font-semibold text-[#D4AF37]">{profile.likes ?? 0}</span> likes
                 </div>
               </div>
             </div>
@@ -146,12 +154,26 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
               </Button>
             )}
             {isOwnProfile && (
-              <Button
-                variant="outline"
-                className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 bg-transparent"
-              >
-                Editar Perfil
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 bg-transparent"
+                  onClick={() => setShowEdit(true)}
+                >
+                  Editar Perfil
+                </Button>
+                {showEdit && (
+                  // @ts-ignore - dynamic import
+                  <EditProfileDialog
+                    profile={profile}
+                    onClose={() => setShowEdit(false)}
+                    onSaved={() => {
+                      setShowEdit(false)
+                      router.refresh()
+                    }}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>
