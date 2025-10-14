@@ -15,6 +15,7 @@ import { CreatePostDialog } from "@/components/dashboard/create-post-dialog"
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
   const [createPostOpen, setCreatePostOpen] = useState(false)
+  const [metrics, setMetrics] = useState<any>(null)
   const supabase = getSupabaseBrowserClient()
 
   useEffect(() => {
@@ -26,6 +27,21 @@ export default function DashboardPage() {
     }
     getUser()
   }, [supabase])
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const res = await fetch("/api/dashboard/metrics")
+        if (!res.ok) return
+        const json = await res.json()
+        setMetrics(json)
+      } catch (err) {
+        console.error("Failed to fetch dashboard metrics", err)
+      }
+    }
+
+    fetchMetrics()
+  }, [])
 
   return (
     <PrivateRoute>
@@ -42,10 +58,30 @@ export default function DashboardPage() {
 
           {/* Stats Grid */}
           <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <StatsCard title="Subscribers" value="1,234" icon={Users} description="+12% this month" />
-            <StatsCard title="Total Revenue" value="$12,345" icon={DollarSign} description="+8% this month" />
-            <StatsCard title="Likes" value="5,678" icon={Heart} description="+23% this month" />
-            <StatsCard title="Content Published" value="89" icon={TrendingUp} description="This month: 12" />
+            <StatsCard
+              title="Subscribers"
+              value={metrics ? String(metrics.profile.subscribers) : "-"}
+              icon={Users}
+              description="Subscribers"
+            />
+            <StatsCard
+              title="Total Revenue"
+              value={metrics ? `$${metrics.profile.total_earnings}` : "-"}
+              icon={DollarSign}
+              description="Total earnings"
+            />
+            <StatsCard
+              title="Likes"
+              value={metrics ? String(metrics.metrics.total_likes) : "-"}
+              icon={Heart}
+              description="Total likes on your posts"
+            />
+            <StatsCard
+              title="Content Published"
+              value={metrics ? String(metrics.profile.posts_count) : "-"}
+              icon={TrendingUp}
+              description="Total posts published"
+            />
           </div>
 
           {/* Quick Actions */}
@@ -114,30 +150,51 @@ export default function DashboardPage() {
             <Card className="border-[#D4AF37]/20 bg-black/50">
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  <ActivityItem
-                    icon={<Heart className="h-5 w-5" />}
-                    title="New Like"
-                    description="@usuario123 liked your post"
-                    time="5 minutes ago"
-                  />
-                  <ActivityItem
-                    icon={<Users className="h-5 w-5" />}
-                    title="New Subscription"
-                    description="@fan_elite subscribed to your content"
-                    time="1 hour ago"
-                  />
-                  <ActivityItem
-                    icon={<DollarSign className="h-5 w-5" />}
-                    title="Payment Received"
-                    description="You received $29.99 from subscriptions"
-                    time="3 hours ago"
-                  />
-                  <ActivityItem
-                    icon={<Video className="h-5 w-5" />}
-                    title="Content Published"
-                    description="Your video was published successfully"
-                    time="5 hours ago"
-                  />
+                  {metrics && metrics.recent ? (
+                    <>
+                      {metrics.recent.likes.map((l: any) => (
+                        <ActivityItem
+                          key={`like-${l.id}`}
+                          icon={<Heart className="h-5 w-5" />}
+                          title="New Like"
+                          description={`@${l.username} liked your post`}
+                          time={new Date(l.created_at).toLocaleString()}
+                        />
+                      ))}
+
+                      {metrics.recent.subscriptions.map((s: any) => (
+                        <ActivityItem
+                          key={`sub-${s.id}`}
+                          icon={<Users className="h-5 w-5" />}
+                          title="New Subscription"
+                          description={`@${s.username} subscribed`}
+                          time={new Date(s.created_at || s.start_date).toLocaleString()}
+                        />
+                      ))}
+
+                      {metrics.recent.transactions.map((t: any) => (
+                        <ActivityItem
+                          key={`tx-${t.id}`}
+                          icon={<DollarSign className="h-5 w-5" />}
+                          title="Payment Received"
+                          description={`You received $${t.amount} (${t.type}) from @${t.username}`}
+                          time={new Date(t.created_at).toLocaleString()}
+                        />
+                      ))}
+
+                      {metrics.recent.comments.map((c: any) => (
+                        <ActivityItem
+                          key={`c-${c.id}`}
+                          icon={<ImageIcon className="h-5 w-5" />}
+                          title="New Comment"
+                          description={`@${c.username}: ${c.content}`}
+                          time={new Date(c.created_at).toLocaleString()}
+                        />
+                      ))}
+                    </>
+                  ) : (
+                    <p className="text-[#D4AF37]/60">No recent activity</p>
+                  )}
                 </div>
               </CardContent>
             </Card>

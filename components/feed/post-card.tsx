@@ -7,8 +7,10 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Heart, MessageCircle, Share2, Lock } from "lucide-react"
+import { useEffect } from "react"
 
 interface PostCardProps {
+  postId?: string
   creator: {
     name: string
     username: string
@@ -24,17 +26,90 @@ interface PostCardProps {
   isSubscribed?: boolean
 }
 
-export function PostCard({ creator, content, isSubscribed = false }: PostCardProps) {
+export function PostCard({ postId, creator, content, isSubscribed = false }: PostCardProps) {
   const [liked, setLiked] = useState(false)
   const [likes, setLikes] = useState(content.likes)
+  const [commentText, setCommentText] = useState("")
+  const [comments, setComments] = useState(content.comments)
+  const [commenting, setCommenting] = useState(false)
+
+  useEffect(() => {
+    if (!postId) return
+    let mounted = true
+    fetch(`/api/likes?postId=${encodeURIComponent(postId)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (!mounted) return
+        if (json && typeof json.liked === "boolean") setLiked(Boolean(json.liked))
+        if (json && json.like_count != null) setLikes(Number(json.like_count))
+      })
+      .catch(() => {})
+    return () => {
+      mounted = false
+    }
+  }, [postId])
 
   const handleLike = () => {
-    if (liked) {
-      setLikes(likes - 1)
-    } else {
-      setLikes(likes + 1)
+    // OPTIMISTIC UI
+    const prevLiked = liked
+    const prevLikes = likes
+    setLiked((s) => !s)
+    setLikes((l) => (liked ? Math.max(0, l - 1) : l + 1))
+
+    fetch(`/api/likes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId: postId }),
+    })
+      .then(async (res) => {
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok) {
+          // rollback
+          setLiked(prevLiked)
+          setLikes(prevLikes)
+          return
+        }
+
+        // Ajustar basado en respuesta del servidor (like_count o action)
+        if (json.like_count != null) {
+          setLikes(Number(json.like_count))
+        } else if (json.action === "already_liked") {
+          setLiked(true)
+        } else if (json.action === "unliked") {
+          setLiked(false)
+        }
+      })
+      .catch(() => {
+        setLiked(prevLiked)
+        setLikes(prevLikes)
+      })
+  }
+
+  const handleCommentSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault()
+    if (!commentText.trim()) return
+    setCommenting(true)
+    const prevComments = comments
+    setComments((c) => c + 1)
+
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ postId: postId, text: commentText.trim() }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        setComments(prevComments)
+      } else {
+        setCommentText("")
+        // Optionally use returned comment (json.comment)
+      }
+    } catch (err) {
+      setComments(prevComments)
+    } finally {
+      setCommenting(false)
     }
-    setLiked(!liked)
   }
 
   return (

@@ -142,6 +142,7 @@ export default async function FeedPage() {
                   return (
                     <div key={post.id} className="mx-auto w-full max-w-xl"> {/* LIMIT EACH POST WIDTH TO max-w-xl */}
                       <PostCard
+                        postId={post.id}
                         creator={{ name: post.full_name || post.username || "Creator", username: post.username || "", avatar: post.avatar_url || "/placeholder-user.jpg" }}
                         content={{
                           type: showLocked
