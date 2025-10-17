@@ -2,9 +2,8 @@ import { PrivateRoute } from "@/components/auth/private-route"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { PostCard } from "@/components/feed/post-card"
 import { CreatorCard } from "@/components/feed/creator-card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Search, TrendingUp, Users, Heart, Star } from "lucide-react"
 import { createServerClient } from "@/lib/supabase/server"
 
 type PostRow = {
@@ -25,13 +24,11 @@ type PostRow = {
   isOwn?: boolean
 }
 
-// CONSTANTES
 const FEED_LIMIT = 20
 
 async function getFeedData() {
   const supabase = await createServerClient()
 
-  // TRAER POSTS PUBLICOS Y RELACIONADOS CON PERFILES (LIMIT)
   const { data: posts, error } = await supabase
     .from("posts")
     .select(`*, profiles:profiles(id, username, full_name, avatar_url)`)
@@ -43,11 +40,9 @@ async function getFeedData() {
     return { posts: [] as PostRow[], creators: [] }
   }
 
-  // OBTENER USUARIO ACTUAL PARA VERIFICAR SUSCRIPCIONES
   const { data: userData } = await supabase.auth.getUser()
   const currentUserId = userData?.user?.id
 
-  // TRAER SUSCRIPCIONES ACTIVAS DEL USUARIO ACTUAL
   let subscribedCreatorIds: string[] = []
   if (currentUserId) {
     const { data: subs } = await supabase
@@ -58,7 +53,6 @@ async function getFeedData() {
     subscribedCreatorIds = (subs || []).map((s: any) => s.creator_id)
   }
 
-  // MAPEAR POSTS AL SHAPE ESPERADO POR PostCard
   const mapped = (posts as any[]).map((p) => ({
     id: p.id,
     creator_id: p.creator_id,
@@ -77,13 +71,11 @@ async function getFeedData() {
     isOwn: currentUserId ? currentUserId === p.creator_id : false,
   }))
 
-  // PRIORITIZAR POSTS DE CREADORES SUSCRITOS: MOVER AL TOPE
   mapped.sort((a: any, b: any) => {
     if (a.isSubscribed === b.isSubscribed) return 0
     return a.isSubscribed ? -1 : 1
   })
 
-  // TRAER CREADORES SUGERIDOS
   const { data: creators } = await supabase
     .from("profiles")
     .select("username, full_name, avatar_url, cover_url, subscriber_count")
@@ -98,108 +90,162 @@ export default async function FeedPage() {
 
   return (
     <PrivateRoute>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-gradient-to-br from-black via-black to-[#0A0A0A] overflow-hidden">
         <DashboardHeader />
-        <main className="container mx-auto px-4 py-8">
-          {/* Top search and title */}
-          <div className="mb-6">
-            <h1 className="mb-4 text-3xl font-bold text-[#D4AF37]">Explore</h1>
-            <div className="relative max-w-xl">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#D4AF37]/50" />
-                <Input
-                placeholder="Search creators..."
-                className="border-[#D4AF37]/30 bg-black/50 pl-10 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]"
-              />
+
+        <main className="relative container mx-auto px-3 py-6 flex gap-6 h-[calc(100vh-6rem)]">
+          {/* Sidebar izquierda */}
+          <aside className="hidden lg:block lg:w-72">
+            <div className="sticky top-0 space-y-4">
+              <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
+                <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Explorar
+                </h3>
+                <ul className="space-y-2">
+                  <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] transition-all duration-200 font-medium">
+                    Para ti
+                  </li>
+                  <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all duration-200">
+                    Siguiendo
+                  </li>
+                  <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all duration-200">
+                    Popular
+                  </li>
+                  <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all duration-200">
+                    Categorías
+                  </li>
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
+                <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
+                  <Star className="h-5 w-5" />
+                  Filtros
+                </h3>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20"
+                    />
+                    <span className="text-sm text-[#D4AF37]/80">Solo imágenes</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20"
+                    />
+                    <span className="text-sm text-[#D4AF37]/80">Solo videos</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20"
+                    />
+                    <span className="text-sm text-[#D4AF37]/80">Contenido premium</span>
+                  </label>
+                </div>
+              </div>
             </div>
-          </div>
+          </aside>
 
-          {/* 3-column layout: left nav, main feed, right suggestions */}
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            {/* Left - compact nav / filters */}
-            <aside className="hidden lg:block lg:col-span-2">
-              <div className="sticky top-24 space-y-4">
-                <div className="rounded border border-[#D4AF37]/20 bg-black/50 p-3">
-                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Browse</h3>
-                  <ul className="space-y-2 text-[#D4AF37]/80 text-sm">
-                      <li className="cursor-pointer hover:text-[#D4AF37]">For you</li>
-                      <li className="cursor-pointer hover:text-[#D4AF37]">Following</li>
-                      <li className="cursor-pointer hover:text-[#D4AF37]">Popular</li>
-                      <li className="cursor-pointer hover:text-[#D4AF37]">Categories</li>
-                  </ul>
+          {/* Feed principal */}
+          <section className="flex-1 space-y-6 overflow-y-auto scrollbar-hide pr-2 h-full">
+            <div className="mb-6 text-center">
+              <h1 className="mb-3 text-3xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#F4BF37] to-[#D4AF37] bg-clip-text text-transparent">
+                Descubre Contenido Exclusivo
+              </h1>
+              <p className="text-[#D4AF37]/70 text-base mb-5">Explora el mejor contenido de tus creadores favoritos</p>
+
+              <div className="relative max-w-xl mx-auto">
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#D4AF37]/50" />
+                <Input
+                  placeholder="Buscar creadores, contenido..."
+                  className="border-[#D4AF37]/30 bg-black/50 backdrop-blur-sm pl-12 pr-4 py-2.5 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]/60 focus:ring-2 focus:ring-[#D4AF37]/20 rounded-full text-center shadow-lg shadow-[#D4AF37]/10"
+                />
+              </div>
+            </div>
+
+            {posts.map((post) => {
+              const showLocked = post.is_locked && !post.isSubscribed && !post.isOwn
+              return (
+                <div key={post.id} className="mx-auto w-full max-w-xl">
+                  <PostCard
+                    postId={post.id}
+                    creator={{
+                      name: post.full_name || post.username || "Creator",
+                      username: post.username || "",
+                      avatar: post.avatar_url || "/placeholder-user.jpg",
+                    }}
+                    content={{
+                      type: showLocked ? "locked" : post.media_type === "video" ? "video" : "image",
+                      url: showLocked ? undefined : (post.media_urls && post.media_urls[0]) || undefined,
+                      description: post.content || "",
+                      likes: post.like_count || 0,
+                      comments: post.comment_count || 0,
+                    }}
+                    isSubscribed={post.isSubscribed}
+                  />
                 </div>
-                <div className="rounded border border-[#D4AF37]/20 bg-black/50 p-3">
-                    <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Filters</h3>
-                    <p className="text-xs text-[#D4AF37]/70">Show images only</p>
+              )
+            })}
+          </section>
+
+          {/* Sidebar derecha */}
+          <aside className="hidden lg:block lg:w-72">
+            <div className="sticky top-0 space-y-4">
+              <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
+                <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Creadores Sugeridos
+                </h3>
+                <div className="space-y-3">
+                  {creators.map((creator: any, index: number) => (
+                    <CreatorCard
+                      key={index}
+                      name={creator.full_name || creator.username}
+                      username={creator.username}
+                      avatar={creator.avatar_url || "/placeholder-user.jpg"}
+                      coverImage={creator.cover_url || creator.avatar_url || "/placeholder.jpg"}
+                      subscribers={creator.subscriber_count || 0}
+                      isSubscribed={false}
+                    />
+                  ))}
                 </div>
               </div>
-            </aside>
 
-            {/* Main feed */}
-            <section className="col-span-1 lg:col-span-7">
-              <div className="space-y-3"> {/* LESS SPACE BETWEEN POSTS */}
-                {posts.map((post) => {
-                  const showLocked = post.is_locked && !post.isSubscribed && !post.isOwn
-                  return (
-                    <div key={post.id} className="mx-auto w-full max-w-xl"> {/* LIMIT EACH POST WIDTH TO max-w-xl */}
-                      <PostCard
-                        postId={post.id}
-                        creator={{ name: post.full_name || post.username || "Creator", username: post.username || "", avatar: post.avatar_url || "/placeholder-user.jpg" }}
-                        content={{
-                          type: showLocked
-                            ? "locked"
-                            : post.media_type === "video"
-                            ? "video"
-                            : "image",
-                          url: showLocked ? undefined : (post.media_urls && post.media_urls[0]) || undefined,
-                          description: post.content || "",
-                          likes: post.like_count || 0,
-                          comments: post.comment_count || 0,
-                        }}
-                        isSubscribed={post.isSubscribed}
+              <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
+                <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
+                  <Heart className="h-5 w-5" />
+                  Tendencias
+                </h3>
+                <div className="space-y-3">
+                  {posts.slice(0, 3).map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex items-center gap-3 p-2.5 rounded-xl bg-black/30 hover:bg-black/50 transition-all duration-200 cursor-pointer group"
+                    >
+                      <img
+                        src={p.avatar_url || "/placeholder-user.jpg"}
+                        alt={p.username}
+                        className="h-10 w-10 rounded-full object-cover border-2 border-[#D4AF37]/30 group-hover:border-[#D4AF37]/50 transition-all duration-200"
                       />
-                    </div>
-                  )
-                })}
-              </div>
-            </section>
-
-            {/* Right - suggestions */}
-            <aside className="col-span-1 lg:col-span-3">
-              <div className="sticky top-24 space-y-4">
-                <div className="rounded border border-[#D4AF37]/10 bg-black/50 p-4">
-                  <h3 className="mb-3 text-sm font-semibold text-[#D4AF37]">Suggestions for you</h3>
-                  <div className="space-y-3">
-                    {creators.map((creator: any, index: number) => (
-                      <CreatorCard
-                        key={index}
-                        name={creator.full_name || creator.username}
-                        username={creator.username}
-                        avatar={creator.avatar_url || "/placeholder-user.jpg"}
-                        coverImage={creator.cover_url || creator.avatar_url || "/placeholder.jpg"}
-                        subscribers={creator.subscriber_count || 0}
-                        isSubscribed={false}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                  <div className="rounded border border-[#D4AF37]/10 bg-black/50 p-4">
-                  <h3 className="mb-2 text-sm font-semibold text-[#D4AF37]">Popular Content</h3>
-                  <div className="space-y-2">
-                    {posts.slice(0, 3).map((p) => (
-                      <div key={p.id} className="flex items-center gap-3">
-                        <img src={p.avatar_url || "/placeholder-user.jpg"} alt={p.username} className="h-10 w-10 rounded object-cover" />
-                        <div>
-                          <p className="text-sm text-[#D4AF37]">{p.full_name || p.username}</p>
-                          <p className="text-xs text-[#D4AF37]/70">{p.like_count} likes</p>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-[#D4AF37] group-hover:text-[#F4BF37] transition-colors">
+                          {p.full_name || p.username}
+                        </p>
+                        <div className="flex items-center gap-2 text-xs text-[#D4AF37]/70">
+                          <Heart className="h-3 w-3" />
+                          <span>{p.like_count} likes</span>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </aside>
-          </div>
+            </div>
+          </aside>
         </main>
       </div>
     </PrivateRoute>
