@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
@@ -135,7 +137,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
     setLoadingComments(true)
     try {
       const offset = reset ? 0 : commentsOffset
-      const res = await fetch(`/api/comments?postId=${encodeURIComponent(postId)}&limit=${COMMENTS_PAGE}&offset=${offset}`)
+      const res = await fetch(
+        `/api/comments?postId=${encodeURIComponent(postId)}&limit=${COMMENTS_PAGE}&offset=${offset}`,
+      )
       const json = await res.json()
       if (res.ok && json?.comments) {
         const items = json.comments as any[]
@@ -157,9 +161,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
   const handleCommentLike = async (commentId: string) => {
     try {
       // optimistic UI: toggle locally
-      setCommentList((list) =>
-        list.map((c) => (c.id === commentId ? { ...c, liking: true } : c)),
-      )
+      setCommentList((list) => list.map((c) => (c.id === commentId ? { ...c, liking: true } : c)))
       const res = await fetch("/api/comment-likes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -167,7 +169,13 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
       })
       const json = await res.json().catch(() => ({}))
       if (res.ok) {
-        setCommentList((list) => list.map((c) => (c.id === commentId ? { ...c, liked: json.action === "liked", like_count: json.like_count ?? c.like_count } : c)))
+        setCommentList((list) =>
+          list.map((c) =>
+            c.id === commentId
+              ? { ...c, liked: json.action === "liked", like_count: json.like_count ?? c.like_count }
+              : c,
+          ),
+        )
       }
     } catch (err) {
       // ignore
@@ -250,22 +258,24 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
                 </div>
               )}
             </div>
-            <p className="text-sm text-[#D4AF37]/70 hover:text-[#D4AF37]/90 transition-colors">
-              @{creator.username}
-            </p>
+            <p className="text-sm text-[#D4AF37]/70 hover:text-[#D4AF37]/90 transition-colors">@{creator.username}</p>
           </div>
         </Link>
-        
+
         <div className="flex items-center gap-2">
           {!isSubscribed && (
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               className="bg-gradient-to-r from-[#D4AF37] to-[#F4BF37] text-black hover:from-[#C9A961] hover:to-[#D4AF37] font-semibold px-6 py-2 rounded-full shadow-lg shadow-[#D4AF37]/30 transition-all duration-200 hover:scale-105"
             >
               Seguir
             </Button>
           )}
-          <Button variant="ghost" size="sm" className="text-[#D4AF37]/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-full">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-[#D4AF37]/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-full"
+          >
             <MoreHorizontal className="h-5 w-5" />
           </Button>
         </div>
@@ -295,14 +305,17 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
             <video
               src={content.url}
               controls
-              preload="metadata"
-              className="w-full h-auto max-h-[600px] object-contain transition-transform duration-300 group-hover:scale-105"
-              playsInline
+              controlsList="nodownload"
+              autoPlay
+              loop
               muted
+              preload="metadata"
+              className="w-full h-auto max-h-[600px] object-contain transition-transform duration-300 group-hover:scale-105 video-gold-controls"
+              playsInline
             >
               Your browser does not support the video tag.
             </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
           </div>
         ) : (
           <div className="relative w-full overflow-hidden bg-black group">
@@ -329,15 +342,15 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
               size="sm"
               onClick={handleLike}
               className={`gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
-                liked 
-                  ? "text-red-500 bg-red-500/10 hover:bg-red-500/20 scale-110" 
+                liked
+                  ? "text-red-500 bg-red-500/10 hover:bg-red-500/20 scale-110"
                   : "text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105"
               }`}
             >
               <Heart className={`h-5 w-5 transition-all duration-200 ${liked ? "fill-current animate-pulse" : ""}`} />
               <span className="font-semibold">{likes}</span>
             </Button>
-            
+
             <Button
               variant="ghost"
               size="sm"
@@ -353,23 +366,23 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
               <MessageCircle className="h-5 w-5" />
               <span className="font-semibold">{comments}</span>
             </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm" 
+
+            <Button
+              variant="ghost"
+              size="sm"
               className="gap-2 px-4 py-2 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
             >
               <Share2 className="h-5 w-5" />
             </Button>
           </div>
-          
+
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setBookmarked(!bookmarked)}
             className={`p-2 rounded-full transition-all duration-200 ${
-              bookmarked 
-                ? "text-[#D4AF37] bg-[#D4AF37]/10 scale-110" 
+              bookmarked
+                ? "text-[#D4AF37] bg-[#D4AF37]/10 scale-110"
                 : "text-[#D4AF37]/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:scale-105"
             }`}
           >
@@ -380,9 +393,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
         {/* Descripción del post */}
         {content.description && (
           <div className="w-full">
-            <p className="text-[#D4AF37]/90 leading-relaxed text-sm">
-              {content.description}
-            </p>
+            <p className="text-[#D4AF37]/90 leading-relaxed text-sm">{content.description}</p>
           </div>
         )}
       </CardFooter>
@@ -428,7 +439,10 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
               </div>
             ) : (
               commentList.map((c) => (
-                <div key={c.id} className="flex flex-col gap-2 p-3 rounded-2xl bg-black/30 border border-[#D4AF37]/10 hover:bg-black/40 transition-all duration-200">
+                <div
+                  key={c.id}
+                  className="flex flex-col gap-2 p-3 rounded-2xl bg-black/30 border border-[#D4AF37]/10 hover:bg-black/40 transition-all duration-200"
+                >
                   <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8 border border-[#D4AF37]/30">
                       <AvatarImage src={c.profiles?.avatar_url || "/placeholder.svg"} />
@@ -441,16 +455,14 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
                         <span className="font-semibold text-[#D4AF37] text-sm">
                           {c.profiles?.full_name || `@${c.profiles?.username}`}
                         </span>
-                        <span className="text-xs text-[#D4AF37]/50">
-                          {new Date(c.created_at).toLocaleString()}
-                        </span>
+                        <span className="text-xs text-[#D4AF37]/50">{new Date(c.created_at).toLocaleString()}</span>
                       </div>
                       <p className="text-sm text-[#D4AF37]/90 leading-relaxed mb-2">{c.content}</p>
                       <div className="flex items-center gap-4 text-xs">
                         <button
                           className={`flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-200 ${
-                            c.liked 
-                              ? "text-red-400 bg-red-400/10" 
+                            c.liked
+                              ? "text-red-400 bg-red-400/10"
                               : "text-[#D4AF37]/70 hover:text-red-400 hover:bg-red-400/10"
                           }`}
                           onClick={() => handleCommentLike(c.id)}
@@ -458,15 +470,15 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
                           <Heart className={`h-3 w-3 ${c.liked ? "fill-current" : ""}`} />
                           <span>{c.like_count ?? 0}</span>
                         </button>
-                        <button 
-                          className="text-[#D4AF37]/70 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200" 
+                        <button
+                          className="text-[#D4AF37]/70 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
                           onClick={() => setReplyingTo(c.id)}
                         >
                           Responder
                         </button>
                         {c.profiles?.id === "me" && (
-                          <button 
-                            className="text-red-400/70 hover:text-red-400 px-2 py-1 rounded-full hover:bg-red-400/10 transition-all duration-200" 
+                          <button
+                            className="text-red-400/70 hover:text-red-400 px-2 py-1 rounded-full hover:bg-red-400/10 transition-all duration-200"
                             onClick={() => handleCommentDelete(c.id)}
                           >
                             Eliminar
@@ -484,14 +496,14 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
                         placeholder="Escribe una respuesta..."
                         className="flex-1 rounded-full bg-black/40 border border-[#D4AF37]/20 px-3 py-1 text-sm text-[#D4AF37] placeholder:text-[#D4AF37]/50 focus:border-[#D4AF37]/50 focus:outline-none"
                       />
-                      <button 
-                        className="rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-semibold text-black hover:bg-[#C9A961] transition-colors" 
+                      <button
+                        className="rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-semibold text-black hover:bg-[#C9A961] transition-colors"
                         onClick={() => handleReplySubmit(c.id)}
                       >
                         Responder
                       </button>
-                      <button 
-                        className="text-xs text-[#D4AF37]/60 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200" 
+                      <button
+                        className="text-xs text-[#D4AF37]/60 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
                         onClick={() => setReplyingTo(null)}
                       >
                         Cancelar
