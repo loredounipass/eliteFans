@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { DollarSign, Heart, ImageIcon, TrendingUp, Upload, Users, Video } from "lucide-react"
 import { CreatePostDialog } from "@/components/dashboard/create-post-dialog"
+import Link from "next/link"
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
@@ -115,12 +116,14 @@ export default function DashboardPage() {
                   <CardDescription className="text-[#D4AF37]/60">Manage your photos and videos</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button
-                    variant="outline"
-                    className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 bg-transparent"
-                  >
-                    View Gallery
-                  </Button>
+                  <Link href="/dashboard/gallery">
+                    <Button
+                      variant="outline"
+                      className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 bg-transparent"
+                    >
+                      View Gallery
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
 
