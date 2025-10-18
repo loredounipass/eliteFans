@@ -48,64 +48,28 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
 
   const handleSubscribe = async () => {
     setIsLoading(true)
-    const supabase = createBrowserClient()
-
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        router.push("/")
-        return
-      }
-
+      const supabase = createBrowserClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return void router.push("/")
       if (isSubscribed) {
-        // Unsubscribe
-        const { error } = await supabase
-          .from("subscriptions")
-          .update({ status: "cancelled" })
-          .eq("subscriber_id", user.id)
-          .eq("creator_id", profile.id)
-
-        if (!error) {
-          setIsSubscribed(false)
-        }
+        const { error } = await supabase.from("subscriptions").update({ status: "cancelled" }).eq("subscriber_id", user.id).eq("creator_id", profile.id)
+        if (!error) setIsSubscribed(false)
       } else {
-        // Subscribe
-        const { error } = await supabase.from("subscriptions").insert({
-          subscriber_id: user.id,
-          creator_id: profile.id,
-          amount: profile.subscription_price || 0,
-          status: "active",
-          start_date: new Date().toISOString(),
-        })
-
-        if (!error) {
-          setIsSubscribed(true)
-        }
+        const { error } = await supabase.from("subscriptions").insert({ subscriber_id: user.id, creator_id: profile.id, amount: profile.subscription_price || 0, status: "active", start_date: new Date().toISOString() })
+        if (!error) setIsSubscribed(true)
       }
-
       router.refresh()
-    } catch (error) {
-      console.error("Subscription error:", error)
+    } catch (err) {
+      console.error("Subscription error:", err)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleFollowChange = (isFollowing: boolean) => {
-    if (isFollowing) {
-      setFollowersCount(prev => prev + 1)
-    } else {
-      setFollowersCount(prev => Math.max(0, prev - 1))
-    }
-  }
+  const handleFollowChange = (isFollowing: boolean) => setFollowersCount((p) => Math.max(0, p + (isFollowing ? 1 : -1)))
 
-  const createdDate = new Date(profile.created_at).toLocaleDateString("es-ES", {
-    month: "long",
-    year: "numeric",
-  })
+  const createdDate = new Date(profile.created_at).toLocaleDateString("es-ES", { month: "long", year: "numeric" })
 
   return (
     <div className="mb-8 relative">
@@ -196,22 +160,20 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
                   </div>
                   <div className="group cursor-pointer">
                     <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
+                      {profile.subscriber_count ?? 0}
+                    </span>
+                    <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
+                      suscriptores
+                    </span>
+                  </div>
+                  <div className="group cursor-pointer">
+                    <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
                       {followingCount}
                     </span>
                     <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
                       siguiendo
                     </span>
                   </div>
-                  {profile.is_creator && (
-                    <div className="group cursor-pointer">
-                      <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
-                        {profile.subscriber_count || 0}
-                      </span>
-                      <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
-                        suscriptores
-                      </span>
-                    </div>
-                  )}
                   <div className="group cursor-pointer">
                     <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
                       {profile.post_count ?? 0}

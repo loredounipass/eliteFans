@@ -18,81 +18,48 @@ export function FollowButton({ userId, initialIsFollowing = false, onFollowChang
   const [currentUser, setCurrentUser] = useState<any>(null)
   const { toast } = useToast()
 
+  const postJson = async (url: string, body: any) => {
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+    const json = await res.json().catch(() => ({}))
+    return { ok: res.ok, json }
+  }
+
+  const delFetch = async (url: string) => {
+    const res = await fetch(url, { method: "DELETE" })
+    const json = await res.json().catch(() => ({}))
+    return { ok: res.ok, json }
+  }
+
   useEffect(() => {
-    const supabase = getSupabaseBrowserClient()
-    
-    // Get current user
-    const getCurrentUser = async () => {
+    ;(async () => {
+      const supabase = getSupabaseBrowserClient()
       const { data: { user } } = await supabase.auth.getUser()
       setCurrentUser(user)
-      
-      if (user && user.id !== userId) {
-        // Check if already following
-        const { data } = await supabase
-          .from("follows")
-          .select("id")
-          .eq("follower_id", user.id)
-          .eq("following_id", userId)
-          .maybeSingle()
-        
-        setIsFollowing(!!data)
-      }
-    }
-
-    getCurrentUser()
+      if (!user || user.id === userId) return
+      const { data } = await supabase.from("follows").select("id").eq("follower_id", user.id).eq("following_id", userId).maybeSingle()
+      setIsFollowing(!!data)
+    })()
   }, [userId])
 
   const handleFollow = async () => {
     if (!currentUser || currentUser.id === userId) return
-
     setIsLoading(true)
-    
     try {
       if (isFollowing) {
-        // Unfollow
-        const response = await fetch(`/api/follows?following_id=${userId}`, {
-          method: "DELETE",
-        })
-
-        if (!response.ok) {
-          const error = await response.json()
-          throw new Error(error.error || "Failed to unfollow")
-        }
-
+        const { ok, json } = await delFetch(`/api/follows?following_id=${userId}`)
+        if (!ok) throw new Error(json.error || "Failed to unfollow")
         setIsFollowing(false)
         onFollowChange?.(false)
-        toast({
-          title: "Unfollowed",
-          description: "You are no longer following this user",
-        })
+        toast({ title: "Unfollowed", description: "You are no longer following this user" })
       } else {
-        // Follow
-        const response = await fetch("/api/follows", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ following_id: userId }),
-        })
-
-        if (!response.ok) {
-          const error = await response.json()
-          throw new Error(error.error || "Failed to follow")
-        }
-
+        const { ok, json } = await postJson("/api/follows", { following_id: userId })
+        if (!ok) throw new Error(json.error || "Failed to follow")
         setIsFollowing(true)
         onFollowChange?.(true)
-        toast({
-          title: "Following",
-          description: "You are now following this user",
-        })
+        toast({ title: "Following", description: "You are now following this user" })
       }
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      })
+      toast({ title: "Error", description: error.message, variant: "destructive" })
     } finally {
       setIsLoading(false)
     }

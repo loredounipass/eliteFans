@@ -48,6 +48,23 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
   const { toast } = useToast()
   const COMMENTS_PAGE = 10
 
+  // --- Helpers to reduce repetition and keep behavior identical ---
+  const postJson = async (url: string, body?: any, method = "POST") => {
+    const res = await fetch(url, {
+      method,
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    })
+    const json = await res.json().catch(() => ({}))
+    return { ok: res.ok, json }
+  }
+
+  const getProfileId = async (username: string) => {
+    const supabase = getSupabaseBrowserClient()
+    const profileRes = await supabase.from("profiles").select("id").eq("username", username).maybeSingle()
+    return (profileRes.data as any)?.id ?? null
+  }
+
   useEffect(() => {
     if (!postId) return
     let mounted = true
@@ -69,87 +86,43 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
     let mounted = true
     const supabase = getSupabaseBrowserClient()
 
-    const checkFollow = async () => {
+    ;(async () => {
       try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    setCurrentUserId(user.id)
-        // creator here may contain username; follow-button uses creator id (userId) elsewhere
-        // we assume `creator.username` maps to profile.username and follow table stores auth.users.id
-        // attempt to check follows by resolving profile -> id via profiles table
-  const profileRes = await supabase.from("profiles").select("id").eq("username", creator.username).maybeSingle()
-  const targetId = (profileRes.data as any)?.id
-    if (targetId) setCreatorProfileId(targetId)
-    if (!targetId) return
-
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+        setCurrentUserId(user.id)
+        const targetId = await getProfileId(creator.username)
+        if (targetId) setCreatorProfileId(targetId)
+        if (!targetId) return
         const { data } = await supabase
           .from("follows")
           .select("id")
           .eq("follower_id", user.id)
           .eq("following_id", targetId)
           .maybeSingle()
-
         if (!mounted) return
         setIsFollowing(!!data)
       } catch (err) {
         // ignore
       }
-    }
+    })()
 
-    checkFollow()
     return () => {
       mounted = false
     }
   }, [creator.username])
 
   const handleFollowToggle = async () => {
+    setFollowLoading(true)
     try {
-      setFollowLoading(true)
-      // Try using the API toggle endpoint
-      // prefer cached creatorProfileId resolved during mount
-      let targetId = creatorProfileId
-      if (!targetId) {
-        const profileRes = await getSupabaseBrowserClient()
-          .from("profiles")
-          .select("id")
-          .eq("username", creator.username)
-          .maybeSingle()
-        targetId = (profileRes.data as any)?.id
-      }
-      if (!targetId) {
-        toast({ title: "Usuario no encontrado", description: "No se encontró el usuario a seguir", variant: "destructive" })
-        setFollowLoading(false)
-        return
-      }
-
-      // Prevent following yourself as a safety check
-      if (currentUserId && targetId && currentUserId === targetId) {
-        setFollowLoading(false)
-        return
-      }
-
-      const res = await fetch("/api/follows", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ following_id: targetId }),
-      })
-
-      const json = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        toast({ title: "Error", description: json.error || "No se pudo actualizar follow", variant: "destructive" })
-        return
-      }
-
-      if (json.action === "unfollowed") {
-        setIsFollowing(false)
-        toast({ title: "Unfollowed", description: "Has dejado de seguir a este usuario" })
-      } else if (json.action === "followed") {
-        setIsFollowing(true)
-        toast({ title: "Following", description: "Ahora sigues a este usuario" })
-      } else {
-        // fallback toggle
-        setIsFollowing((s) => !s)
-      }
+      const targetId = (creatorProfileId ?? (await getProfileId(creator.username))) as string | null
+      if (!targetId) return toast({ title: "Usuario no encontrado", description: "No se encontró el usuario a seguir", variant: "destructive" })
+      if (currentUserId === targetId) return
+      const { ok, json } = await postJson("/api/follows", { following_id: targetId })
+      if (!ok) return toast({ title: "Error", description: json.error || "No se pudo actualizar follow", variant: "destructive" })
+      if (json.action === "unfollowed") setIsFollowing(false)
+      else if (json.action === "followed") setIsFollowing(true)
+      else setIsFollowing((s) => !s)
     } catch (err) {
       toast({ title: "Error", description: "No se pudo actualizar follow", variant: "destructive" })
     } finally {
@@ -157,40 +130,26 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
     }
   }
 
-  const handleLike = () => {
-    // OPTIMISTIC UI
+  const handleLike = async () => {
+    // optimistic UI
     const prevLiked = liked
     const prevLikes = likes
     setLiked((s) => !s)
     setLikes((l) => (liked ? Math.max(0, l - 1) : l + 1))
-
-    fetch(`/api/likes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ postId: postId }),
-    })
-      .then(async (res) => {
-        const json = await res.json().catch(() => ({}))
-        if (!res.ok) {
-          // rollback
-          setLiked(prevLiked)
-          setLikes(prevLikes)
-          return
-        }
-
-        // Ajustar basado en respuesta del servidor (like_count o action)
-        if (json.like_count != null) {
-          setLikes(Number(json.like_count))
-        } else if (json.action === "already_liked") {
-          setLiked(true)
-        } else if (json.action === "unliked") {
-          setLiked(false)
-        }
-      })
-      .catch(() => {
+    try {
+      const { ok, json } = await postJson("/api/likes", { postId })
+      if (!ok) {
         setLiked(prevLiked)
         setLikes(prevLikes)
-      })
+        return
+      }
+      if (json.like_count != null) setLikes(Number(json.like_count))
+      else if (json.action === "already_liked") setLiked(true)
+      else if (json.action === "unliked") setLiked(false)
+    } catch (e) {
+      setLiked(prevLiked)
+      setLikes(prevLikes)
+    }
   }
 
   const handleCommentSubmit = async (e?: React.FormEvent) => {
@@ -209,20 +168,13 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
     if (showComments) setCommentList((l) => [tempComment, ...l])
 
     try {
-      const res = await fetch("/api/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId: postId, text: commentText.trim() }),
-      })
-      const json = await res.json()
-      if (!res.ok) {
+      const { ok, json } = await postJson("/api/comments", { postId, text: commentText.trim() })
+      if (!ok) {
         setComments(prevComments)
         if (showComments) setCommentList((l) => l.filter((c) => c.id !== tempComment.id))
       } else {
         setCommentText("")
-        if (showComments && json?.comment) {
-          setCommentList((l) => [json.comment, ...l.filter((c) => c.id !== tempComment.id)])
-        }
+        if (showComments && json?.comment) setCommentList((l) => [json.comment, ...l.filter((c) => c.id !== tempComment.id)])
       }
     } catch (err) {
       setComments(prevComments)
@@ -237,12 +189,11 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
     setLoadingComments(true)
     try {
       const offset = reset ? 0 : commentsOffset
-      const res = await fetch(
-        `/api/comments?postId=${encodeURIComponent(postId)}&limit=${COMMENTS_PAGE}&offset=${offset}`,
-      )
-      const json = await res.json()
-      if (res.ok && json?.comments) {
-        const items = json.comments as any[]
+      const q = `/api/comments?postId=${encodeURIComponent(postId)}&limit=${COMMENTS_PAGE}&offset=${offset}`
+      const r = await fetch(q)
+      const j = await r.json().catch(() => ({}))
+      if (r.ok && j?.comments) {
+        const items = j.comments as any[]
         if (reset) {
           setCommentList(items)
           setCommentsOffset(items.length)
@@ -262,21 +213,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
     try {
       // optimistic UI: toggle locally
       setCommentList((list) => list.map((c) => (c.id === commentId ? { ...c, liking: true } : c)))
-      const res = await fetch("/api/comment-likes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ commentId }),
-      })
-      const json = await res.json().catch(() => ({}))
-      if (res.ok) {
-        setCommentList((list) =>
-          list.map((c) =>
-            c.id === commentId
-              ? { ...c, liked: json.action === "liked", like_count: json.like_count ?? c.like_count }
-              : c,
-          ),
-        )
-      }
+      const { ok, json } = await postJson("/api/comment-likes", { commentId })
+      if (ok) setCommentList((list) => list.map((c) => (c.id === commentId ? { ...c, liked: json.action === "liked", like_count: json.like_count ?? c.like_count } : c)))
     } catch (err) {
       // ignore
     }
@@ -284,8 +222,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
 
   const handleCommentDelete = async (commentId: string) => {
     try {
-      const res = await fetch(`/api/comments?id=${encodeURIComponent(commentId)}`, { method: "DELETE" })
-      if (res.ok) {
+      const r = await fetch(`/api/comments?id=${encodeURIComponent(commentId)}`, { method: "DELETE" })
+      if (r.ok) {
         setCommentList((l) => l.filter((c) => c.id !== commentId))
         setComments((c) => Math.max(0, c - 1))
       }
@@ -300,18 +238,11 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
   const handleReplySubmit = async (parentId: string) => {
     if (!replyText.trim()) return
     try {
-      const res = await fetch("/api/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId, text: replyText.trim(), parentId }),
-      })
-      const json = await res.json()
-      if (res.ok && json?.comment) {
-        // insert reply after parent
+      const { ok, json } = await postJson("/api/comments", { postId, text: replyText.trim(), parentId })
+      if (ok && json?.comment) {
         setCommentList((l) => {
           const idx = l.findIndex((c) => c.id === parentId)
           if (idx === -1) return [json.comment, ...l]
-          // insert right after parent
           const copy = [...l]
           copy.splice(idx + 1, 0, json.comment)
           return copy
