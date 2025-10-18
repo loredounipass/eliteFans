@@ -8,6 +8,7 @@ import { createBrowserClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
+import { FollowButton } from "./follow-button"
 
 const EditProfileDialog = dynamic(() => import("./edit-profile-dialog"))
 
@@ -22,6 +23,8 @@ interface ProfileHeaderProps {
     subscriber_count: number | null
     post_count: number | null
     likes?: number | null
+    followers_count?: number | null
+    following_count?: number | null
     subscription_price: number | null
     is_creator: boolean | null
     created_at: string
@@ -36,6 +39,8 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
   const [isLoading, setIsLoading] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [followersCount, setFollowersCount] = useState(profile.followers_count || 0)
+  const [followingCount, setFollowingCount] = useState(profile.following_count || 0)
 
   useEffect(() => {
     setMounted(true)
@@ -86,6 +91,14 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
       console.error("Subscription error:", error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleFollowChange = (isFollowing: boolean) => {
+    if (isFollowing) {
+      setFollowersCount(prev => prev + 1)
+    } else {
+      setFollowersCount(prev => Math.max(0, prev - 1))
     }
   }
 
@@ -171,16 +184,34 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
                   @{profile.username}
                 </p>
 
-                {/* Stats con animaciones */}
+                {/* Stats con animaciones - Incluye seguidores y siguiendo */}
                 <div className={`flex flex-wrap gap-6 text-sm transition-all duration-700 delay-400 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                   <div className="group cursor-pointer">
                     <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
-                      {profile.subscriber_count || 0}
+                      {followersCount}
                     </span>
                     <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
-                      suscriptores
+                      seguidores
                     </span>
                   </div>
+                  <div className="group cursor-pointer">
+                    <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
+                      {followingCount}
+                    </span>
+                    <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
+                      siguiendo
+                    </span>
+                  </div>
+                  {profile.is_creator && (
+                    <div className="group cursor-pointer">
+                      <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
+                        {profile.subscriber_count || 0}
+                      </span>
+                      <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
+                        suscriptores
+                      </span>
+                    </div>
+                  )}
                   <div className="group cursor-pointer">
                     <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
                       {profile.post_count ?? 0}
@@ -201,38 +232,46 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
               </div>
             </div>
 
-            {/* Botones mejorados */}
+            {/* Botones mejorados - Incluye botón de seguir */}
             <div className={`flex gap-3 transition-all duration-700 delay-600 ${mounted ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
               {!isOwnProfile && (
-                <Button
-                  onClick={handleSubscribe}
-                  disabled={isLoading}
-                  className={`group transition-all duration-300 hover:scale-110 shadow-lg ${
-                    isSubscribed
-                      ? "border-[#D4AF37] bg-transparent text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:shadow-[#D4AF37]/25"
-                      : "bg-[#D4AF37] text-black hover:bg-[#C9A961] hover:shadow-[#D4AF37]/50"
-                  }`}
-                  variant={isSubscribed ? "outline" : "default"}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      Procesando...
-                    </div>
-                  ) : isSubscribed ? (
-                    <>
-                      <Crown className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
-                      Suscrito
-                      <Sparkles className="ml-2 h-4 w-4 group-hover:animate-spin" />
-                    </>
-                  ) : (
-                    <>
-                      <Star className="mr-2 h-4 w-4 group-hover:animate-pulse" />
-                      Suscribirse - ${profile.subscription_price || 0}/mes
-                      <Diamond className="ml-2 h-4 w-4 group-hover:animate-bounce" />
-                    </>
+                <>
+                  <FollowButton 
+                    userId={profile.id} 
+                    onFollowChange={handleFollowChange}
+                  />
+                  {profile.is_creator && (
+                    <Button
+                      onClick={handleSubscribe}
+                      disabled={isLoading}
+                      className={`group transition-all duration-300 hover:scale-110 shadow-lg ${
+                        isSubscribed
+                          ? "border-[#D4AF37] bg-transparent text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:shadow-[#D4AF37]/25"
+                          : "bg-[#D4AF37] text-black hover:bg-[#C9A961] hover:shadow-[#D4AF37]/50"
+                      }`}
+                      variant={isSubscribed ? "outline" : "default"}
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Procesando...
+                        </div>
+                      ) : isSubscribed ? (
+                        <>
+                          <Crown className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
+                          Suscrito
+                          <Sparkles className="ml-2 h-4 w-4 group-hover:animate-spin" />
+                        </>
+                      ) : (
+                        <>
+                          <Star className="mr-2 h-4 w-4 group-hover:animate-pulse" />
+                          Suscribirse - ${profile.subscription_price || 0}/mes
+                          <Diamond className="ml-2 h-4 w-4 group-hover:animate-bounce" />
+                        </>
+                      )}
+                    </Button>
                   )}
-                </Button>
+                </>
               )}
               {isOwnProfile && (
                 <>
