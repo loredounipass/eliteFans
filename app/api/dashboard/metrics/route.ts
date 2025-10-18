@@ -3,6 +3,12 @@ import { NextResponse } from "next/server"
 
 export const runtime = "nodejs"
 
+type PostRow = { id: string; like_count?: number; comment_count?: number }
+type ProfileData = { is_creator?: boolean; subscriber_count?: number; total_earnings?: number; post_count?: number }
+type SimpleUser = { id: string; username?: string }
+
+const RECENT_LIMIT = 5
+
 export async function GET(req: Request) {
   try {
     const supabase = await createServerClient()
@@ -13,72 +19,76 @@ export async function GET(req: Request) {
 
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
 
-    // Get profile aggregated fields
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("is_creator, subscriber_count, total_earnings, post_count")
-      .eq("id", user.id)
-      .maybeSingle()
+    // Fetch profile and posts in parallel for speed
+    const [profileRes, postsRes] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("is_creator, subscriber_count, total_earnings, post_count")
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase.from("posts").select("id, like_count, comment_count, created_at").eq("creator_id", user.id),
+    ])
 
-    if (profileError) return NextResponse.json({ error: profileError.message }, { status: 500 })
+    if (profileRes.error) return NextResponse.json({ error: profileRes.error.message }, { status: 500 })
+    if (postsRes.error) return NextResponse.json({ error: postsRes.error.message }, { status: 500 })
+
+    const profileData = profileRes.data as ProfileData | null
+    const posts = (postsRes.data || []) as PostRow[]
 
     const subscribers = profileData?.subscriber_count ?? 0
     const total_earnings = profileData?.total_earnings ?? 0
     const posts_count = profileData?.post_count ?? 0
 
-    // Fetch posts for the creator to calculate likes/comments totals and recent post IDs
-    const { data: posts, error: postsError } = await supabase
-      .from("posts")
-      .select("id, like_count, comment_count, created_at")
-      .eq("creator_id", user.id)
+    const total_likes = posts.reduce((acc, p) => acc + (p.like_count ?? 0), 0)
+    const total_comments = posts.reduce((acc, p) => acc + (p.comment_count ?? 0), 0)
+    const postIds = posts.map((p) => p.id).filter(Boolean)
 
-    if (postsError) return NextResponse.json({ error: postsError.message }, { status: 500 })
-
-    const total_likes = (posts || []).reduce((acc: number, p: any) => acc + (p.like_count ?? 0), 0)
-    const total_comments = (posts || []).reduce((acc: number, p: any) => acc + (p.comment_count ?? 0), 0)
-    const postIds = (posts || []).map((p: any) => p.id).filter(Boolean)
-
-    // Recent transactions (payments) for this creator
-    const { data: transactions } = await supabase
-      .from("transactions")
-      .select("id, amount, type, status, created_at, user_id, subscription_id, post_id")
-      .eq("creator_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(5)
-
-    // Recent subscriptions
-    const { data: subscriptions } = await supabase
-      .from("subscriptions")
-      .select("id, subscriber_id, status, amount, start_date, created_at")
-      .eq("creator_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(5)
-
-    // Recent comments on creator posts
-    let comments: any[] = []
-    if (postIds.length > 0) {
-      const { data: commentsData } = await supabase
-        .from("comments")
-        .select("id, post_id, user_id, content, created_at")
-        .in("post_id", postIds)
+    // Fetch recent activity in parallel (transactions, subscriptions)
+    const [transactionsRes, subscriptionsRes] = await Promise.all([
+      supabase
+        .from("transactions")
+        .select("id, amount, type, status, created_at, user_id, subscription_id, post_id")
+        .eq("creator_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(5)
-      comments = commentsData || []
-    }
+        .limit(RECENT_LIMIT),
+      supabase
+        .from("subscriptions")
+        .select("id, subscriber_id, status, amount, start_date, created_at")
+        .eq("creator_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(RECENT_LIMIT),
+    ])
 
-    // Recent likes on creator posts
+    if (transactionsRes.error) return NextResponse.json({ error: transactionsRes.error.message }, { status: 500 })
+    if (subscriptionsRes.error) return NextResponse.json({ error: subscriptionsRes.error.message }, { status: 500 })
+
+    const transactions = (transactionsRes.data || [])
+    const subscriptions = (subscriptionsRes.data || [])
+
+    // Fetch recent comments and likes only if there are posts
+    let comments: any[] = []
     let likes: any[] = []
     if (postIds.length > 0) {
-      const { data: likesData } = await supabase
-        .from("likes")
-        .select("id, post_id, user_id, created_at")
-        .in("post_id", postIds)
-        .order("created_at", { ascending: false })
-        .limit(5)
-      likes = likesData || []
+      const [commentsRes, likesRes] = await Promise.all([
+        supabase
+          .from("comments")
+          .select("id, post_id, user_id, content, created_at")
+          .in("post_id", postIds)
+          .order("created_at", { ascending: false })
+          .limit(RECENT_LIMIT),
+        supabase
+          .from("likes")
+          .select("id, post_id, user_id, created_at")
+          .in("post_id", postIds)
+          .order("created_at", { ascending: false })
+          .limit(RECENT_LIMIT),
+      ])
+
+      comments = commentsRes.data || []
+      likes = likesRes.data || []
     }
 
-    // Collect all user IDs referenced in recent activity so we can fetch usernames
+    // Collect user IDs referenced in recent activity and fetch usernames
     const userIds = new Set<string>()
     ;(transactions || []).forEach((t: any) => t.user_id && userIds.add(t.user_id))
     ;(subscriptions || []).forEach((s: any) => s.subscriber_id && userIds.add(s.subscriber_id))
@@ -86,7 +96,7 @@ export async function GET(req: Request) {
     likes.forEach((l: any) => l.user_id && userIds.add(l.user_id))
 
     const userIdArray = Array.from(userIds)
-    let usersMap: Record<string, any> = {}
+    const usersMap: Record<string, SimpleUser> = {}
     if (userIdArray.length > 0) {
       const { data: usersData } = await supabase.from("profiles").select("id, username").in("id", userIdArray)
       ;(usersData || []).forEach((u: any) => {
