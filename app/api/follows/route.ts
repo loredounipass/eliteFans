@@ -4,13 +4,14 @@ import { cookies } from "next/headers"
 
 export async function POST(request: NextRequest) {
   try {
-    const { following_id } = await request.json()
+    const body = (await request.json()) as { following_id?: string }
+    const following_id = body?.following_id
 
     if (!following_id) {
       return NextResponse.json({ error: "following_id is required" }, { status: 400 })
     }
 
-    const cookieStore = cookies()
+  const cookieStore = await cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -23,26 +24,39 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
+    const getUserRes = await supabase.auth.getUser()
+    const user = getUserRes.data?.user ?? null
+    const authError = getUserRes.error ?? null
+
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if already following
-    const { data: existingFollow } = await supabase
+    // Check if already following (use maybeSingle to avoid 406 when no row exists)
+    const existingFollowRes = await supabase
       .from("follows")
       .select("id")
       .eq("follower_id", user.id)
       .eq("following_id", following_id)
-      .single()
+      .maybeSingle()
 
-    if (existingFollow) {
-      return NextResponse.json({ error: "Already following this user" }, { status: 400 })
+    // If already following -> unfollow (delete)
+    if (existingFollowRes.data) {
+      const deleteRes = await supabase
+        .from("follows")
+        .delete()
+        .eq("id", existingFollowRes.data.id)
+
+      if (deleteRes.error) {
+        console.error("Unfollow error:", deleteRes.error)
+        return NextResponse.json({ error: deleteRes.error.message }, { status: 500 })
+      }
+
+      return NextResponse.json({ success: true, action: 'unfollowed' })
     }
 
-    // Create follow relationship
-    const { data, error } = await supabase
+    // Otherwise create follow relationship
+    const insertRes = await supabase
       .from("follows")
       .insert({
         follower_id: user.id,
@@ -50,12 +64,12 @@ export async function POST(request: NextRequest) {
       })
       .select()
 
-    if (error) {
-      console.error("Follow error:", error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (insertRes.error) {
+      console.error("Follow error:", insertRes.error)
+      return NextResponse.json({ error: insertRes.error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, data })
+    return NextResponse.json({ success: true, action: 'followed', data: insertRes.data })
   } catch (error) {
     console.error("Follow API error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
@@ -71,7 +85,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "following_id is required" }, { status: 400 })
     }
 
-    const cookieStore = cookies()
+  const cookieStore = await cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -84,22 +98,24 @@ export async function DELETE(request: NextRequest) {
       }
     )
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
+    const getUserRes = await supabase.auth.getUser()
+    const user = getUserRes.data?.user ?? null
+    const authError = getUserRes.error ?? null
+
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     // Delete follow relationship
-    const { error } = await supabase
+    const deleteRes = await supabase
       .from("follows")
       .delete()
       .eq("follower_id", user.id)
       .eq("following_id", following_id)
 
-    if (error) {
-      console.error("Unfollow error:", error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (deleteRes.error) {
+      console.error("Unfollow error:", deleteRes.error)
+      return NextResponse.json({ error: deleteRes.error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
@@ -119,7 +135,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "user_id and type are required" }, { status: 400 })
     }
 
-    const cookieStore = cookies()
+  const cookieStore = await cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -132,7 +148,7 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    let query
+    let query: any
     if (type === 'followers') {
       // Get users who follow this user
       query = supabase
@@ -169,7 +185,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid type. Use 'followers' or 'following'" }, { status: 400 })
     }
 
-    const { data, error } = await query.order("created_at", { ascending: false })
+    const queryRes = await query.order("created_at", { ascending: false })
+    const data = queryRes.data
+    const error = queryRes.error
 
     if (error) {
       console.error("Get follows error:", error)

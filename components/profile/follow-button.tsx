@@ -33,7 +33,7 @@ export function FollowButton({ userId, initialIsFollowing = false, onFollowChang
           .select("id")
           .eq("follower_id", user.id)
           .eq("following_id", userId)
-          .single()
+          .maybeSingle()
         
         setIsFollowing(!!data)
       }
