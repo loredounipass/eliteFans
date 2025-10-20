@@ -1,148 +1,138 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
+
+type FollowAction = "follow" | "unfollow"
 
 interface UseFollowProps {
   userId: string
   onFollowChange?: (isFollowing: boolean) => void
 }
 
-export function useFollow({ userId, onFollowChange }: UseFollowProps) {
-  const [isFollowing, setIsFollowing] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+interface UseFollowReturn {
+  following: boolean
+  loading: boolean
+  canFollow: boolean
+  ready: boolean
+  toggleFollow: () => Promise<void>
+}
+
+// small helper to call the follow API
+async function postFollowAction(followingId: string, action: FollowAction) {
+  const res = await fetch("/api/follows", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ following_id: followingId, action }),
+  })
+  const json = await res.json().catch(() => ({}))
+  return { ok: res.ok, json }
+}
+
+export function useFollow({ userId, onFollowChange }: UseFollowProps): UseFollowReturn {
+  const [following, setFollowing] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const [ready, setReady] = useState(false)
   const { toast } = useToast()
 
-  // Centralized API call function
-  const makeFollowRequest = useCallback(async (following_id: string, action: 'follow' | 'unfollow') => {
-    const response = await fetch('/api/follows', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ following_id, action })
-    })
-    
-    const json = await response.json().catch(() => ({}))
-    return { ok: response.ok, json }
-  }, [])
-
-  // Check initial follow status
+  // Load initial follow state and current user
   useEffect(() => {
     let mounted = true
-    
-    const checkFollowStatus = async () => {
+
+    async function load() {
       try {
         const supabase = getSupabaseBrowserClient()
         const { data: { user } } = await supabase.auth.getUser()
-        
         if (!mounted) return
         setCurrentUser(user)
-        
+
         if (!user || user.id === userId) return
-        
+
         const { data } = await supabase
           .from("follows")
           .select("id")
           .eq("follower_id", user.id)
           .eq("following_id", userId)
           .maybeSingle()
-        
+
         if (!mounted) return
-        setIsFollowing(!!data)
-      } catch (error) {
-        console.error('Error checking follow status:', error)
+        setFollowing(Boolean(data))
+      } catch (err) {
+        console.error("useFollow: failed to load state", err)
+      } finally {
+        if (mounted) setReady(true)
       }
     }
 
-    checkFollowStatus()
-    
+    load()
     return () => {
       mounted = false
     }
   }, [userId])
 
-  // Listen for global follow changes to sync multiple buttons on the page
+  // Keep multiple buttons in sync across the page
   useEffect(() => {
-    const onFollowChanged = (e: any) => {
-      try {
-        const detail = e?.detail
-        if (!detail) return
-        if (detail.userId === userId) {
-          setIsFollowing(Boolean(detail.isFollowing))
-        }
-      } catch (err) {
-        // ignore
-      }
+    function onFollowChanged(e: any) {
+      const d = e?.detail
+      if (!d || d.userId !== userId) return
+      setFollowing(Boolean(d.isFollowing))
     }
 
-    window.addEventListener('follow:changed', onFollowChanged)
-    return () => window.removeEventListener('follow:changed', onFollowChanged)
+    window.addEventListener("follow:changed", onFollowChanged)
+    return () => window.removeEventListener("follow:changed", onFollowChanged)
+  }, [userId])
+
+  const dispatchFollowChanged = useCallback((isFollowing: boolean) => {
+    try {
+      window.dispatchEvent(new CustomEvent("follow:changed", { detail: { userId, isFollowing } }))
+    } catch (err) {
+      // ignore
+    }
   }, [userId])
 
   const toggleFollow = useCallback(async () => {
-    if (!currentUser || currentUser.id === userId || isLoading) return
-    
-    setIsLoading(true)
-    const previousState = isFollowing
-    
+    if (!currentUser || currentUser.id === userId || loading) return
+
+    setLoading(true)
+    const prev = following
+
     try {
-      // Optimistic update
-      setIsFollowing(!isFollowing)
-      onFollowChange?.(!isFollowing)
-      
-      const { ok, json } = await makeFollowRequest(userId, isFollowing ? 'unfollow' : 'follow')
-      
+      // optimistic
+      setFollowing(!prev)
+      onFollowChange?.(!prev)
+
+      const action: FollowAction = prev ? "unfollow" : "follow"
+      const { ok, json } = await postFollowAction(userId, action)
+
       if (!ok) {
-        // Revert optimistic update on error
-        setIsFollowing(previousState)
-        onFollowChange?.(previousState)
-        throw new Error(json.error || 'Failed to update follow status')
+        setFollowing(prev)
+        onFollowChange?.(prev)
+        throw new Error(json?.error || "Failed to update follow status")
       }
-      
-      // Update based on server response
-      const newFollowState = json.action === 'followed'
-      setIsFollowing(newFollowState)
-      onFollowChange?.(newFollowState)
 
-      // Broadcast change so other FollowButton instances update
-      try {
-        window.dispatchEvent(new CustomEvent('follow:changed', { detail: { userId, isFollowing: newFollowState } }))
-      } catch (err) {
-        // ignore
-      }
-      
+      const newState = json.action === "followed"
+      setFollowing(newState)
+      onFollowChange?.(newState)
+      dispatchFollowChanged(newState)
+
       toast({
-        title: newFollowState ? "Siguiendo" : "Dejaste de seguir",
-        description: newFollowState 
-          ? "Ahora sigues a este usuario" 
-          : "Ya no sigues a este usuario"
+        title: newState ? "Siguiendo" : "Dejaste de seguir",
+        description: newState ? "Ahora sigues a este usuario" : "Ya no sigues a este usuario",
       })
-      
-    } catch (error: any) {
-      // Revert optimistic update on error
-      setIsFollowing(previousState)
-      onFollowChange?.(previousState)
-      
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      })
+    } catch (err: any) {
+      setFollowing(prev)
+      onFollowChange?.(prev)
+      toast({ title: "Error", description: err?.message ?? "Error", variant: "destructive" })
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
-  }, [currentUser, userId, isFollowing, isLoading, onFollowChange, makeFollowRequest, toast])
+  }, [currentUser, userId, following, loading, onFollowChange, dispatchFollowChanged, toast])
 
-  // Don't show follow functionality for own profile or when not logged in
-  const canFollow = currentUser && currentUser.id !== userId
+  const canFollow = Boolean(currentUser && currentUser.id !== userId)
 
-  return {
-    isFollowing,
-    isLoading,
-    canFollow,
-    toggleFollow
-  }
+  return { following, loading, canFollow, ready, toggleFollow }
 }
 
 interface FollowButtonProps {
@@ -151,20 +141,27 @@ interface FollowButtonProps {
   className?: string
 }
 
-// Componente reutilizable para mostrar el botón de seguir
 export function FollowButton({ userId, onFollowChange, className }: FollowButtonProps) {
-  const { isFollowing, isLoading, canFollow, toggleFollow } = useFollow({ userId, onFollowChange })
+  const { following, loading, canFollow, ready, toggleFollow } = useFollow({ userId, onFollowChange })
 
-  if (!canFollow) return null
+  // When ready and not allowed to follow, hide the button
+  if (ready && !canFollow) return null
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (!ready || !canFollow || loading) return
+    void toggleFollow()
+  }
 
   return (
     <button
-      onClick={toggleFollow}
-      disabled={isLoading}
-      className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 ${className || ''}`}
-      aria-pressed={isFollowing}
+      onClick={handleClick}
+      disabled={!ready || loading || !canFollow}
+      className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 ${className || ""}`}
+      aria-pressed={following}
     >
-      {isLoading ? '...' : isFollowing ? 'Siguiendo' : 'Seguir'}
+      {loading ? "..." : following ? "Siguiendo" : "Seguir"}
     </button>
   )
 }
