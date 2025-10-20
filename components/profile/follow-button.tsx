@@ -1,99 +1,170 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
+import { useState, useEffect, useCallback } from "react"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { UserPlus, UserMinus, Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
-interface FollowButtonProps {
+interface UseFollowProps {
   userId: string
-  initialIsFollowing?: boolean
   onFollowChange?: (isFollowing: boolean) => void
 }
 
-export function FollowButton({ userId, initialIsFollowing = false, onFollowChange }: FollowButtonProps) {
-  const [isFollowing, setIsFollowing] = useState(initialIsFollowing)
+export function useFollow({ userId, onFollowChange }: UseFollowProps) {
+  const [isFollowing, setIsFollowing] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const { toast } = useToast()
 
-  const postJson = async (url: string, body: any) => {
-    const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
-    const json = await res.json().catch(() => ({}))
-    return { ok: res.ok, json }
-  }
+  // Centralized API call function
+  const makeFollowRequest = useCallback(async (following_id: string, action: 'follow' | 'unfollow') => {
+    const response = await fetch('/api/follows', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ following_id, action })
+    })
+    
+    const json = await response.json().catch(() => ({}))
+    return { ok: response.ok, json }
+  }, [])
 
-  const delFetch = async (url: string) => {
-    const res = await fetch(url, { method: "DELETE" })
-    const json = await res.json().catch(() => ({}))
-    return { ok: res.ok, json }
-  }
-
+  // Check initial follow status
   useEffect(() => {
-    ;(async () => {
-      const supabase = getSupabaseBrowserClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      setCurrentUser(user)
-      if (!user || user.id === userId) return
-      const { data } = await supabase.from("follows").select("id").eq("follower_id", user.id).eq("following_id", userId).maybeSingle()
-      setIsFollowing(!!data)
-    })()
+    let mounted = true
+    
+    const checkFollowStatus = async () => {
+      try {
+        const supabase = getSupabaseBrowserClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        
+        if (!mounted) return
+        setCurrentUser(user)
+        
+        if (!user || user.id === userId) return
+        
+        const { data } = await supabase
+          .from("follows")
+          .select("id")
+          .eq("follower_id", user.id)
+          .eq("following_id", userId)
+          .maybeSingle()
+        
+        if (!mounted) return
+        setIsFollowing(!!data)
+      } catch (error) {
+        console.error('Error checking follow status:', error)
+      }
+    }
+
+    checkFollowStatus()
+    
+    return () => {
+      mounted = false
+    }
   }, [userId])
 
-  const handleFollow = async () => {
-    if (!currentUser || currentUser.id === userId) return
-    setIsLoading(true)
-    try {
-      if (isFollowing) {
-        const { ok, json } = await delFetch(`/api/follows?following_id=${userId}`)
-        if (!ok) throw new Error(json.error || "Failed to unfollow")
-        setIsFollowing(false)
-        onFollowChange?.(false)
-        toast({ title: "Unfollowed", description: "You are no longer following this user" })
-      } else {
-        const { ok, json } = await postJson("/api/follows", { following_id: userId })
-        if (!ok) throw new Error(json.error || "Failed to follow")
-        setIsFollowing(true)
-        onFollowChange?.(true)
-        toast({ title: "Following", description: "You are now following this user" })
+  // Listen for global follow changes to sync multiple buttons on the page
+  useEffect(() => {
+    const onFollowChanged = (e: any) => {
+      try {
+        const detail = e?.detail
+        if (!detail) return
+        if (detail.userId === userId) {
+          setIsFollowing(Boolean(detail.isFollowing))
+        }
+      } catch (err) {
+        // ignore
       }
+    }
+
+    window.addEventListener('follow:changed', onFollowChanged)
+    return () => window.removeEventListener('follow:changed', onFollowChanged)
+  }, [userId])
+
+  const toggleFollow = useCallback(async () => {
+    if (!currentUser || currentUser.id === userId || isLoading) return
+    
+    setIsLoading(true)
+    const previousState = isFollowing
+    
+    try {
+      // Optimistic update
+      setIsFollowing(!isFollowing)
+      onFollowChange?.(!isFollowing)
+      
+      const { ok, json } = await makeFollowRequest(userId, isFollowing ? 'unfollow' : 'follow')
+      
+      if (!ok) {
+        // Revert optimistic update on error
+        setIsFollowing(previousState)
+        onFollowChange?.(previousState)
+        throw new Error(json.error || 'Failed to update follow status')
+      }
+      
+      // Update based on server response
+      const newFollowState = json.action === 'followed'
+      setIsFollowing(newFollowState)
+      onFollowChange?.(newFollowState)
+
+      // Broadcast change so other FollowButton instances update
+      try {
+        window.dispatchEvent(new CustomEvent('follow:changed', { detail: { userId, isFollowing: newFollowState } }))
+      } catch (err) {
+        // ignore
+      }
+      
+      toast({
+        title: newFollowState ? "Siguiendo" : "Dejaste de seguir",
+        description: newFollowState 
+          ? "Ahora sigues a este usuario" 
+          : "Ya no sigues a este usuario"
+      })
+      
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" })
+      // Revert optimistic update on error
+      setIsFollowing(previousState)
+      onFollowChange?.(previousState)
+      
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [currentUser, userId, isFollowing, isLoading, onFollowChange, makeFollowRequest, toast])
 
-  // Don't show button for own profile or if not logged in
-  if (!currentUser || currentUser.id === userId) {
-    return null
+  // Don't show follow functionality for own profile or when not logged in
+  const canFollow = currentUser && currentUser.id !== userId
+
+  return {
+    isFollowing,
+    isLoading,
+    canFollow,
+    toggleFollow
   }
+}
+
+interface FollowButtonProps {
+  userId: string
+  onFollowChange?: (isFollowing: boolean) => void
+  className?: string
+}
+
+// Componente reutilizable para mostrar el botón de seguir
+export function FollowButton({ userId, onFollowChange, className }: FollowButtonProps) {
+  const { isFollowing, isLoading, canFollow, toggleFollow } = useFollow({ userId, onFollowChange })
+
+  if (!canFollow) return null
 
   return (
-    <Button
-      onClick={handleFollow}
+    <button
+      onClick={toggleFollow}
       disabled={isLoading}
-      variant={isFollowing ? "outline" : "default"}
-      className={
-        isFollowing
-          ? "border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
-          : "bg-[#D4AF37] text-black hover:bg-[#C9A961]"
-      }
+      className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 ${className || ''}`}
+      aria-pressed={isFollowing}
     >
-      {isLoading ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      ) : isFollowing ? (
-        <>
-          <UserMinus className="mr-2 h-4 w-4" />
-          Unfollow
-        </>
-      ) : (
-        <>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Follow
-        </>
-      )}
-    </Button>
+      {isLoading ? '...' : isFollowing ? 'Siguiendo' : 'Seguir'}
+    </button>
   )
 }

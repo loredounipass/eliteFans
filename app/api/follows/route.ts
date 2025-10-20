@@ -1,32 +1,24 @@
-import { NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
+import { NextResponse } from "next/server"
+import { createServerClient } from "@/lib/supabase/server"
 
-export async function POST(request: NextRequest) {
+export const runtime = "nodejs"
+
+export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { following_id?: string }
+    const body = (await request.json()) as { following_id?: string; action?: string }
     const following_id = body?.following_id
+    const action = body?.action
 
     if (!following_id) {
       return NextResponse.json({ error: "following_id is required" }, { status: 400 })
     }
 
-  const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-        },
-      }
-    )
+    const supabase = await createServerClient()
 
-    const getUserRes = await supabase.auth.getUser()
-    const user = getUserRes.data?.user ?? null
-    const authError = getUserRes.error ?? null
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -40,12 +32,42 @@ export async function POST(request: NextRequest) {
       .eq("following_id", following_id)
       .maybeSingle()
 
-    // If already following -> unfollow (delete)
-    if (existingFollowRes.data) {
+  const existingFollow = existingFollowRes.data ?? null
+  const isCurrentlyFollowing = !!existingFollow
+
+    // Handle explicit action or toggle behavior
+    let shouldFollow: boolean
+    if (action === 'follow') {
+      shouldFollow = true
+    } else if (action === 'unfollow') {
+      shouldFollow = false
+    } else {
+      // Toggle behavior (default)
+      shouldFollow = !isCurrentlyFollowing
+    }
+
+    if (shouldFollow && !isCurrentlyFollowing) {
+      // Create follow relationship
+      const insertRes = await supabase
+        .from("follows")
+        .insert({
+          follower_id: user.id,
+          following_id: following_id
+        })
+        .select()
+
+      if (insertRes.error) {
+        console.error("Follow error:", insertRes.error)
+        return NextResponse.json({ error: insertRes.error.message }, { status: 500 })
+      }
+
+      return NextResponse.json({ success: true, action: 'followed', data: insertRes.data })
+    } else if (!shouldFollow && isCurrentlyFollowing) {
+      // Remove follow relationship
       const deleteRes = await supabase
         .from("follows")
         .delete()
-        .eq("id", existingFollowRes.data.id)
+        .eq("id", existingFollow?.id)
 
       if (deleteRes.error) {
         console.error("Unfollow error:", deleteRes.error)
@@ -53,30 +75,20 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json({ success: true, action: 'unfollowed' })
-    }
-
-    // Otherwise create follow relationship
-    const insertRes = await supabase
-      .from("follows")
-      .insert({
-        follower_id: user.id,
-        following_id: following_id
+    } else {
+      // No change needed
+      return NextResponse.json({ 
+        success: true, 
+        action: isCurrentlyFollowing ? 'already_following' : 'not_following' 
       })
-      .select()
-
-    if (insertRes.error) {
-      console.error("Follow error:", insertRes.error)
-      return NextResponse.json({ error: insertRes.error.message }, { status: 500 })
     }
-
-    return NextResponse.json({ success: true, action: 'followed', data: insertRes.data })
   } catch (error) {
     console.error("Follow API error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const following_id = searchParams.get("following_id")
@@ -85,22 +97,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "following_id is required" }, { status: 400 })
     }
 
-  const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-        },
-      }
-    )
+    const supabase = await createServerClient()
 
-    const getUserRes = await supabase.auth.getUser()
-    const user = getUserRes.data?.user ?? null
-    const authError = getUserRes.error ?? null
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -118,14 +120,14 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: deleteRes.error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, action: 'unfollowed' })
   } catch (error) {
     console.error("Unfollow API error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const user_id = searchParams.get("user_id")
@@ -135,18 +137,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "user_id and type are required" }, { status: 400 })
     }
 
-  const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-        },
-      }
-    )
+    const supabase = await createServerClient()
 
     let query: any
     if (type === 'followers') {

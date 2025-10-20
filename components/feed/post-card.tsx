@@ -9,9 +9,10 @@ import Link from "next/link"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Heart, MessageCircle, Share2, Lock, MoreHorizontal, Bookmark, UserPlus, UserMinus, Loader2 } from "lucide-react"
+import { Heart, MessageCircle, Share2, Lock, MoreHorizontal, Bookmark } from "lucide-react"
 import { useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { FollowButton } from "@/components/profile/follow-button"
 
 interface PostCardProps {
   postId?: string
@@ -41,8 +42,6 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
   const [loadingComments, setLoadingComments] = useState(false)
   const [commentsOffset, setCommentsOffset] = useState(0)
   const [bookmarked, setBookmarked] = useState(false)
-  const [isFollowing, setIsFollowing] = useState(false)
-  const [followLoading, setFollowLoading] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [creatorProfileId, setCreatorProfileId] = useState<string | null>(null)
   const { toast } = useToast()
@@ -82,7 +81,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
   }, [postId])
 
   useEffect(() => {
-    // check if current user follows the creator
+    // Get current user and creator profile ID
     let mounted = true
     const supabase = getSupabaseBrowserClient()
 
@@ -93,15 +92,6 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
         setCurrentUserId(user.id)
         const targetId = await getProfileId(creator.username)
         if (targetId) setCreatorProfileId(targetId)
-        if (!targetId) return
-        const { data } = await supabase
-          .from("follows")
-          .select("id")
-          .eq("follower_id", user.id)
-          .eq("following_id", targetId)
-          .maybeSingle()
-        if (!mounted) return
-        setIsFollowing(!!data)
       } catch (err) {
         // ignore
       }
@@ -111,24 +101,6 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
       mounted = false
     }
   }, [creator.username])
-
-  const handleFollowToggle = async () => {
-    setFollowLoading(true)
-    try {
-      const targetId = (creatorProfileId ?? (await getProfileId(creator.username))) as string | null
-      if (!targetId) return toast({ title: "Usuario no encontrado", description: "No se encontró el usuario a seguir", variant: "destructive" })
-      if (currentUserId === targetId) return
-      const { ok, json } = await postJson("/api/follows", { following_id: targetId })
-      if (!ok) return toast({ title: "Error", description: json.error || "No se pudo actualizar follow", variant: "destructive" })
-      if (json.action === "unfollowed") setIsFollowing(false)
-      else if (json.action === "followed") setIsFollowing(true)
-      else setIsFollowing((s) => !s)
-    } catch (err) {
-      toast({ title: "Error", description: "No se pudo actualizar follow", variant: "destructive" })
-    } finally {
-      setFollowLoading(false)
-    }
-  }
 
   const handleLike = async () => {
     // optimistic UI
@@ -294,32 +266,12 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
         </Link>
 
         <div className="flex items-center gap-2">
-          {/* Only show follow button when not subscribed and when the creator is not the current user */}
-          {!isSubscribed && currentUserId && creatorProfileId && currentUserId !== creatorProfileId && (
-            <Button
-              size="sm"
-              onClick={handleFollowToggle}
-              disabled={followLoading}
-              className={`font-semibold px-6 py-2 rounded-full shadow-lg shadow-[#D4AF37]/30 transition-all duration-200 ${
-                isFollowing
-                  ? "border border-[#D4AF37] text-[#D4AF37] bg-transparent hover:bg-[#D4AF37]/10"
-                  : "bg-gradient-to-r from-[#D4AF37] to-[#F4BF37] text-black hover:from-[#C9A961] hover:to-[#D4AF37] hover:scale-105"
-              }`}
-            >
-              {followLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isFollowing ? (
-                <>
-                  <UserMinus className="mr-2 h-4 w-4" />
-                  Siguiendo
-                </>
-              ) : (
-                <>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Seguir
-                </>
-              )}
-            </Button>
+          {/* Use centralized FollowButton component - only show when not subscribed */}
+          {!isSubscribed && creatorProfileId && (
+            <FollowButton 
+              userId={creatorProfileId}
+              className="font-semibold px-6 py-2 rounded-full shadow-lg shadow-[#D4AF37]/30 transition-all duration-200 hover:scale-105"
+            />
           )}
           <Button
             variant="ghost"
