@@ -1,9 +1,9 @@
 import { PrivateRoute } from "@/components/auth/private-route"
 import { DashboardHeader } from "@/components/dashboard/header"
-import { PostCard } from "@/components/feed/post-card"
 import { CreatorCard } from "@/components/feed/creator-card"
 import SearchBar from "@/components/feed/search-bar"
-import { TrendingUp, Users, Heart, Star } from "lucide-react"
+import { FilteredFeed } from "@/components/feed/filtered-feed"
+import { Users, Heart } from "lucide-react"
 import { createServerClient } from "@/lib/supabase/server"
 
 type PostRow = {
@@ -93,13 +93,10 @@ export default async function FeedPage() {
       <div className="min-h-screen bg-gradient-to-br from-black via-black to-[#0A0A0A] overflow-hidden">
         <DashboardHeader />
         <main className="relative container mx-auto px-3 py-6 flex gap-6 h-[calc(100vh-6rem)]">
-          <LeftSidebar />
-
-          <section className="flex-1 space-y-6 overflow-y-auto scrollbar-hide pr-2 h-full">
+          <div className="flex-1 space-y-6 overflow-y-auto scrollbar-hide pr-2 h-full">
             <HeaderSearch />
-
-            <FeedList posts={posts} />
-          </section>
+            <FilteredFeed posts={posts} />
+          </div>
 
           <RightSidebar creators={creators} posts={posts} />
         </main>
@@ -109,56 +106,6 @@ export default async function FeedPage() {
 }
 
 // --- Small presentational components extracted for readability ---
-
-function LeftSidebar() {
-  return (
-    <aside className="hidden lg:block lg:w-72">
-      <div className="sticky top-0 space-y-4">
-        <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
-          <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Explorar
-          </h3>
-          <ul className="space-y-2">
-            <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] transition-all duration-200 font-medium">
-              Para ti
-            </li>
-            <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all duration-200">
-              Siguiendo
-            </li>
-            <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all duration-200">
-              Popular
-            </li>
-            <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all duration-200">
-              Categorías
-            </li>
-          </ul>
-        </div>
-
-        <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
-          <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
-            <Star className="h-5 w-5" />
-            Filtros
-          </h3>
-          <div className="space-y-2">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20" />
-              <span className="text-sm text-[#D4AF37]/80">Solo imágenes</span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20" />
-              <span className="text-sm text-[#D4AF37]/80">Solo videos</span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20" />
-              <span className="text-sm text-[#D4AF37]/80">Contenido premium</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </aside>
-  )
-}
 
 function HeaderSearch() {
   return (
@@ -172,36 +119,6 @@ function HeaderSearch() {
         <SearchBar />
       </div>
     </div>
-  )
-}
-
-function FeedList({ posts }: { posts: PostRow[] }) {
-  return (
-    <>
-      {posts.map((post) => {
-        const showLocked = post.is_locked && !post.isSubscribed && !post.isOwn
-        return (
-          <div key={post.id} className="mx-auto w-full max-w-xl">
-            <PostCard
-              postId={post.id}
-              creator={{
-                name: post.full_name || post.username || "Creator",
-                username: post.username || "",
-                avatar: post.avatar_url || "/placeholder-user.jpg",
-              }}
-              content={{
-                type: showLocked ? "locked" : post.media_type === "video" ? "video" : "image",
-                url: showLocked ? undefined : (post.media_urls && post.media_urls[0]) || undefined,
-                description: post.content || "",
-                likes: post.like_count || 0,
-                comments: post.comment_count || 0,
-              }}
-              isSubscribed={post.isSubscribed}
-            />
-          </div>
-        )
-      })}
-    </>
   )
 }
 
