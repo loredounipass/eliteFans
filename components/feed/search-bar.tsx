@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef, useCallback } from "react"
+import { createPortal } from "react-dom"
 import { Input } from "@/components/ui/input"
 import { Search, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -26,7 +27,7 @@ function highlightMatch(text: string, query: string) {
   return `${before}<strong class=\"text-[#F4BF37]\">${match}</strong>${after}`
 }
 
-export function SearchBar() {
+export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<UserSuggestion[]>([])
   const [loading, setLoading] = useState(false)
@@ -34,6 +35,9 @@ export function SearchBar() {
   const [activeIndex, setActiveIndex] = useState(-1)
   const router = useRouter()
   const ref = useRef<HTMLDivElement | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties | null>(null)
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
 
   // Fetch suggestions with debounce
   useEffect(() => {
@@ -66,13 +70,33 @@ export function SearchBar() {
   // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
+      const target = e.target as Node
+      // if click is inside the main container or inside the dropdown (portal), don't close
+      if (ref.current && ref.current.contains(target)) return
+      if (dropdownRef.current && dropdownRef.current.contains(target)) return
+      setOpen(false)
     }
     document.addEventListener("mousedown", handleClick)
     return () => document.removeEventListener("mousedown", handleClick)
   }, [])
+
+  // Calcular posición del dropdown cuando esté en sidebar
+  const updateDropdownPosition = useCallback(() => {
+    if (!isSidebar || !inputRef.current) return
+    const rect = inputRef.current.getBoundingClientRect()
+    setDropdownStyle({ position: "fixed", left: rect.left, top: rect.bottom + 8, width: rect.width, zIndex: 9999 })
+  }, [isSidebar])
+
+  useEffect(() => {
+    if (!isSidebar) return
+    updateDropdownPosition()
+    window.addEventListener("resize", updateDropdownPosition)
+    window.addEventListener("scroll", updateDropdownPosition, true)
+    return () => {
+      window.removeEventListener("resize", updateDropdownPosition)
+      window.removeEventListener("scroll", updateDropdownPosition, true)
+    }
+  }, [isSidebar, updateDropdownPosition])
 
   const goToProfile = useCallback(
     (username: string) => {
@@ -103,12 +127,13 @@ export function SearchBar() {
   }
 
   return (
-    <div ref={ref} className="relative max-w-xl mx-auto">
+    <div ref={ref} className={isSidebar ? "relative w-full" : "relative max-w-xl mx-auto"}>
       <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#D4AF37]/50" />
 
       <Input
         value={query}
         onChange={(e: any) => setQuery(e.target.value)}
+        ref={inputRef as any}
         onKeyDown={onKeyDown}
         aria-autocomplete="list"
         aria-expanded={open}
@@ -121,32 +146,42 @@ export function SearchBar() {
       </div>
 
       {open && (
-        <div className="absolute left-0 right-0 mt-2 z-50 rounded-xl bg-black/95 border border-[#D4AF37]/20 backdrop-blur-sm shadow-lg overflow-hidden">
-          {results.length === 0 && !loading ? (
-            <div className="p-3 text-sm text-[#D4AF37]/70">No se encontraron creadores</div>
-          ) : (
-            <ul role="listbox" className="divide-y divide-[#D4AF37]/10">
-              {results.map((u, idx) => (
-                <li
-                  key={u.id}
-                  role="option"
-                  aria-selected={activeIndex === idx}
-                  onMouseDown={(e) => e.preventDefault()} // prevent blur before click
-                  onClick={() => goToProfile(u.username)}
-                  className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-150 ${
-                    activeIndex === idx ? "bg-[#D4AF37]/12" : "hover:bg-[#D4AF37]/10"
-                  }`}
-                >
-                  <img src={u.avatar_url || "/placeholder-user.jpg"} className="h-10 w-10 rounded-full object-cover border border-[#D4AF37]/20" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-[#D4AF37] leading-5 truncate" dangerouslySetInnerHTML={{ __html: highlightMatch(u.full_name || u.username, query) }} />
-                    <div className="text-xs text-[#D4AF37]/70 truncate">@{u.username}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        (() => {
+          const dropdown = (
+            <div ref={dropdownRef} style={isSidebar ? dropdownStyle || undefined : undefined} className={`${isSidebar ? "rounded-xl bg-black/95 border border-[#D4AF37]/20 backdrop-blur-sm shadow-lg overflow-hidden" : "absolute left-0 right-0 mt-2 z-50 rounded-xl bg-black/95 border border-[#D4AF37]/20 backdrop-blur-sm shadow-lg overflow-hidden"}`}>
+              {results.length === 0 && !loading ? (
+                <div className="p-3 text-sm text-[#D4AF37]/70">No se encontraron creadores</div>
+              ) : (
+                <ul role="listbox" className="divide-y divide-[#D4AF37]/10">
+                  {results.map((u, idx) => (
+                    <li
+                      key={u.id}
+                      role="option"
+                      aria-selected={activeIndex === idx}
+                      onMouseDown={(e) => e.preventDefault()} // prevent blur before click
+                      onClick={() => goToProfile(u.username)}
+                      className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-150 ${
+                        activeIndex === idx ? "bg-[#D4AF37]/12" : "hover:bg-[#D4AF37]/10"
+                      }`}
+                    >
+                      <img src={u.avatar_url || "/placeholder-user.jpg"} className="h-10 w-10 rounded-full object-cover border border-[#D4AF37]/20" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-[#D4AF37] leading-5 truncate" dangerouslySetInnerHTML={{ __html: highlightMatch(u.full_name || u.username, query) }} />
+                        <div className="text-xs text-[#D4AF37]/70 truncate">@{u.username}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )
+
+          if (isSidebar && typeof document !== "undefined") {
+            return createPortal(dropdown, document.body)
+          }
+
+          return dropdown
+        })()
       )}
     </div>
   )

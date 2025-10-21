@@ -126,8 +126,8 @@ function RightSidebar({ creators, posts }: { creators: any[]; posts: PostRow[] }
     <aside className="hidden lg:block lg:w-72">
       <div className="sticky top-0 space-y-4">
         <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
-          <div className="relative">
-            <SearchBar />
+            <div className="relative">
+            <SearchBar isSidebar={true} />
           </div>
         </div>
         <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
