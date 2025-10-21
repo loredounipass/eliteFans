@@ -108,24 +108,18 @@ export default async function FeedPage() {
 // --- Small presentational components extracted for readability ---
 
 function HeaderSearch() {
-  return (
-    <div className="mb-6 text-center">
-      <h1 className="mb-3 text-3xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#F4BF37] to-[#D4AF37] bg-clip-text text-transparent">
-        Descubre Contenido Exclusivo
-      </h1>
-      <p className="text-[#D4AF37]/70 text-base mb-5">Explora el mejor contenido de tus creadores favoritos</p>
-
-      <div className="relative max-w-xl mx-auto">
-        <SearchBar />
-      </div>
-    </div>
-  )
+  return null
 }
 
 function RightSidebar({ creators, posts }: { creators: any[]; posts: PostRow[] }) {
   return (
     <aside className="hidden lg:block lg:w-72">
       <div className="sticky top-0 space-y-4">
+        <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
+          <div className="relative">
+            <SearchBar />
+          </div>
+        </div>
         <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
           <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
             <Users className="h-5 w-5" />
