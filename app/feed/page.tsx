@@ -4,6 +4,7 @@ import { CreatorCard } from "@/components/feed/creator-card"
 import SearchBar from "@/components/feed/search-bar"
 import { FilteredFeed } from "@/components/feed/filtered-feed"
 import { Users, Heart } from "lucide-react"
+import CreatorCarousel from "@/components/feed/creator-carousel"
 import { createServerClient } from "@/lib/supabase/server"
 
 type PostRow = {
@@ -91,8 +92,22 @@ async function getFeedData() {
     .select("username, full_name, avatar_url, cover_url, subscriber_count")
     .eq("is_creator", true)
     .limit(6)
+  // Si no hay creators marcados como creador, construir un fallback a partir de los posts
+  let creatorsList = creators || []
+  if ((!creatorsList || creatorsList.length === 0) && (mapped && mapped.length > 0)) {
+    const seen = new Set<string>()
+    creatorsList = mapped
+      .filter((p: any) => p.username)
+      .map((p: any) => ({ username: p.username, full_name: p.full_name, avatar_url: p.avatar_url, cover_url: p.avatar_url, subscriber_count: 0 }))
+      .filter((c: any) => {
+        if (seen.has(c.username)) return false
+        seen.add(c.username)
+        return true
+      })
+      .slice(0, 6)
+  }
 
-  return { posts: mapped as PostRow[], creators: creators || [], subscribedCreatorIds, followedCreatorIds }
+  return { posts: mapped as PostRow[], creators: creatorsList || [], subscribedCreatorIds, followedCreatorIds }
 }
 
 export default async function FeedPage() {
@@ -135,50 +150,14 @@ function RightSidebar({ creators, posts }: { creators: any[]; posts: PostRow[] }
             <Users className="h-5 w-5" />
             Creadores Sugeridos
           </h3>
-          <div className="space-y-3">
-            {creators.map((creator: any, index: number) => (
-              <CreatorCard
-                key={index}
-                name={creator.full_name || creator.username}
-                username={creator.username}
-                avatar={creator.avatar_url || "/placeholder-user.jpg"}
-                coverImage={creator.cover_url || creator.avatar_url || "/placeholder.jpg"}
-                subscribers={creator.subscriber_count || 0}
-                isSubscribed={false}
-              />
-            ))}
+          <div>
+            {/* Carousel that shows 3 items per view and scrolls horizontally */}
+            {/* Import client component dynamically to avoid server/client mismatch */}
+            <CreatorCarousel creators={creators} />
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
-          <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
-            <Heart className="h-5 w-5" />
-            Tendencias
-          </h3>
-          <div className="space-y-3">
-            {posts.slice(0, 3).map((p) => (
-              <div
-                key={p.id}
-                className="flex items-center gap-3 p-2.5 rounded-xl bg-black/30 hover:bg-black/50 transition-all duration-200 cursor-pointer group"
-              >
-                <img
-                  src={p.avatar_url || "/placeholder-user.jpg"}
-                  alt={p.username}
-                  className="h-10 w-10 rounded-full object-cover border-2 border-[#D4AF37]/30 group-hover:border-[#D4AF37]/50 transition-all duration-200"
-                />
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-[#D4AF37] group-hover:text-[#F4BF37] transition-colors">
-                    {p.full_name || p.username}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-[#D4AF37]/70">
-                    <Heart className="h-3 w-3" />
-                    <span>{p.like_count} likes</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        
       </div>
     </aside>
   )
