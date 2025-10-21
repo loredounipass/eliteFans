@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { PostCard } from "@/components/feed/post-card"
 import { FeedFilters, FilterState } from "@/components/feed/feed-filters"
+import { SubscriptionsBox } from "@/components/feed/subscriptions-box"
 
 type PostRow = {
   id: string
@@ -152,6 +153,10 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
             onFiltersChange={handleFiltersChange} 
             initialFilters={filters}
           />
+          {/* Caja combinada: Suscripciones y Chat */}
+          <div className="mt-4">
+            <SubscriptionsBox />
+          </div>
         </div>
       </aside>
 
