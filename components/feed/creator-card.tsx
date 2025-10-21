@@ -1,9 +1,15 @@
+"use client"
+
+import React, { useState, useRef, useEffect } from "react"
+import { useToast } from '@/hooks/use-toast'
 import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Crown } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
+import { createPortal } from 'react-dom'
 
 interface CreatorCardProps {
   name: string
@@ -32,6 +38,8 @@ export function CreatorCard({
           <div className="relative h-24 w-full rounded-lg overflow-hidden">
             <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
+            {/* three-dots menu */}
+            <MenuOverlay username={username} />
             <div className="absolute left-3 bottom-4 flex items-center gap-3">
               <Avatar className="h-12 w-12 border-2 border-black shadow-md">
                 <AvatarImage src={avatar || "/placeholder.svg"} alt={name} />
@@ -54,6 +62,7 @@ export function CreatorCard({
         <div className="relative h-28 md:h-32 w-full">
           <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
+          <MenuOverlay username={username} />
         </div>
       </Link>
       <CardContent className="relative -mt-12 px-4 pb-4 pt-2">
@@ -89,5 +98,78 @@ export function CreatorCard({
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+function MenuOverlay({ username }: { username: string }) {
+  const [open, setOpen] = useState(false)
+  const btnRef = useRef<HTMLButtonElement | null>(null)
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handleDocClick = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (btnRef.current && !btnRef.current.contains(target)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('click', handleDocClick)
+    return () => document.removeEventListener('click', handleDocClick)
+  }, [open])
+
+  const openMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = btnRef.current?.getBoundingClientRect()
+    if (rect) {
+      const menuWidth = 200
+      const left = Math.max(8, rect.right - menuWidth)
+      const top = rect.top + window.scrollY + rect.height + 8
+      setCoords({ top, left })
+    }
+    setOpen(true)
+  }
+
+  const closeAnd = (fn?: () => void) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (fn) fn()
+    setOpen(false)
+  }
+
+  const { toast } = useToast()
+
+  const copyLink = async () => {
+    try {
+      const url = (typeof window !== 'undefined' ? window.location.origin : '') + `/profile/${username}`
+      await navigator.clipboard.writeText(url)
+      toast({ title: 'Copiado', description: 'Link copiado al portapapeles' })
+    } catch (err) { console.error(err); toast({ title: 'Error', description: 'No se pudo copiar el link', variant: 'destructive' }) }
+  }
+
+  const blockUser = () => toast({ title: 'Bloqueado', description: `@${username} bloqueado (placeholder)` })
+  const removeUser = () => toast({ title: 'Eliminado', description: `@${username} eliminado (placeholder)` })
+  const reportUser = () => toast({ title: 'Reportado', description: `@${username} reportado (placeholder)` })
+
+  return (
+    <>
+      <button ref={btnRef} onClick={openMenu} className="absolute top-2 right-2 z-40 p-1 rounded-full bg-black/40 hover:bg-black/60">
+        <MoreHorizontal className="h-5 w-5 text-[#D4AF37]" />
+      </button>
+      {open && coords && typeof document !== 'undefined' && createPortal(
+        <div style={{ position: 'absolute', top: coords.top + 'px', left: coords.left + 'px', zIndex: 9999 }}>
+          <div className="w-48 bg-background border border-[#D4AF37]/20 rounded-md shadow-xl py-1">
+            <div className="px-3 py-2 text-xs text-[#D4AF37]/80 font-semibold">@{username}</div>
+            <div className="border-t border-[#D4AF37]/10" />
+            <button onClick={closeAnd(copyLink)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">Copy link to profile</button>
+            <button onClick={closeAnd(blockUser)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">Block</button>
+            <button onClick={closeAnd(removeUser)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">Remove</button>
+            <button onClick={closeAnd(reportUser)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">Report</button>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   )
 }
