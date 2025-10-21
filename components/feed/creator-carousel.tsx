@@ -16,67 +16,114 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 
 export default function CreatorCarousel({ creators }: CreatorCarouselProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [pageIndex, setPageIndex] = useState(0)
-  const pages = chunkArray(creators || [], 3)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(true)
+  
+  // Organizar creadores en filas de 3
+  const rows = chunkArray(creators || [], 3)
+  // Reducimos el ancho para que las tarjetas en la sidebar no se vean demasiado anchas
+  const itemWidth = 280 // Ancho aproximado de cada fila (ligeramente mayor)
+  const gap = 16 // Gap entre elementos
 
   useEffect(() => {
-    // reset to first page when creators change
-    setPageIndex(0)
-    const el = containerRef.current
-    if (el) el.scrollTo({ left: 0 })
+    setCurrentIndex(0)
+    updateScrollButtons()
   }, [creators])
 
+  const updateScrollButtons = () => {
+    const container = containerRef.current
+    if (!container) return
+
+    const scrollLeft = container.scrollLeft
+    const maxScroll = container.scrollWidth - container.clientWidth
+
+    setCanScrollLeft(scrollLeft > 0)
+    setCanScrollRight(scrollLeft < maxScroll - 10) // -10 para tolerancia
+  }
+
   useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    const onScroll = () => {
-      const idx = Math.round(el.scrollLeft / el.clientWidth)
-      setPageIndex(idx)
+    const container = containerRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      updateScrollButtons()
+      // Calcular el índice actual basado en la posición de scroll
+      const scrollLeft = container.scrollLeft
+      const newIndex = Math.round(scrollLeft / (itemWidth + gap))
+      setCurrentIndex(newIndex)
     }
-    el.addEventListener("scroll", onScroll)
-    const onResize = () => {
-      // keep current page aligned after resize
-      el.scrollTo({ left: pageIndex * el.clientWidth })
-    }
-    window.addEventListener("resize", onResize)
+
+    container.addEventListener('scroll', handleScroll)
+    const resizeObserver = new ResizeObserver(updateScrollButtons)
+    resizeObserver.observe(container)
+
     return () => {
-      el.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onResize)
+      container.removeEventListener('scroll', handleScroll)
+      resizeObserver.disconnect()
     }
-  }, [pageIndex])
+  }, [itemWidth, gap])
 
-  const canLeft = pageIndex > 0
-  const canRight = pageIndex < pages.length - 1
+  const scrollToIndex = (index: number) => {
+    const container = containerRef.current
+    if (!container) return
 
-  const go = (dir: number) => {
-    const el = containerRef.current
-    if (!el) return
-    const next = Math.min(Math.max(0, pageIndex + dir), pages.length - 1)
-    el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" })
-    setPageIndex(next)
+    const scrollLeft = index * (itemWidth + gap)
+    container.scrollTo({
+      left: scrollLeft,
+      behavior: 'smooth'
+    })
+  }
+
+  const scrollLeft = () => {
+    if (currentIndex > 0) {
+      scrollToIndex(currentIndex - 1)
+    }
+  }
+
+  const scrollRight = () => {
+    if (currentIndex < rows.length - 1) {
+      scrollToIndex(currentIndex + 1)
+    }
   }
 
   if (!creators || creators.length === 0) return null
 
   return (
-    <div className="relative">
-      {canLeft && (
+    <div className="relative group">
+      {/* Botón izquierdo */}
+      {canScrollLeft && (
         <button
+          onClick={scrollLeft}
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center h-10 w-10 rounded-full bg-black/80 hover:bg-black/90 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-200 opacity-0 group-hover:opacity-100"
           aria-label="Anterior"
-          onClick={() => go(-1)}
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center h-8 w-8 rounded-full bg-black/60 hover:bg-black/70"
         >
-          <ChevronLeft className="h-4 w-4 text-[#D4AF37]" />
+          <ChevronLeft className="h-5 w-5 text-[#D4AF37]" />
         </button>
       )}
 
-      <div ref={containerRef} className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-        {pages.map((page, pIdx) => (
-          <div key={pIdx} className="min-w-full flex-shrink-0 p-1 snap-start">
-            <div className="flex flex-col gap-3">
-              {page.map((creator: any, index: number) => (
+      {/* Contenedor del carrusel */}
+      <div 
+        ref={containerRef}
+        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+        style={{
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        {rows.map((row, rowIndex) => (
+          <div 
+            key={rowIndex} 
+            className="flex-shrink-0 flex flex-col gap-3"
+              style={{ 
+                width: `${itemWidth}px`,
+                maxWidth: '100%',
+                scrollSnapAlign: 'start'
+              }}
+          >
+            {row.map((creator: any, creatorIndex: number) => (
+              <div key={`${rowIndex}-${creatorIndex}`} className="w-full">
                 <CreatorCard
-                  key={index}
                   compact
                   name={creator.full_name || creator.username}
                   username={creator.username}
@@ -85,20 +132,39 @@ export default function CreatorCarousel({ creators }: CreatorCarouselProps) {
                   subscribers={creator.subscriber_count || 0}
                   isSubscribed={false}
                 />
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         ))}
       </div>
 
-      {canRight && (
+      {/* Botón derecho */}
+      {canScrollRight && (
         <button
+          onClick={scrollRight}
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center h-10 w-10 rounded-full bg-black/80 hover:bg-black/90 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-200 opacity-0 group-hover:opacity-100"
           aria-label="Siguiente"
-          onClick={() => go(1)}
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center h-8 w-8 rounded-full bg-black/60 hover:bg-black/70"
         >
-          <ChevronRight className="h-4 w-4 text-[#D4AF37]" />
+          <ChevronRight className="h-5 w-5 text-[#D4AF37]" />
         </button>
+      )}
+
+      {/* Indicadores de página (opcional) */}
+      {rows.length > 1 && (
+        <div className="flex justify-center mt-4 gap-2">
+          {rows.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => scrollToIndex(index)}
+              className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                index === currentIndex 
+                  ? 'bg-[#D4AF37] w-6' 
+                  : 'bg-[#D4AF37]/30 hover:bg-[#D4AF37]/50'
+              }`}
+              aria-label={`Ir a la página ${index + 1}`}
+            />
+          ))}
+        </div>
       )}
     </div>
   )

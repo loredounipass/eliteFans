@@ -27,6 +27,15 @@ type PostRow = {
 
 const FEED_LIMIT = 20
 
+type CreatorPreview = {
+  username?: string
+  full_name?: string
+  avatar_url?: string
+  cover_url?: string
+  subscriber_count?: number
+  is_creator?: boolean
+}
+
 async function getFeedData() {
   const supabase = await createServerClient()
 
@@ -87,24 +96,56 @@ async function getFeedData() {
     return a.isSubscribed ? -1 : 1
   })
 
-  const { data: creators } = await supabase
+  // Traer TODOS los usuarios de la tabla profiles para el carrusel
+  const { data: allProfiles } = await supabase
     .from("profiles")
-    .select("username, full_name, avatar_url, cover_url, subscriber_count")
-    .eq("is_creator", true)
-    .limit(6)
-  // Si no hay creators marcados como creador, construir un fallback a partir de los posts
-  let creatorsList = creators || []
+    .select("username, full_name, avatar_url, cover_url, subscriber_count, is_creator")
+    // Supabase client order options don't include `nullsLast`; use `nullsFirst: false` to place nulls last
+    .order("subscriber_count", { ascending: false, nullsFirst: false })
+
+  // Filtrar y organizar los creadores
+  let creatorsList: CreatorPreview[] = []
+  
+  if (allProfiles && allProfiles.length > 0) {
+    // Primero mostrar usuarios marcados como creadores
+    const markedCreators = allProfiles.filter(profile => profile.is_creator === true)
+    
+    // Luego agregar otros usuarios que no son el usuario actual
+    const otherUsers = allProfiles.filter(profile => 
+      profile.is_creator !== true && 
+      profile.username && 
+      profile.username !== userData?.user?.user_metadata?.username
+    )
+    
+    // Combinar creadores marcados y otros usuarios
+    creatorsList = [...markedCreators, ...otherUsers]
+    
+    // Excluir al usuario actual si está en la lista
+    if (currentUserId && userData?.user?.user_metadata?.username) {
+      creatorsList = creatorsList.filter(creator => 
+        creator.username !== userData.user.user_metadata.username
+      )
+    }
+  }
+
+  // Si no hay profiles, construir un fallback a partir de los posts
   if ((!creatorsList || creatorsList.length === 0) && (mapped && mapped.length > 0)) {
     const seen = new Set<string>()
     creatorsList = mapped
-      .filter((p: any) => p.username)
-      .map((p: any) => ({ username: p.username, full_name: p.full_name, avatar_url: p.avatar_url, cover_url: p.avatar_url, subscriber_count: 0 }))
+      .filter((p: any) => p.username && p.creator_id !== currentUserId)
+      .map((p: any) => ({ 
+        username: p.username, 
+        full_name: p.full_name, 
+        avatar_url: p.avatar_url, 
+        cover_url: p.avatar_url, 
+        subscriber_count: 0,
+        is_creator: false
+      }))
       .filter((c: any) => {
         if (seen.has(c.username)) return false
         seen.add(c.username)
         return true
       })
-      .slice(0, 6)
   }
 
   return { posts: mapped as PostRow[], creators: creatorsList || [], subscribedCreatorIds, followedCreatorIds }
