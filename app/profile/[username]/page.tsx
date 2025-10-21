@@ -16,10 +16,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const supabase = await createServerClient()
 
   // ASEGURAR QUE params ESTE RESUELTO ANTES DE USAR SUS PROPIEDADES (REQUERIMIENTO DE NEXT.JS)
-  const { username } = (await params) as ProfilePageProps["params"]
+  const { username: rawUsername } = (await params) as ProfilePageProps["params"]
 
-  // OBTENER DATOS DEL PERFIL
-  const { data: profile, error } = await supabase.from("profiles").select("*").eq("username", username).single()
+  // Normalizar y decodificar el parametro de ruta. Quitamos un posible '@' y espacios.
+  const usernameParam = decodeURIComponent(rawUsername || "").trim()
+  const lookupName = usernameParam.startsWith("@") ? usernameParam.slice(1) : usernameParam
+
+  // OBTENER DATOS DEL PERFIL (case-insensitive) para evitar problemas con mayúsculas/minúsculas
+  const { data: profile, error } = await supabase.from("profiles").select("*").ilike("username", lookupName).single()
 
   if (error || !profile) {
     notFound()
