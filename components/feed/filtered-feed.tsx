@@ -24,11 +24,13 @@ type PostRow = {
 
 interface FilteredFeedProps {
   posts: PostRow[]
+  subscribedCreatorIds?: string[]
+  followedCreatorIds?: string[]
 }
 
 const FILTERS_STORAGE_KEY = 'eliteFans_feed_filters'
 
-export function FilteredFeed({ posts }: FilteredFeedProps) {
+export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }: FilteredFeedProps) {
   const [filters, setFilters] = useState<FilterState>(() => {
     try {
       const saved = typeof window !== 'undefined' ? localStorage.getItem(FILTERS_STORAGE_KEY) : null
@@ -83,30 +85,65 @@ export function FilteredFeed({ posts }: FilteredFeedProps) {
 
   const filteredPosts = filterPosts(posts, filters)
 
+  // Estado para la pestaña activa del feed
+  const [activeTab, setActiveTab] = useState<'parati' | 'siguiendo' | 'popular'>('parati')
+
+  // Calcular posts según la pestaña seleccionada
+  const postsForTab = (() => {
+    switch (activeTab) {
+      case 'parati':
+        // Priorizar posts de creadores suscritos, luego por fecha
+        return [...filteredPosts].sort((a, b) => {
+          if ((a.isSubscribed === b.isSubscribed)) return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          return a.isSubscribed ? -1 : 1
+        })
+      case 'siguiendo':
+        // Priorizar creadores que sigues (follows). Si no hay follows, usar suscripciones como fallback.
+        if (followedCreatorIds && followedCreatorIds.length > 0) {
+          return filteredPosts.filter(p => followedCreatorIds.includes(p.creator_id))
+        }
+        if (subscribedCreatorIds && subscribedCreatorIds.length > 0) {
+          return filteredPosts.filter(p => subscribedCreatorIds.includes(p.creator_id))
+        }
+        // Fallback a usar la propiedad isSubscribed si ninguna lista está disponible
+        return filteredPosts.filter(p => p.isSubscribed)
+      case 'popular':
+        // Mostrar solo el/los post(s) con más likes (máximo)
+        if (filteredPosts.length === 0) return filteredPosts
+        const maxLikes = filteredPosts.reduce((m, p) => Math.max(m, p.like_count || 0), 0)
+        return filteredPosts.filter(p => (p.like_count || 0) === maxLikes)
+        default:
+          return filteredPosts
+    }
+  })()
+
   return (
     <div className="flex gap-6 h-full">
       {/* Sidebar izquierdo con filtros */}
       <aside className="hidden lg:block lg:w-72">
         <div className="sticky top-0 space-y-4">
           <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
-            <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
+              <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
-              Explorar
+              Secciones
             </h3>
             <ul className="space-y-2">
-              <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] transition-all duration-200 font-medium">
+              <li
+                onClick={() => setActiveTab('parati')}
+                className={`cursor-pointer rounded-full px-3 py-1.5 transition-all duration-200 font-medium ${activeTab === 'parati' ? 'text-[#F4BF37] bg-[#D4AF37]/10' : 'text-[#D4AF37]/80 hover:bg-[#D4AF37]/10'}`}>
                 Para ti
               </li>
-              <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all duration-200">
+              <li
+                onClick={() => setActiveTab('siguiendo')}
+                className={`cursor-pointer rounded-full px-3 py-1.5 transition-all duration-200 ${activeTab === 'siguiendo' ? 'text-[#F4BF37] bg-[#D4AF37]/10' : 'text-[#D4AF37]/80 hover:bg-[#D4AF37]/10'}`}>
                 Siguiendo
               </li>
-              <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all duration-200">
+              <li
+                onClick={() => setActiveTab('popular')}
+                className={`cursor-pointer rounded-full px-3 py-1.5 transition-all duration-200 ${activeTab === 'popular' ? 'text-[#F4BF37] bg-[#D4AF37]/10' : 'text-[#D4AF37]/80 hover:bg-[#D4AF37]/10'}`}>
                 Popular
-              </li>
-              <li className="cursor-pointer rounded-full px-3 py-1.5 text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all duration-200">
-                Categorías
               </li>
             </ul>
           </div>
@@ -146,7 +183,7 @@ export function FilteredFeed({ posts }: FilteredFeedProps) {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-[#D4AF37]/70">
-                  {filteredPosts.length} de {posts.length} posts
+                  {postsForTab.length} de {posts.length} posts
                 </span>
                 <button
                   onClick={() => handleFiltersChange({
@@ -164,18 +201,33 @@ export function FilteredFeed({ posts }: FilteredFeedProps) {
         )}
 
         {/* Lista de posts filtrados */}
-        {filteredPosts.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-[#D4AF37]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+        {postsForTab.length === 0 ? (
+          activeTab === 'siguiendo' ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-[#D4AF37]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-[#D4AF37] mb-2">Aún no sigues a creadores</h3>
+              <p className="text-[#D4AF37]/70 mb-4">No hay publicaciones de creadores que sigues. Empieza a seguir a creadores para ver su contenido aquí.</p>
+              <div>
+                <a href="/feed" className="inline-block px-4 py-2 bg-[#D4AF37] text-black rounded-full font-medium">Explorar creadores</a>
+              </div>
             </div>
-            <h3 className="text-lg font-semibold text-[#D4AF37] mb-2">No hay contenido</h3>
-            <p className="text-[#D4AF37]/70">No se encontraron posts que coincidan con los filtros seleccionados.</p>
-          </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-[#D4AF37]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-[#D4AF37] mb-2">No hay contenido</h3>
+              <p className="text-[#D4AF37]/70">No se encontraron posts que coincidan con los filtros seleccionados.</p>
+            </div>
+          )
         ) : (
-          filteredPosts.map((post) => {
+          postsForTab.map((post) => {
             // Para contenido premium, siempre mostrar como locked si is_locked es true
             // independientemente del estado de suscripción cuando el filtro premium está activo
             const isPremiumFiltered = filters.premiumContent && post.is_locked

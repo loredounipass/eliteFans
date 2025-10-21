@@ -53,6 +53,16 @@ async function getFeedData() {
     subscribedCreatorIds = (subs || []).map((s: any) => s.creator_id)
   }
 
+  // Obtener la lista de creadores que el usuario sigue (tabla follows)
+  let followedCreatorIds: string[] = []
+  if (currentUserId) {
+    const { data: follows } = await supabase
+      .from("follows")
+      .select("following_id")
+      .eq("follower_id", currentUserId)
+    followedCreatorIds = (follows || []).map((f: any) => f.following_id)
+  }
+
   const mapped = (posts as any[]).map((p) => ({
     id: p.id,
     creator_id: p.creator_id,
@@ -82,11 +92,11 @@ async function getFeedData() {
     .eq("is_creator", true)
     .limit(6)
 
-  return { posts: mapped as PostRow[], creators: creators || [] }
+  return { posts: mapped as PostRow[], creators: creators || [], subscribedCreatorIds, followedCreatorIds }
 }
 
 export default async function FeedPage() {
-  const { posts, creators } = await getFeedData()
+  const { posts, creators, subscribedCreatorIds, followedCreatorIds } = await getFeedData()
 
   return (
     <PrivateRoute>
@@ -95,7 +105,7 @@ export default async function FeedPage() {
         <main className="relative container mx-auto px-3 py-6 flex gap-6 h-[calc(100vh-6rem)]">
           <div className="flex-1 space-y-6 overflow-y-auto scrollbar-hide pr-2 h-full">
             <HeaderSearch />
-            <FilteredFeed posts={posts} />
+            <FilteredFeed posts={posts} subscribedCreatorIds={subscribedCreatorIds} followedCreatorIds={followedCreatorIds} />
           </div>
 
           <RightSidebar creators={creators} posts={posts} />
