@@ -232,17 +232,16 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
     <Card className="group overflow-hidden border-0 bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-2xl shadow-[#D4AF37]/5 transition-all duration-300 hover:shadow-[#D4AF37]/10 hover:scale-[1.02] rounded-3xl">
       {/* Header con perfil del creador */}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 px-6 py-4 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
-        <Link
-          href={`/profile/${creator.username}`}
-          className="flex items-center gap-4 flex-1 hover:opacity-80 transition-all duration-200"
-        >
+        <div className="flex items-center gap-4 flex-1">
           <div className="relative">
-            <Avatar className="h-12 w-12 border-3 border-[#D4AF37]/40 shadow-lg shadow-[#D4AF37]/20">
-              <AvatarImage src={creator.avatar || "/placeholder.svg"} alt={creator.name} className="object-cover" />
-              <AvatarFallback className="bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#D4AF37] font-bold text-lg">
-                {creator.name[0]}
-              </AvatarFallback>
-            </Avatar>
+            <Link href={`/profile/${creator.username}`} className="block">
+              <Avatar className="h-12 w-12 border-3 border-[#D4AF37]/40 shadow-lg shadow-[#D4AF37]/20">
+                <AvatarImage src={creator.avatar || "/placeholder.svg"} alt={creator.name} className="object-cover" />
+                <AvatarFallback className="bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#D4AF37] font-bold text-lg">
+                  {creator.name[0]}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
             {isSubscribed && (
               <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-[#D4AF37] border-2 border-black flex items-center justify-center">
                 <div className="h-2 w-2 rounded-full bg-black"></div>
@@ -251,9 +250,12 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <p className="font-bold text-base text-[#D4AF37] hover:text-[#F4BF37] transition-colors">
-                {creator.name}
-              </p>
+              <Link href={`/profile/${creator.username}`} className="hover:opacity-80 transition-all duration-200">
+                <p className="font-bold text-base text-[#D4AF37] hover:text-[#F4BF37] transition-colors">
+                  {creator.name}
+                </p>
+                <p className="text-sm text-[#D4AF37]/70 hover:text-[#D4AF37]/90 transition-colors">@{creator.username}</p>
+              </Link>
               {content.type === "locked" && (
                 <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-[#D4AF37]/20 to-[#D4AF37]/10 px-3 py-1 border border-[#D4AF37]/30">
                   <Lock className="h-3 w-3 text-[#D4AF37]" />
@@ -261,9 +263,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
                 </div>
               )}
             </div>
-            <p className="text-sm text-[#D4AF37]/70 hover:text-[#D4AF37]/90 transition-colors">@{creator.username}</p>
           </div>
-        </Link>
+        </div>
 
         <div className="flex items-center gap-2">
           {/* Use centralized FollowButton component - only show when not subscribed */}
