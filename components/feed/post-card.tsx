@@ -322,15 +322,16 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
           </div>
         ) : (
           <div className="relative w-full overflow-hidden bg-black group">
-            <Image
-              src={content.url || "/placeholder.svg?height=600&width=600"}
-              alt="Post content"
-              width={600}
-              height={600}
-              className="w-full h-auto max-h-[600px] object-contain transition-transform duration-500 group-hover:scale-105"
-              style={{ width: "100%", height: "auto" }}
-              sizes="(max-width: 640px) 100vw, 600px"
-            />
+            <div className="relative w-full h-[600px]">
+              <Image
+                src={content.url || "/placeholder.svg?height=600&width=600"}
+                alt="Post content"
+                fill
+                className="object-contain transition-transform duration-500 group-hover:scale-105"
+                style={{ objectFit: 'contain' }}
+                sizes="(max-width: 640px) 100vw, 600px"
+              />
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
         )}
