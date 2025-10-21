@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { PostCard } from "@/components/feed/post-card"
 import { FeedFilters, FilterState } from "@/components/feed/feed-filters"
 import { SubscriptionsBox } from "@/components/feed/subscriptions-box"
+import { MobileSidebar } from "@/components/feed/mobile-sidebar"
 
 type PostRow = {
   id: string
@@ -88,6 +89,9 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
 
   // Estado para la pestaña activa del feed
   const [activeTab, setActiveTab] = useState<'parati' | 'siguiendo' | 'popular'>('parati')
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [showMobileSubscriptions, setShowMobileSubscriptions] = useState(false)
+  const [showMobileChat, setShowMobileChat] = useState(false)
 
   // Calcular posts según la pestaña seleccionada
   const postsForTab = (() => {
@@ -164,11 +168,11 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
       <section className="flex-1 space-y-6 overflow-y-auto scrollbar-hide pr-2 h-full">
         {/* Indicador de filtros activos */}
         {(filters.onlyImages || filters.onlyVideos || filters.premiumContent) && (
-          <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 mb-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+          <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-3 mb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
                 <span className="text-sm font-semibold text-[#D4AF37]">Filtros activos:</span>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
                   {filters.onlyImages && (
                     <span className="px-3 py-1 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full border border-[#D4AF37]/30">
                       Solo imágenes
@@ -186,7 +190,7 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-start sm:justify-end">
                 <span className="text-xs text-[#D4AF37]/70">
                   {postsForTab.length} de {posts.length} posts
                 </span>
@@ -261,6 +265,49 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
           })
         )}
       </section>
+      {/* Mobile Filters modal (centrado) */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center lg:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileFilters(false)} />
+          <div className="relative w-full max-w-md bg-background rounded-2xl p-6 mx-4 z-10 overflow-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold">Filtros</h3>
+              <button className="text-sm text-muted-foreground" onClick={() => setShowMobileFilters(false)}>Cerrar</button>
+            </div>
+            <FeedFilters onFiltersChange={handleFiltersChange} initialFilters={filters} />
+          </div>
+        </div>
+      )}
+      {/* Mobile Subscriptions overlay */}
+      {showMobileSubscriptions && (
+        <div className="fixed inset-0 z-50 flex items-end lg:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowMobileSubscriptions(false)} />
+          <div className="relative w-full bg-background rounded-t-xl p-4 max-h-[70vh] overflow-auto">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium">Suscripciones</h3>
+              <button className="text-sm text-muted-foreground" onClick={() => setShowMobileSubscriptions(false)}>Cerrar</button>
+            </div>
+            <SubscriptionsBox />
+          </div>
+        </div>
+      )}
+      {/* Mobile sidebar (visible en lg:hidden) */}
+  <MobileSidebar activeTab={activeTab} setActiveTab={setActiveTab} onOpenFilters={() => setShowMobileFilters(true)} onOpenSubscriptions={() => setShowMobileSubscriptions(true)} onOpenChat={() => setShowMobileChat(true)} />
+
+      {/* Mobile Chat overlay */}
+      {showMobileChat && (
+        <div className="fixed inset-0 z-50 flex items-end lg:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowMobileChat(false)} />
+          <div className="relative w-full bg-background rounded-t-xl p-4 max-h-[70vh] overflow-auto">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium">Chat</h3>
+              <button className="text-sm text-muted-foreground" onClick={() => setShowMobileChat(false)}>Cerrar</button>
+            </div>
+            {/* ChatSection */}
+            {/* If you want the full chat UI, we can render ChatSection component here */}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
