@@ -63,7 +63,7 @@ async function getFeedData() {
     subscribedCreatorIds = (subs || []).map((s: any) => s.creator_id)
   }
 
-  // Obtener la lista de creadores que el usuario sigue (tabla follows)
+  // OBTENER LA LISTA DE CREADORES QUE EL USUARIO SIGUE (TABLA FOLLOWS)
   let followedCreatorIds: string[] = []
   if (currentUserId) {
     const { data: follows } = await supabase
@@ -96,31 +96,31 @@ async function getFeedData() {
     return a.isSubscribed ? -1 : 1
   })
 
-  // Traer TODOS los usuarios de la tabla profiles para el carrusel
+  // TRAER TODOS LOS USUARIOS DE LA TABLA PROFILES PARA EL CARRUSEL
   const { data: allProfiles } = await supabase
     .from("profiles")
     .select("username, full_name, avatar_url, cover_url, subscriber_count, is_creator")
     // Supabase client order options don't include `nullsLast`; use `nullsFirst: false` to place nulls last
     .order("subscriber_count", { ascending: false, nullsFirst: false })
 
-  // Filtrar y organizar los creadores
+  // FILTRAR Y ORGANIZAR LOS CREADORES
   let creatorsList: CreatorPreview[] = []
   
   if (allProfiles && allProfiles.length > 0) {
-    // Primero mostrar usuarios marcados como creadores
+  // PRIMERO MOSTRAR USUARIOS MARCADOS COMO CREADORES
     const markedCreators = allProfiles.filter(profile => profile.is_creator === true)
     
-    // Luego agregar otros usuarios que no son el usuario actual
+  // LUEGO AGREGAR OTROS USUARIOS QUE NO SON EL USUARIO ACTUAL
     const otherUsers = allProfiles.filter(profile => 
       profile.is_creator !== true && 
       profile.username && 
       profile.username !== userData?.user?.user_metadata?.username
     )
     
-    // Combinar creadores marcados y otros usuarios
+  // COMBINAR CREADORES MARCADOS Y OTROS USUARIOS
     creatorsList = [...markedCreators, ...otherUsers]
     
-    // Excluir al usuario actual si está en la lista
+  // EXCLUIR AL USUARIO ACTUAL SI ESTÁ EN LA LISTA
     if (currentUserId && userData?.user?.user_metadata?.username) {
       creatorsList = creatorsList.filter(creator => 
         creator.username !== userData.user.user_metadata.username
@@ -128,7 +128,7 @@ async function getFeedData() {
     }
   }
 
-  // Si no hay profiles, construir un fallback a partir de los posts
+  // SI NO HAY PROFILES, CONSTRUIR UN FALLBACK A PARTIR DE LOS POSTS
   if ((!creatorsList || creatorsList.length === 0) && (mapped && mapped.length > 0)) {
     const seen = new Set<string>()
     creatorsList = mapped
@@ -171,7 +171,7 @@ export default async function FeedPage() {
   )
 }
 
-// --- Small presentational components extracted for readability ---
+// --- COMPONENTES PRESENTACIONALES PEQUEÑOS EXTRAÍDOS PARA LEGIBILIDAD ---
 
 function HeaderSearch() {
   return null
@@ -192,8 +192,8 @@ function RightSidebar({ creators, posts }: { creators: any[]; posts: PostRow[] }
             Creadores Sugeridos
           </h3>
           <div>
-            {/* Carousel that shows 3 items per view and scrolls horizontally */}
-            {/* Import client component dynamically to avoid server/client mismatch */}
+            {/* CARROUSEL QUE MUESTRA 3 ITEMS POR VISTA Y HACE SCROLL HORIZONTAL */}
+            {/* IMPORTAR EL COMPONENTE CLIENTE DINÁMICAMENTE PARA EVITAR DESAJUSTE SERVER/CLIENT */}
             <CreatorCarousel creators={creators} />
           </div>
         </div>
