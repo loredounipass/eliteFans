@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { LogOut, Settings, User } from "lucide-react"
+import { LogOut, Settings, User, Grid, Home } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 export function DashboardHeader() {
@@ -38,14 +38,13 @@ export function DashboardHeader() {
           <span className="text-2xl font-extrabold tracking-wide text-[#D4AF37]">ElitFans</span>
         </Link>
         <nav className="flex items-center gap-6">
-          <Link
-            href="/dashboard"
-            className="text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase"
-          >
-            Dashboard
+          <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
+            <Grid className="h-4 w-4" />
+            <span>Dashboard</span>
           </Link>
-          <Link href="/feed" className="text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
-            Feed
+          <Link href="/feed" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
+            <Home className="h-4 w-4" />
+            <span>Feed</span>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
