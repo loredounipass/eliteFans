@@ -229,15 +229,15 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
   }
 
   return (
-    <Card className="group overflow-hidden border-0 bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-2xl shadow-[#D4AF37]/5 transition-all duration-300 hover:shadow-[#D4AF37]/10 hover:scale-[1.02] rounded-3xl">
+    <Card className="group overflow-hidden border-0 bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-2xl shadow-[#D4AF37]/5 transition-all duration-300 hover:shadow-[#D4AF37]/10 hover:scale-[1.02] rounded-3xl max-w-[760px] mx-auto">
       {/* Header con perfil del creador */}
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 px-6 py-4 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
+  <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
         <div className="flex items-center gap-4 flex-1">
           <div className="relative">
             <Link href={`/profile/${creator.username}`} className="block">
-              <Avatar className="h-12 w-12 border-3 border-[#D4AF37]/40 shadow-lg shadow-[#D4AF37]/20">
+              <Avatar className="h-10 w-10 border-2 border-[#D4AF37]/40 shadow-md shadow-[#D4AF37]/15">
                 <AvatarImage src={creator.avatar || "/placeholder.svg"} alt={creator.name} className="object-cover" />
-                <AvatarFallback className="bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#D4AF37] font-bold text-lg">
+                <AvatarFallback className="bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#D4AF37] font-bold text-base">
                   {creator.name[0]}
                 </AvatarFallback>
               </Avatar>
@@ -271,7 +271,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
           {!isSubscribed && creatorProfileId && (
             <FollowButton 
               userId={creatorProfileId}
-              className="font-semibold px-6 py-2 rounded-full shadow-lg shadow-[#D4AF37]/30 transition-all duration-200 hover:scale-105"
+              className="font-semibold px-3 py-1.5 rounded-full shadow-md shadow-[#D4AF37]/25 transition-all duration-200 hover:scale-105"
             />
           )}
           <Button
@@ -322,14 +322,14 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
           </div>
         ) : (
           <div className="relative w-full overflow-hidden bg-black group">
-            <div className="relative w-full h-[600px]">
+            <div className="relative w-full h-[420px]">
               <Image
                 src={content.url || "/placeholder.svg?height=600&width=600"}
                 alt="Post content"
                 fill
                 className="object-contain transition-transform duration-500 group-hover:scale-105"
                 style={{ objectFit: 'contain' }}
-                sizes="(max-width: 640px) 100vw, 600px"
+                sizes="(max-width: 640px) 100vw, 420px"
               />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -341,25 +341,25 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
       <CardFooter className="flex-col items-start gap-4 px-6 py-4 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
         {/* Botones de acción */}
         <div className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleLike}
-              className={`gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
+              className={`gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${
                 liked
                   ? "text-red-500 bg-red-500/10 hover:bg-red-500/20 scale-110"
                   : "text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105"
               }`}
             >
-              <Heart className={`h-5 w-5 transition-all duration-200 ${liked ? "fill-current animate-pulse" : ""}`} />
+              <Heart className={`h-4 w-4 transition-all duration-200 ${liked ? "fill-current animate-pulse" : ""}`} />
               <span className="font-semibold">{likes}</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
-              className="gap-2 px-4 py-2 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
+              className="gap-2 px-3 py-1.5 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
               onClick={async () => {
                 const next = !showComments
                 setShowComments(next)
@@ -368,16 +368,16 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
                 }
               }}
             >
-              <MessageCircle className="h-5 w-5" />
+              <MessageCircle className="h-4 w-4" />
               <span className="font-semibold">{comments}</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
-              className="gap-2 px-4 py-2 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
+              className="gap-2 px-3 py-1.5 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
             >
-              <Share2 className="h-5 w-5" />
+              <Share2 className="h-4 w-4" />
             </Button>
           </div>
 
@@ -391,7 +391,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
                 : "text-[#D4AF37]/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:scale-105"
             }`}
           >
-            <Bookmark className={`h-5 w-5 ${bookmarked ? "fill-current" : ""}`} />
+            <Bookmark className={`h-4 w-4 ${bookmarked ? "fill-current" : ""}`} />
           </Button>
         </div>
 
