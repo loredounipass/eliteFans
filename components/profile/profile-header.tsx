@@ -202,11 +202,27 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
             {/* Botones mejorados - Incluye botón de seguir */}
             <div className={`flex gap-3 transition-all duration-700 delay-600 ${mounted ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
               {!isOwnProfile && (
-                <>
+                <div className="flex items-center gap-2">
                   <FollowButton 
                     userId={profile.id} 
                     onFollowChange={handleFollowChange}
                   />
+
+                  {/* Botón que muestra solo el precio de la suscripción (visible siempre para perfiles de terceros) */}
+                  <Button
+                    aria-label={`Precio de suscripción ${profile.subscription_price ?? 0} dólares por mes`}
+                    title={`Precio: $${profile.subscription_price ?? 0}/mes`}
+                    onClick={() => { /* botón informativo, sin acción por ahora */ }}
+                    variant="outline"
+                    className="border-[#D4AF37] text-[#D4AF37] bg-gradient-to-r from-[#D4AF37]/10 via-[#F4BF37]/5 to-transparent hover:from-[#D4AF37]/20 hover:via-[#F4BF37]/10 hover:shadow-lg hover:shadow-[#D4AF37]/20 transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">${profile.subscription_price ?? 0}</span>
+                      <span className="text-xs text-[#D4AF37]/80">/mes</span>
+                    </div>
+                  </Button>
+
+                  {/* Botón principal de suscripción solo para creadores */}
                   {profile.is_creator && (
                     <Button
                       onClick={handleSubscribe}
@@ -232,13 +248,13 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
                       ) : (
                         <>
                           <Star className="mr-2 h-4 w-4 group-hover:animate-pulse" />
-                          Suscribirse - ${profile.subscription_price || 0}/mes
+                          Suscribirse
                           <Diamond className="ml-2 h-4 w-4 group-hover:animate-bounce" />
                         </>
                       )}
                     </Button>
                   )}
-                </>
+                </div>
               )}
               {isOwnProfile && (
                 <>
