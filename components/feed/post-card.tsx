@@ -321,7 +321,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               <p className="mb-6 text-[#D4AF37]/80 text-lg max-w-sm mx-auto leading-relaxed">
                 Suscríbete para desbloquear este contenido premium y acceder a todo el material exclusivo
               </p>
-                 {/* Botón de desbloqueo eliminado por solicitud. Se mantiene el texto informativo. */}
+              <Button className="bg-gradient-to-r from-[#D4AF37] to-[#F4BF37] text-black hover:from-[#C9A961] hover:to-[#D4AF37] font-bold px-8 py-3 rounded-full shadow-xl shadow-[#D4AF37]/40 transition-all duration-300 hover:scale-110">
+                Desbloquear Ahora
+              </Button>
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
           </div>
