@@ -151,7 +151,7 @@ export default function DashboardPage() {
           <div>
             <h2 className="mb-4 text-xl font-semibold text-[#D4AF37]">Recent Activity</h2>
             <Card className="border-[#D4AF37]/20 bg-black/50">
-              <CardContent className="p-6">
+              <CardContent className="p-6 overflow-y-auto max-h-[50vh] sm:max-h-[60vh] hide-scrollbar">
                 <div className="space-y-4">
                   {metrics && metrics.recent ? (
                     <>
