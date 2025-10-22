@@ -52,6 +52,21 @@ export function FeedFilters({ onFiltersChange, initialFilters }: FeedFiltersProp
         <Star className="h-5 w-5" />
         Filtros
       </h3>
+      <div className="mb-3">
+        <label className="flex items-center gap-3 cursor-pointer group">
+          <input
+            type="checkbox"
+            checked={!filters.onlyImages && !filters.onlyVideos && !filters.premiumContent}
+            onChange={() => {
+              const cleared = { onlyImages: false, onlyVideos: false, premiumContent: false }
+              setFilters(cleared)
+              onFiltersChange(cleared)
+            }}
+            className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20 transition-all duration-200"
+          />
+          <span className="text-sm text-[#D4AF37]/80 group-hover:text-[#D4AF37] transition-colors duration-200">All</span>
+        </label>
+      </div>
       <div className="space-y-2">
         <label className="flex items-center gap-3 cursor-pointer group">
           <input 

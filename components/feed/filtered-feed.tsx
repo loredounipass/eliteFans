@@ -64,24 +64,31 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
         return true
       }
 
-      // Construir condiciones individuales
-      const conditions: boolean[] = []
+      // Mejor detección: comprobar extensiones de las URLs para diferenciar imágenes y videos
+      const imageExt = /\.(jpe?g|png|webp|gif|avif|svg)$/i
+      const videoExt = /\.(mp4|webm|mov|mkv|ogg)$/i
+      const urls: string[] = Array.isArray(post.media_urls) ? post.media_urls.filter(Boolean) as string[] : []
+      const hasImageUrls = urls.some(u => imageExt.test(u))
+      const hasVideoUrls = urls.some(u => videoExt.test(u))
 
+      // Evaluar match por tipo (imagen/video). Si no hay filtro de tipo activo, se considera match por tipo.
+      let passesType = true
       if (filters.onlyImages) {
-        const hasMediaUrls = (post.media_urls?.length ?? 0) > 0
-        conditions.push(post.media_type === 'image' || hasMediaUrls)
+        passesType = post.media_type === 'image' || hasImageUrls
+      } else if (filters.onlyVideos) {
+        passesType = post.media_type === 'video' || hasVideoUrls
       }
 
-      if (filters.onlyVideos) {
-        conditions.push(post.media_type === 'video')
-      }
-
+      // Evaluar match por premium: si el usuario quiere contenido premium -> debe ser is_locked;
+      // si no quiere premium, entonces excluir posts bloqueados.
+      let passesPremium = true
       if (filters.premiumContent) {
-        conditions.push(Boolean(post.is_locked))
+        passesPremium = Boolean(post.is_locked)
+      } else {
+        passesPremium = !Boolean(post.is_locked)
       }
 
-      // Si hay varias condiciones activas, mostrar si cumple AL MENOS UNA (OR)
-      return conditions.some(Boolean)
+      return passesType && passesPremium
     })
   }
 
@@ -125,7 +132,7 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
   return (
     <div className="flex gap-6 h-full">
       {/* Sidebar izquierdo con filtros */}
-      <aside className="hidden lg:block lg:w-72">
+  <aside className="hidden lg:block lg:w-56">
         <div className="sticky top-0 space-y-4">
           <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
               <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
@@ -244,7 +251,7 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
             const showLocked = isPremiumFiltered || (post.is_locked && !post.isSubscribed && !post.isOwn)
             
                 return (
-                <div key={post.id} className="mx-auto w-full max-w-lg">
+                <div key={post.id} className="mx-auto w-full max-w-3xl">
                   <PostCard
                   postId={post.id}
                   creator={{
