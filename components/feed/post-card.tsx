@@ -33,9 +33,10 @@ interface PostCardProps {
     comments: number
   }
   isSubscribed?: boolean
+  autoplay?: boolean
 }
 
-export function PostCard({ postId, creator, content, isSubscribed = false }: PostCardProps) {
+export function PostCard({ postId, creator, content, isSubscribed = false, autoplay = false }: PostCardProps) {
   const [liked, setLiked] = useState(false)
   const [mediaLoaded, setMediaLoaded] = useState(false)
   const [likes, setLikes] = useState(content.likes)
@@ -318,7 +319,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
             <video
               controls
               controlsList="nodownload"
-              autoPlay={false}
+              autoPlay={autoplay}
               loop
               muted
               preload="metadata"

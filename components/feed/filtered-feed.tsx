@@ -260,6 +260,7 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
                     comments: post.comment_count || 0,
                   }}
                   isSubscribed={post.isSubscribed}
+                  autoplay={true}
                 />
                 </div>
               )
