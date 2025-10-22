@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import Image from "next/image"
 import Link from "next/link"
@@ -10,7 +10,6 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Heart, MessageCircle, Share2, Lock, MoreHorizontal, Bookmark } from "lucide-react"
-import { useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { FollowButton } from "@/components/profile/follow-button"
 
@@ -373,6 +372,94 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     }
   }
 
+  // Map of comments by id for quick parent lookup when rendering replies
+  const commentById = useMemo(() => new Map<string, Comment>(commentList.map(c => [c.id, c])), [commentList])
+
+  const renderComment = (c: Comment) => {
+    const parent = c.parent_id ? commentById.get(c.parent_id) : undefined
+    return (
+      <div
+        key={c.id}
+        className={`flex flex-col gap-2 p-3 transition-all duration-200 ${
+          (c as any).depth > 0 ? 'ml-8' : ''
+        }`}
+      >
+        <div className="flex items-start gap-3">
+          <Avatar className="h-8 w-8 border border-[#D4AF37]/30">
+            <AvatarImage src={c.profiles?.avatar_url || "/placeholder.svg"} />
+            <AvatarFallback className="bg-[#D4AF37]/20 text-[#D4AF37] text-xs">
+              {(c.profiles?.full_name || `@${c.profiles?.username}` || "?")[0]}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-semibold text-[#D4AF37] text-sm">
+                {c.profiles?.full_name || `@${c.profiles?.username}`}
+              </span>
+              {c.parent_id && parent ? (
+                <span className="text-xs text-[#D4AF37]/50 ml-2">respondiendo a <span className="font-semibold text-[#D4AF37]">{parent.profiles?.full_name || `@${parent.profiles?.username}`}</span> <span className="ml-2">{new Date(c.created_at).toLocaleDateString()}</span></span>
+              ) : (
+                <span className="text-xs text-[#D4AF37]/50">{new Date(c.created_at).toLocaleDateString()}</span>
+              )}
+            </div>
+            <p className="text-sm text-[#D4AF37]/90 leading-relaxed mb-2">{c.content}</p>
+            <div className="flex items-center gap-4 text-xs">
+              <button
+                className={`flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-200 ${
+                  c.liked
+                    ? "text-red-400 bg-red-400/10"
+                    : "text-[#D4AF37]/70 hover:text-red-400 hover:bg-red-400/10"
+                } ${c.liking ? 'opacity-50' : ''}`}
+                onClick={() => handleCommentLike(c.id)}
+                disabled={c.liking}
+              >
+                <Heart className={`h-3 w-3 ${c.liked ? "fill-current" : ""}`} />
+                <span>{c.like_count ?? 0}</span>
+              </button>
+              <button
+                className="text-[#D4AF37]/70 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
+                onClick={() => setReplyingTo(c.id)}
+              >
+                Responder
+              </button>
+              {c.profiles?.id === "me" && (
+                <button
+                  className="text-red-400/70 hover:text-red-400 px-2 py-1 rounded-full hover:bg-red-400/10 transition-all duration-200"
+                  onClick={() => handleCommentDelete(c.id)}
+                >
+                  Eliminar
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {replyingTo === c.id && (
+          <div className="ml-11 flex items-center gap-2 mt-2">
+            <input
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder="Escribe una respuesta..."
+              className="flex-1 rounded-full bg-black/40 border border-[#D4AF37]/20 px-3 py-1 text-sm text-[#D4AF37] placeholder:text-[#D4AF37]/50 focus:border-[#D4AF37]/50 focus:outline-none"
+            />
+            <button
+              className="rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-semibold text-black hover:bg-[#C9A961] transition-colors"
+              onClick={() => handleReplySubmit(c.id)}
+            >
+              Responder
+            </button>
+            <button
+              className="text-xs text-[#D4AF37]/60 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
+              onClick={() => setReplyingTo(null)}
+            >
+              Cancelar
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
   <Card className="group overflow-hidden border-0 bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-2xl shadow-[#D4AF37]/5 transition-all duration-300 hover:shadow-[#D4AF37]/10 hover:scale-[1.02] rounded-3xl w-full">
       {/* Header con perfil del creador */}
@@ -635,83 +722,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 <p className="text-[#D4AF37]/60">Sé el primero en comentar</p>
               </div>
             ) : (
-              commentList.map((c) => (
-                <div
-                  key={c.id}
-                  className={`flex flex-col gap-2 p-3 rounded-2xl bg-black/30 border border-[#D4AF37]/10 hover:bg-black/40 transition-all duration-200 ${
-                    (c as any).depth > 0 ? 'ml-8 border-l-2 border-[#D4AF37]/30' : ''
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <Avatar className="h-8 w-8 border border-[#D4AF37]/30">
-                      <AvatarImage src={c.profiles?.avatar_url || "/placeholder.svg"} />
-                      <AvatarFallback className="bg-[#D4AF37]/20 text-[#D4AF37] text-xs">
-                        {(c.profiles?.full_name || `@${c.profiles?.username}` || "?")[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-[#D4AF37] text-sm">
-                          {c.profiles?.full_name || `@${c.profiles?.username}`}
-                        </span>
-                        <span className="text-xs text-[#D4AF37]/50">{new Date(c.created_at).toLocaleString()}</span>
-                      </div>
-                      <p className="text-sm text-[#D4AF37]/90 leading-relaxed mb-2">{c.content}</p>
-                      <div className="flex items-center gap-4 text-xs">
-                        <button
-                          className={`flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-200 ${
-                            c.liked
-                              ? "text-red-400 bg-red-400/10"
-                              : "text-[#D4AF37]/70 hover:text-red-400 hover:bg-red-400/10"
-                          } ${c.liking ? 'opacity-50' : ''}`}
-                          onClick={() => handleCommentLike(c.id)}
-                          disabled={c.liking}
-                        >
-                          <Heart className={`h-3 w-3 ${c.liked ? "fill-current" : ""}`} />
-                          <span>{c.like_count ?? 0}</span>
-                        </button>
-                        <button
-                          className="text-[#D4AF37]/70 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
-                          onClick={() => setReplyingTo(c.id)}
-                        >
-                          Responder
-                        </button>
-                        {c.profiles?.id === "me" && (
-                          <button
-                            className="text-red-400/70 hover:text-red-400 px-2 py-1 rounded-full hover:bg-red-400/10 transition-all duration-200"
-                            onClick={() => handleCommentDelete(c.id)}
-                          >
-                            Eliminar
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {replyingTo === c.id && (
-                    <div className="ml-11 flex items-center gap-2 mt-2">
-                      <input
-                        value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
-                        placeholder="Escribe una respuesta..."
-                        className="flex-1 rounded-full bg-black/40 border border-[#D4AF37]/20 px-3 py-1 text-sm text-[#D4AF37] placeholder:text-[#D4AF37]/50 focus:border-[#D4AF37]/50 focus:outline-none"
-                      />
-                      <button
-                        className="rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-semibold text-black hover:bg-[#C9A961] transition-colors"
-                        onClick={() => handleReplySubmit(c.id)}
-                      >
-                        Responder
-                      </button>
-                      <button
-                        className="text-xs text-[#D4AF37]/60 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
-                        onClick={() => setReplyingTo(null)}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))
+              commentList.map(renderComment)
             )}
           </div>
         </div>
