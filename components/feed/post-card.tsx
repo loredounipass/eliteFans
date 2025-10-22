@@ -24,6 +24,10 @@ interface PostCardProps {
   content: {
     type: "image" | "video" | "locked"
     url?: string
+    // optional high-resolution image url (4K) if available
+    highResUrl?: string
+    // optional video sources with resolution metadata
+    videoSources?: Array<{ src: string; type?: string; resolution?: number }>
     description: string
     likes: number
     comments: number
@@ -33,6 +37,7 @@ interface PostCardProps {
 
 export function PostCard({ postId, creator, content, isSubscribed = false }: PostCardProps) {
   const [liked, setLiked] = useState(false)
+  const [mediaLoaded, setMediaLoaded] = useState(false)
   const [likes, setLikes] = useState(content.likes)
   const [commentText, setCommentText] = useState("")
   const [comments, setComments] = useState(content.comments)
@@ -229,7 +234,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
   }
 
   return (
-    <Card className="group overflow-hidden border-0 bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-2xl shadow-[#D4AF37]/5 transition-all duration-300 hover:shadow-[#D4AF37]/10 hover:scale-[1.02] rounded-3xl max-w-[760px] mx-auto">
+  <Card className="group overflow-hidden border-0 bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-2xl shadow-[#D4AF37]/5 transition-all duration-300 hover:shadow-[#D4AF37]/10 hover:scale-[1.02] rounded-3xl w-full">
       {/* Header con perfil del creador */}
   <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
         <div className="flex items-center gap-4 flex-1">
@@ -287,9 +292,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
       {/* Contenido principal */}
       <CardContent className="p-0 relative">
         {content.type === "locked" ? (
-          <div className="relative min-h-[400px] bg-gradient-to-br from-[#D4AF37]/10 via-black/50 to-black/80 flex items-center justify-center">
+          <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] bg-gradient-to-br from-[#D4AF37]/10 via-black/50 to-black/80 flex items-center justify-center max-h-[820px] sm:max-h-[720px]">
             <div className="absolute inset-0 bg-[url('/placeholder.jpg')] bg-cover bg-center opacity-20 blur-sm"></div>
-            <div className="relative z-10 text-center px-8 py-12">
+            <div className="relative z-10 text-center px-6 py-8 sm:px-8 sm:py-12">
               <div className="mb-6 inline-flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border-2 border-[#D4AF37]/40">
                 <Lock className="h-10 w-10 text-[#D4AF37]" />
               </div>
@@ -304,34 +309,66 @@ export function PostCard({ postId, creator, content, isSubscribed = false }: Pos
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
           </div>
         ) : content.type === "video" ? (
-          <div className="relative w-full overflow-hidden bg-black group">
+          <div className="relative w-full flex items-center justify-center bg-black">
+            {!mediaLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/40 to-black/20">
+                <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#D4AF37] border-t-transparent"></div>
+              </div>
+            )}
             <video
-              src={content.url}
               controls
               controlsList="nodownload"
-              autoPlay
+              autoPlay={false}
               loop
               muted
               preload="metadata"
-              className="w-full h-auto max-h-[600px] object-contain transition-transform duration-300 group-hover:scale-105 video-gold-controls"
+              onLoadedData={() => setMediaLoaded(true)}
+              className={`max-h-[520px] sm:max-h-[600px] w-full h-auto object-contain object-center transition-transform duration-300 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105 video-gold-controls`}
               playsInline
+              poster={content.highResUrl}
             >
+              {content.videoSources && content.videoSources.length > 0 ? (
+                // Priorizar la fuente con mayor resolución (si se proporciona)
+                content.videoSources
+                  .slice()
+                  .sort((a, b) => (b.resolution || 0) - (a.resolution || 0))
+                  .map((vs, idx) => (
+                    <source key={idx} src={vs.src} type={vs.type || 'video/mp4'} />
+                  ))
+              ) : (
+                content.url ? <source src={content.url} /> : null
+              )}
               Your browser does not support the video tag.
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
           </div>
         ) : (
-          <div className="relative w-full overflow-hidden bg-black group">
-            <div className="relative w-full h-[420px]">
-              <Image
+          <div className="relative w-full flex items-center justify-center bg-black">
+            {!mediaLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/40 to-black/20">
+                <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#D4AF37] border-t-transparent"></div>
+              </div>
+            )}
+            {content.highResUrl ? (
+                <Image
+                  src={content.highResUrl}
+                  alt="Post content"
+                  width={1920}
+                  height={1080}
+                  onLoadingComplete={() => setMediaLoaded(true)}
+                  className={`max-h-[520px] sm:max-h-[600px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                  sizes="(max-width: 640px) 100vw, 1200px"
+                  priority={false}
+                />
+            ) : (
+              <img
                 src={content.url || "/placeholder.svg?height=600&width=600"}
                 alt="Post content"
-                fill
-                className="object-contain transition-transform duration-500 group-hover:scale-105"
-                style={{ objectFit: 'contain' }}
-                sizes="(max-width: 640px) 100vw, 420px"
+                onLoad={() => setMediaLoaded(true)}
+                className={`max-h-[680px] sm:max-h-[720px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                loading="lazy"
               />
-            </div>
+                )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
         )}

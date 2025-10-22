@@ -236,15 +236,16 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
             </div>
           )
         ) : (
-          postsForTab.map((post) => {
+          <div className="flex flex-col gap-6">
+            {postsForTab.map((post) => {
             // Para contenido premium, siempre mostrar como locked si is_locked es true
             // independientemente del estado de suscripción cuando el filtro premium está activo
             const isPremiumFiltered = filters.premiumContent && post.is_locked
             const showLocked = isPremiumFiltered || (post.is_locked && !post.isSubscribed && !post.isOwn)
             
-            return (
-              <div key={post.id} className="mx-auto w-full max-w-xl">
-                <PostCard
+                return (
+                <div key={post.id} className="mx-auto w-full max-w-lg">
+                  <PostCard
                   postId={post.id}
                   creator={{
                     name: post.full_name || post.username || "Creator",
@@ -260,9 +261,10 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
                   }}
                   isSubscribed={post.isSubscribed}
                 />
-              </div>
-            )
-          })
+                </div>
+              )
+            })}
+          </div>
         )}
       </section>
       {/* Mobile Filters modal (centrado) */}
