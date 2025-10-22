@@ -148,31 +148,38 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
       {open && (
         (() => {
           const dropdown = (
-            <div ref={dropdownRef} style={isSidebar ? dropdownStyle || undefined : undefined} className={`${isSidebar ? "rounded-xl bg-black/95 border border-[#D4AF37]/20 backdrop-blur-sm shadow-lg overflow-hidden" : "absolute left-0 right-0 mt-2 z-50 rounded-xl bg-black/95 border border-[#D4AF37]/20 backdrop-blur-sm shadow-lg overflow-hidden"}`}>
-              {results.length === 0 && !loading ? (
-                <div className="p-3 text-sm text-[#D4AF37]/70">No se encontraron creadores</div>
-              ) : (
-                <ul role="listbox" className="divide-y divide-[#D4AF37]/10">
-                  {results.map((u, idx) => (
-                    <li
-                      key={u.id}
-                      role="option"
-                      aria-selected={activeIndex === idx}
-                      onMouseDown={(e) => e.preventDefault()} // prevent blur before click
-                      onClick={() => goToProfile(u.username)}
-                      className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-150 ${
-                        activeIndex === idx ? "bg-[#D4AF37]/12" : "hover:bg-[#D4AF37]/10"
-                      }`}
-                    >
-                      <img src={u.avatar_url || "/placeholder-user.jpg"} className="h-10 w-10 rounded-full object-cover border border-[#D4AF37]/20" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-[#D4AF37] leading-5 truncate" dangerouslySetInnerHTML={{ __html: highlightMatch(u.full_name || u.username, query) }} />
-                        <div className="text-xs text-[#D4AF37]/70 truncate">@{u.username}</div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <div
+              ref={dropdownRef}
+              style={isSidebar ? dropdownStyle || undefined : undefined}
+              className={`${isSidebar ? "rounded-xl bg-black/95 border border-[#D4AF37]/20 backdrop-blur-sm shadow-lg" : "absolute left-0 right-0 mt-2 z-50 rounded-xl bg-black/95 border border-[#D4AF37]/20 backdrop-blur-sm shadow-lg"}`}
+            >
+              {/* scrollable inner area to prevent dropdown from extending to bottom */}
+              <div className="max-h-[60vh] overflow-auto">
+                {results.length === 0 && !loading ? (
+                  <div className="p-3 text-sm text-[#D4AF37]/70">No se encontraron creadores</div>
+                ) : (
+                  <ul role="listbox" className="divide-y divide-[#D4AF37]/10">
+                    {results.map((u, idx) => (
+                      <li
+                        key={u.id}
+                        role="option"
+                        aria-selected={activeIndex === idx}
+                        onMouseDown={(e) => e.preventDefault()} // prevent blur before click
+                        onClick={() => goToProfile(u.username)}
+                        className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-150 ${
+                          activeIndex === idx ? "bg-[#D4AF37]/12" : "hover:bg-[#D4AF37]/10"
+                        }`}
+                      >
+                        <img src={u.avatar_url || "/placeholder-user.jpg"} className="h-10 w-10 rounded-full object-cover border border-[#D4AF37]/20" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-[#D4AF37] leading-5 truncate" dangerouslySetInnerHTML={{ __html: highlightMatch(u.full_name || u.username, query) }} />
+                          <div className="text-xs text-[#D4AF37]/70 truncate">@{u.username}</div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           )
 
