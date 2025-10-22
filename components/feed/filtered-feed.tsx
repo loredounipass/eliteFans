@@ -14,6 +14,7 @@ type PostRow = {
   media_type: string | null
   is_locked: boolean
   price: number | null
+  profile_subscription_price?: number | null
   like_count: number
   comment_count: number
   created_at: string
@@ -268,6 +269,7 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
                   }}
                   isSubscribed={post.isSubscribed}
                   autoplay={true}
+                  subscriptionPrice={post.profile_subscription_price ?? post.price}
                 />
                 </div>
               )

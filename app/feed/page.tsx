@@ -15,6 +15,7 @@ type PostRow = {
   media_type: string | null
   is_locked: boolean
   price: number | null
+  profile_subscription_price?: number | null
   like_count: number
   comment_count: number
   created_at: string
@@ -41,7 +42,7 @@ async function getFeedData() {
 
   const { data: posts, error } = await supabase
     .from("posts")
-    .select(`*, profiles:profiles(id, username, full_name, avatar_url)`)
+    .select(`*, profiles:profiles(id, username, full_name, avatar_url, subscription_price)`)
     .order("created_at", { ascending: false })
     .limit(FEED_LIMIT)
 
@@ -81,6 +82,7 @@ async function getFeedData() {
     media_type: p.media_type,
     is_locked: p.is_locked,
     price: p.price,
+    profile_subscription_price: p.profiles?.subscription_price ?? null,
     like_count: p.like_count,
     comment_count: p.comment_count,
     created_at: p.created_at,
