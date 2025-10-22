@@ -47,19 +47,19 @@ export default function HomePage() {
         {/* Header */}
         <header className="fixed top-0 z-50 w-full border-b border-[#D4AF37]/20 bg-black/80 backdrop-blur-sm transition-all duration-300">
           <div className="container mx-auto flex h-16 items-center justify-between px-4">
-            <div className={`flex items-center gap-3 transition-all duration-700 ${mounted ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
+            <div className={`flex items-center gap-0 transition-all duration-700 ${mounted ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
               <div className="relative">
                 <img 
                   src="/favicon.ico?v=2" 
                   alt="ElitFans" 
-                  width={56} 
-                  height={56} 
-                  className="h-14 w-14 brightness-110 animate-pulse bg-transparent" 
+                  width={72} 
+                  height={72} 
+                  className="h-[72px] w-[72px] brightness-110 animate-pulse bg-transparent" 
                   style={{ backgroundColor: 'transparent', mixBlendMode: 'screen' }}
                 />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#D4AF37] rounded-full animate-ping opacity-75" />
               </div>
-              <span className="text-2xl font-extrabold tracking-wide hover:scale-105 transition-transform duration-300 brand">
+              <span className="-ml-1 text-2xl font-extrabold tracking-wide hover:scale-105 transition-transform duration-300 brand">
                 EliteFans
               </span>
             </div>
