@@ -23,15 +23,15 @@ export async function POST(req: Request) {
       if (del.error) return NextResponse.json({ error: del.error.message }, { status: 500 })
       // return unliked
       // get count
-      const { data: countData } = await supabase.from("comment_likes").select("id", { count: "exact", head: true }).eq("comment_id", commentId)
-      const count = (countData as any)?.count ?? null
-      return NextResponse.json({ ok: true, action: "unliked", like_count: count })
+      const { count: delCount, error: delCountErr } = await supabase.from("comment_likes").select("id", { count: "exact", head: true }).eq("comment_id", commentId)
+      if (delCountErr) return NextResponse.json({ error: delCountErr.message }, { status: 500 })
+      return NextResponse.json({ ok: true, action: "unliked", like_count: delCount ?? 0 })
     }
 
     // success inserted
-    const { data: countData } = await supabase.from("comment_likes").select("id", { count: "exact", head: true }).eq("comment_id", commentId)
-    const count = (countData as any)?.count ?? null
-    return NextResponse.json({ ok: true, action: "liked", like_count: count })
+    const { count: insCount, error: insCountErr } = await supabase.from("comment_likes").select("id", { count: "exact", head: true }).eq("comment_id", commentId)
+    if (insCountErr) return NextResponse.json({ error: insCountErr.message }, { status: 500 })
+    return NextResponse.json({ ok: true, action: "liked", like_count: insCount ?? 0 })
   } catch (err: any) {
     console.error("Comment likes POST error:", err)
     return NextResponse.json({ error: err?.message ?? String(err) }, { status: 500 })
@@ -49,10 +49,9 @@ export async function GET(req: Request) {
       data: { user },
     } = await supabase.auth.getUser()
 
-    // get like count
-    const { data: countData, error: cntErr } = await supabase.from("comment_likes").select("id", { count: "exact", head: true }).eq("comment_id", commentId)
-    if (cntErr) return NextResponse.json({ error: cntErr.message }, { status: 500 })
-    const count = (countData as any)?.count ?? 0
+  // get like count
+  const { count, error: cntErr } = await supabase.from("comment_likes").select("id", { count: "exact", head: true }).eq("comment_id", commentId)
+  if (cntErr) return NextResponse.json({ error: cntErr.message }, { status: 500 })
 
     // check if current user liked
     let liked = false
@@ -61,7 +60,7 @@ export async function GET(req: Request) {
       if (!likeErr && likeData && likeData.length > 0) liked = true
     }
 
-    return NextResponse.json({ ok: true, like_count: count, liked })
+    return NextResponse.json({ ok: true, like_count: count ?? 0, liked })
   } catch (err: any) {
     console.error("Comment likes GET error:", err)
     return NextResponse.json({ error: err?.message ?? String(err) }, { status: 500 })

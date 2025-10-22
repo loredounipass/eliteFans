@@ -37,6 +37,25 @@ interface PostCardProps {
   subscriptionPrice?: number | null
 }
 
+interface Comment {
+  id: string
+  content: string
+  created_at: string
+  parent_id?: string | null
+  profiles: {
+    id: string
+    username: string
+    full_name: string
+    avatar_url?: string
+  }
+  liked?: boolean
+  like_count?: number
+  liking?: boolean
+  replies?: Comment[]
+  // depth used for rendering reply indentation; optional
+  depth?: number
+}
+
 export function PostCard({ postId, creator, content, isSubscribed = false, autoplay = false, subscriptionPrice }: PostCardProps) {
   const [liked, setLiked] = useState(false)
   const [mediaLoaded, setMediaLoaded] = useState(false)
@@ -45,7 +64,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   const [comments, setComments] = useState(content.comments)
   const [commenting, setCommenting] = useState(false)
   const [showComments, setShowComments] = useState(false)
-  const [commentList, setCommentList] = useState<any[]>([])
+  const [commentList, setCommentList] = useState<Comment[]>([])
   const [loadingComments, setLoadingComments] = useState(false)
   const [commentsOffset, setCommentsOffset] = useState(0)
   const [bookmarked, setBookmarked] = useState(false)
@@ -138,11 +157,13 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     const prevComments = comments
     setComments((c) => c + 1)
     // optimistic add to list if visible
-    const tempComment = {
+    const tempComment: Comment = {
       id: `temp-${Date.now()}`,
       content: commentText.trim(),
       created_at: new Date().toISOString(),
-      profiles: { id: "me", name: "You", username: "you", avatar_url: "" },
+      profiles: { id: "me", username: "you", full_name: "You", avatar_url: "" },
+      like_count: 0,
+      liked: false,
     }
     if (showComments) setCommentList((l) => [tempComment, ...l])
 
@@ -153,7 +174,11 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         if (showComments) setCommentList((l) => l.filter((c) => c.id !== tempComment.id))
       } else {
         setCommentText("")
-        if (showComments && json?.comment) setCommentList((l) => [json.comment, ...l.filter((c) => c.id !== tempComment.id)])
+        if (showComments && json?.comment) {
+          // Load like info for the new comment
+          const newComment = { ...json.comment, like_count: 0, liked: false }
+          setCommentList((l) => [newComment, ...l.filter((c) => c.id !== tempComment.id)])
+        }
       }
     } catch (err) {
       setComments(prevComments)
@@ -172,12 +197,33 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
       const r = await fetch(q)
       const j = await r.json().catch(() => ({}))
       if (r.ok && j?.comments) {
-        const items = j.comments as any[]
+        const items = j.comments as Comment[]
+        
+        // Load like info for each comment
+        const commentsWithLikes = await Promise.all(
+          items.map(async (comment) => {
+            try {
+              const likeRes = await fetch(`/api/comment-likes?commentId=${comment.id}`)
+              const likeData = await likeRes.json()
+              return {
+                ...comment,
+                like_count: likeData.like_count || 0,
+                liked: likeData.liked || false,
+              }
+            } catch {
+              return { ...comment, like_count: 0, liked: false }
+            }
+          })
+        )
+
+        // Organize comments with replies
+        const organizedComments = organizeCommentsWithReplies(commentsWithLikes)
+        
         if (reset) {
-          setCommentList(items)
+          setCommentList(organizedComments)
           setCommentsOffset(items.length)
         } else {
-          setCommentList((l) => [...l, ...items])
+          setCommentList((l) => [...l, ...organizedComments])
           setCommentsOffset((o) => o + items.length)
         }
       }
@@ -188,14 +234,104 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     }
   }
 
+  // Function to organize comments with replies positioned correctly
+  const organizeCommentsWithReplies = (comments: Comment[]): Comment[] => {
+    const commentMap = new Map<string, Comment>()
+    const rootComments: Comment[] = []
+    
+    // First pass: create map of all comments
+    comments.forEach(comment => {
+      commentMap.set(comment.id, { ...comment, replies: [] })
+    })
+    
+    // Second pass: organize hierarchy
+    comments.forEach(comment => {
+      if (comment.parent_id && commentMap.has(comment.parent_id)) {
+        // This is a reply, don't add to root
+        return
+      } else {
+        // This is a root comment
+        rootComments.push(commentMap.get(comment.id)!)
+      }
+    })
+    
+    // Third pass: create flat list with replies positioned after parents
+    const flatList: Comment[] = []
+    
+    const addCommentAndReplies = (comment: Comment, depth = 0) => {
+      flatList.push({ ...comment, depth })
+      
+      // Find and add replies immediately after parent
+      const replies = comments.filter(c => c.parent_id === comment.id)
+      replies.forEach(reply => {
+        addCommentAndReplies(commentMap.get(reply.id)!, depth + 1)
+      })
+    }
+    
+    rootComments.forEach(comment => addCommentAndReplies(comment))
+    
+    return flatList
+  }
+
   const handleCommentLike = async (commentId: string) => {
     try {
       // optimistic UI: toggle locally
-      setCommentList((list) => list.map((c) => (c.id === commentId ? { ...c, liking: true } : c)))
+      setCommentList((list) => 
+        list.map((c) => 
+          c.id === commentId 
+            ? { 
+                ...c, 
+                liking: true,
+                liked: !c.liked,
+                like_count: c.liked ? Math.max(0, (c.like_count || 0) - 1) : (c.like_count || 0) + 1
+              } 
+            : c
+        )
+      )
+      
       const { ok, json } = await postJson("/api/comment-likes", { commentId })
-      if (ok) setCommentList((list) => list.map((c) => (c.id === commentId ? { ...c, liked: json.action === "liked", like_count: json.like_count ?? c.like_count } : c)))
+      if (ok) {
+        setCommentList((list) => 
+          list.map((c) => 
+            c.id === commentId 
+              ? { 
+                  ...c, 
+                  liked: json.action === "liked", 
+                  like_count: json.like_count ?? c.like_count,
+                  liking: false
+                } 
+              : c
+          )
+        )
+      } else {
+        // Revert optimistic update
+        setCommentList((list) => 
+          list.map((c) => 
+            c.id === commentId 
+              ? { 
+                  ...c, 
+                  liked: !c.liked,
+                  like_count: c.liked ? (c.like_count || 0) + 1 : Math.max(0, (c.like_count || 0) - 1),
+                  liking: false
+                } 
+              : c
+          )
+        )
+      }
     } catch (err) {
-      // ignore
+      // Revert optimistic update
+      setCommentList((list) => 
+        list.map((c) => 
+          c.id === commentId 
+            ? { 
+                ...c, 
+                liked: !c.liked,
+                like_count: c.liked ? (c.like_count || 0) + 1 : Math.max(0, (c.like_count || 0) - 1),
+                liking: false
+              } 
+            : c
+        )
+      )
     }
   }
 
@@ -219,12 +355,14 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     try {
       const { ok, json } = await postJson("/api/comments", { postId, text: replyText.trim(), parentId })
       if (ok && json?.comment) {
+        // Find the parent comment index and insert reply right after it
         setCommentList((l) => {
-          const idx = l.findIndex((c) => c.id === parentId)
-          if (idx === -1) return [json.comment, ...l]
-          const copy = [...l]
-          copy.splice(idx + 1, 0, json.comment)
-          return copy
+          const parentIndex = l.findIndex((c) => c.id === parentId)
+          if (parentIndex === -1) return [{ ...json.comment, like_count: 0, liked: false }, ...l]
+          
+          const newList = [...l]
+          newList.splice(parentIndex + 1, 0, { ...json.comment, like_count: 0, liked: false })
+          return newList
         })
         setReplyText("")
         setReplyingTo(null)
@@ -485,8 +623,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
             </form>
           </div>
 
-          {/* Lista de comentarios */}
-          <div className="px-6 py-4 max-h-80 overflow-y-auto space-y-4">
+          {/* Lista de comentarios - UN SOLO CONTENEDOR */}
+          <div className="px-6 py-4 max-h-80 overflow-y-auto scrollbar-hide space-y-3">
             {loadingComments && commentList.length === 0 ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#D4AF37] border-t-transparent"></div>
@@ -500,7 +638,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               commentList.map((c) => (
                 <div
                   key={c.id}
-                  className="flex flex-col gap-2 p-3 rounded-2xl bg-black/30 border border-[#D4AF37]/10 hover:bg-black/40 transition-all duration-200"
+                  className={`flex flex-col gap-2 p-3 rounded-2xl bg-black/30 border border-[#D4AF37]/10 hover:bg-black/40 transition-all duration-200 ${
+                    (c as any).depth > 0 ? 'ml-8 border-l-2 border-[#D4AF37]/30' : ''
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8 border border-[#D4AF37]/30">
@@ -523,8 +663,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                             c.liked
                               ? "text-red-400 bg-red-400/10"
                               : "text-[#D4AF37]/70 hover:text-red-400 hover:bg-red-400/10"
-                          }`}
+                          } ${c.liking ? 'opacity-50' : ''}`}
                           onClick={() => handleCommentLike(c.id)}
+                          disabled={c.liking}
                         >
                           <Heart className={`h-3 w-3 ${c.liked ? "fill-current" : ""}`} />
                           <span>{c.like_count ?? 0}</span>
