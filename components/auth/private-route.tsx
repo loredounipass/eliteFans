@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
@@ -35,7 +34,28 @@ export function PrivateRoute({ children, redirectTo = "/" }: PrivateRouteProps) 
   if (isChecking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-black">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#D4AF37] border-t-transparent" />
+        <img
+          src="/favicon.ico"
+          alt="Loading..."
+          className="w-44 h-44 animate-float"
+        />
+        <style jsx>{`
+          @keyframes float {
+            0% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-20px);
+            }
+            100% {
+              transform: translateY(0px);
+            }
+          }
+          .animate-float {
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 24px #d4af37) brightness(1.2);
+          }
+        `}</style>
       </div>
     )
   }
