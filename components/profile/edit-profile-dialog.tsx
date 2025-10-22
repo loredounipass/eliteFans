@@ -21,6 +21,11 @@ export default function EditProfileDialog({ profile, onClose, onSaved }: EditPro
     full_name: profile.full_name || "",
     bio: profile.bio || "",
     subscription_price: profile.subscription_price || 0,
+    facebook_url: profile.facebook_url || "",
+    instagram_url: profile.instagram_url || "",
+    tiktok_url: profile.tiktok_url || "",
+    x_url: profile.x_url || "",
+    youtube_url: profile.youtube_url || "",
   })
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [coverFile, setCoverFile] = useState<File | null>(null)
@@ -93,6 +98,11 @@ export default function EditProfileDialog({ profile, onClose, onSaved }: EditPro
         full_name: formData.full_name,
         bio: formData.bio,
         subscription_price: Number(formData.subscription_price),
+        facebook_url: formData.facebook_url,
+        instagram_url: formData.instagram_url,
+        tiktok_url: formData.tiktok_url,
+        x_url: formData.x_url,
+        youtube_url: formData.youtube_url,
       }
 
       // Helper to convert file to base64
@@ -355,6 +365,46 @@ export default function EditProfileDialog({ profile, onClose, onSaved }: EditPro
                       <strong>Máximo 500 caracteres.</strong> Describe tu contenido y personalidad para atraer suscriptores. 
                       Sé auténtico y específico sobre lo que ofreces.
                     </p>
+                  </div>
+                </div>
+
+                {/* Social Links */}
+                <div className="space-y-4">
+                  <Label className="text-lg font-semibold text-[#D4AF37] flex items-center gap-2">
+                    <Sparkles className="h-5 w-5" />
+                    Redes Sociales
+                  </Label>
+                  <div className="grid grid-cols-1 gap-4">
+                    <Input
+                      value={formData.facebook_url}
+                      onChange={(e) => handleInputChange('facebook_url', e.target.value)}
+                      placeholder="Enlace a Facebook (https://...)"
+                      className="h-12 border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 rounded-xl px-4"
+                    />
+                    <Input
+                      value={formData.instagram_url}
+                      onChange={(e) => handleInputChange('instagram_url', e.target.value)}
+                      placeholder="Enlace a Instagram (https://...)"
+                      className="h-12 border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 rounded-xl px-4"
+                    />
+                    <Input
+                      value={formData.tiktok_url}
+                      onChange={(e) => handleInputChange('tiktok_url', e.target.value)}
+                      placeholder="Enlace a TikTok (https://...)"
+                      className="h-12 border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 rounded-xl px-4"
+                    />
+                    <Input
+                      value={formData.x_url}
+                      onChange={(e) => handleInputChange('x_url', e.target.value)}
+                      placeholder="Enlace a X / Twitter (https://...)"
+                      className="h-12 border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 rounded-xl px-4"
+                    />
+                    <Input
+                      value={formData.youtube_url}
+                      onChange={(e) => handleInputChange('youtube_url', e.target.value)}
+                      placeholder="Enlace a YouTube (https://...)"
+                      className="h-12 border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40 rounded-xl px-4"
+                    />
                   </div>
                 </div>
               </div>

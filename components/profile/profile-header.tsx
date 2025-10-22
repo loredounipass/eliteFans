@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Crown, Calendar, Sparkles, Diamond, Star } from "lucide-react"
+import { Crown, Calendar, Sparkles, Diamond, Star, Facebook, Instagram, Twitter, Youtube } from "lucide-react"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
@@ -20,6 +20,11 @@ interface ProfileHeaderProps {
     bio: string | null
     avatar_url: string | null
     cover_url: string | null
+  facebook_url?: string | null
+  instagram_url?: string | null
+  tiktok_url?: string | null
+  x_url?: string | null
+  youtube_url?: string | null
     subscriber_count: number | null
     post_count: number | null
     likes?: number | null
@@ -265,6 +270,37 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
           {profile.bio && (
             <div className={`mt-6 p-4 rounded-xl bg-black/30 border border-[#D4AF37]/10 transition-all duration-700 delay-800 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
               <p className="text-[#D4AF37]/90 leading-relaxed">{profile.bio}</p>
+            </div>
+          )}
+
+          {/* Social links */}
+          {(profile.facebook_url || profile.instagram_url || profile.tiktok_url || profile.x_url || profile.youtube_url) && (
+            <div className={`mt-4 flex items-center gap-4 transition-all duration-700 delay-900 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              {profile.facebook_url && (
+                <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                  <Facebook className="h-6 w-6" />
+                </a>
+              )}
+              {profile.instagram_url && (
+                <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                  <Instagram className="h-6 w-6" />
+                </a>
+              )}
+              {profile.tiktok_url && (
+                <a href={profile.tiktok_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                  <img src="https://cdn.simpleicons.org/tiktok/FFD400" alt="TikTok" className="h-6 w-6" />
+                </a>
+              )}
+              {profile.x_url && (
+                <a href={profile.x_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                  <Twitter className="h-6 w-6" />
+                </a>
+              )}
+              {profile.youtube_url && (
+                <a href={profile.youtube_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                  <Youtube className="h-6 w-6" />
+                </a>
+              )}
             </div>
           )}
 

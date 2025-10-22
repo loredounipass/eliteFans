@@ -97,6 +97,7 @@ export function ProfileTabs({ profile, posts, isSubscribed, isOwnProfile }: Prof
                         comments: post.comment_count || 0,
                       }}
                       isSubscribed={isSubscribed}
+                      autoplay={true}
                     />
                   </div>
                 )
