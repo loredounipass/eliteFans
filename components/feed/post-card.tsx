@@ -34,9 +34,10 @@ interface PostCardProps {
   }
   isSubscribed?: boolean
   autoplay?: boolean
+  subscriptionPrice?: number | null
 }
 
-export function PostCard({ postId, creator, content, isSubscribed = false, autoplay = false }: PostCardProps) {
+export function PostCard({ postId, creator, content, isSubscribed = false, autoplay = false, subscriptionPrice }: PostCardProps) {
   const [liked, setLiked] = useState(false)
   const [mediaLoaded, setMediaLoaded] = useState(false)
   const [likes, setLikes] = useState(content.likes)
@@ -274,12 +275,29 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
 
         <div className="flex items-center gap-2">
           {/* Use centralized FollowButton component - only show when not subscribed */}
-          {!isSubscribed && creatorProfileId && (
-            <FollowButton 
-              userId={creatorProfileId}
-              className="font-semibold px-3 py-1.5 rounded-full shadow-md shadow-[#D4AF37]/25 transition-all duration-200 hover:scale-105"
-            />
-          )}
+          <div className="flex items-center gap-2">
+            {!isSubscribed && creatorProfileId && (
+              <FollowButton 
+                userId={creatorProfileId}
+                className="font-semibold px-3 py-1.5 rounded-full shadow-md shadow-[#D4AF37]/25 transition-all duration-200 hover:scale-105"
+              />
+            )}
+
+            {/* Non-functional subscription price button (display only) */}
+            {creatorProfileId && subscriptionPrice != null && content.type === 'locked' && (
+              <button
+                type="button"
+                className="bg-[#D4AF37] text-black px-3 py-1.5 rounded-full font-semibold hover:bg-[#C9A961] transition-all duration-200"
+                onClick={(e) => {
+                  // Intentionally no functionality for now; prevent propagation
+                  e.stopPropagation()
+                }}
+                aria-label={`Precio de suscripción ${subscriptionPrice}`}
+              >
+                ${subscriptionPrice}/mes
+              </button>
+            )}
+          </div>
           <Button
             variant="ghost"
             size="sm"

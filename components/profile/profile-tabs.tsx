@@ -98,6 +98,7 @@ export function ProfileTabs({ profile, posts, isSubscribed, isOwnProfile }: Prof
                       }}
                       isSubscribed={isSubscribed}
                       autoplay={true}
+                      subscriptionPrice={profile.subscription_price}
                     />
                   </div>
                 )
