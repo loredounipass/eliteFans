@@ -35,7 +35,7 @@ export function DashboardHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/dashboard" className="flex items-center gap-3">
           <img src="/favicon.ico?v=2" alt="ElitFans" width={56} height={56} className="h-14 w-14 object-contain" />
-          <span className="text-2xl font-extrabold tracking-wide text-[#D4AF37]">ElitFans</span>
+          <span className="text-2xl font-extrabold tracking-wide brand">EliteFans</span>
         </Link>
         <nav className="flex items-center gap-6">
           <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">

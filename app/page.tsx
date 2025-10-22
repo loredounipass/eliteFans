@@ -59,8 +59,8 @@ export default function HomePage() {
                 />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#D4AF37] rounded-full animate-ping opacity-75" />
               </div>
-              <span className="text-2xl font-extrabold tracking-wide text-[#D4AF37] hover:scale-105 transition-transform duration-300">
-                ElitFans
+              <span className="text-2xl font-extrabold tracking-wide hover:scale-105 transition-transform duration-300 brand">
+                EliteFans
               </span>
             </div>
             <div className={`flex items-center gap-3 transition-all duration-700 delay-200 ${mounted ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
@@ -116,7 +116,7 @@ export default function HomePage() {
               <span className="inline-block hover:scale-110 transition-transform duration-300 delay-100">Content</span>
               <br />
               <span className="text-white inline-block hover:scale-110 transition-transform duration-300 delay-200">For</span>{" "}
-              <span className="text-white inline-block hover:scale-110 transition-transform duration-300 delay-300">EliteFans</span>{" "}
+              <span className="text-white inline-block hover:scale-110 transition-transform duration-300 delay-300 brand">EliteFans</span>{" "}
             </h1>
             
             <p className={`mb-8 text-balance text-xl text-[#D4AF37]/80 md:text-2xl transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
