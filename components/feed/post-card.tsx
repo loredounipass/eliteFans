@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Heart, MessageCircle, Share2, Lock, MoreHorizontal, Bookmark, MoreVertical, Edit3, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { CreatorCard } from "@/components/feed/creator-card"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { FollowButton } from "@/components/profile/follow-button"
 
@@ -70,6 +71,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   const [bookmarked, setBookmarked] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [creatorProfileId, setCreatorProfileId] = useState<string | null>(null)
+  const [subscriberCount, setSubscriberCount] = useState<number | null>(null)
+  const [coverImage, setCoverImage] = useState<string | null>(null)
   const { toast } = useToast()
   const COMMENTS_PAGE = 10
 
@@ -138,7 +141,19 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         if (!user) return
         setCurrentUserId(user.id)
         const targetId = await getProfileId(creator.username)
-        if (targetId) setCreatorProfileId(targetId)
+        if (targetId) {
+          setCreatorProfileId(targetId)
+          try {
+            const profRes = await supabase.from('profiles').select('subscriber_count, cover_url').eq('id', targetId).maybeSingle()
+            const pdata = (profRes.data as any) ?? null
+            if (pdata) {
+              setSubscriberCount(pdata.subscriber_count ?? 0)
+              setCoverImage(pdata.cover_url || null)
+            }
+          } catch (e) {
+            // ignore profile fetch errors
+          }
+        }
       } catch (err) {
         // ignore
       }
@@ -686,6 +701,22 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           </div>
         )}
       </CardContent>
+      {/* Creator card: mostrar información del creador encima de las acciones (likes/comments) */}
+      <div className="w-full px-6 pb-4">
+        <div className="-mx-6">
+          <CreatorCard
+            name={creator.name}
+            username={creator.username}
+            avatar={creator.avatar}
+            coverImage={coverImage || content.highResUrl || content.url || "/placeholder.jpg"}
+            subscribers={subscriberCount ?? 0}
+            isSubscribed={!!isSubscribed}
+            compact={false}
+            onlyFans={true}
+            showMenuIcon={true}
+          />
+        </div>
+      </div>
 
       {/* Footer con acciones */}
       <CardFooter className="flex-col items-start gap-4 px-6 py-4 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">

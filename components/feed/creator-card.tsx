@@ -19,6 +19,8 @@ interface CreatorCardProps {
   subscribers: number
   isSubscribed?: boolean
   compact?: boolean
+  onlyFans?: boolean
+  showMenuIcon?: boolean
 }
 
 export function CreatorCard({
@@ -29,6 +31,8 @@ export function CreatorCard({
   subscribers,
   isSubscribed = false,
   compact = false,
+  onlyFans = false,
+  showMenuIcon = false,
 }: CreatorCardProps) {
   // Compact style for sidebar suggestions
   if (compact) {
@@ -52,6 +56,51 @@ export function CreatorCard({
             </div>
           </div>
         </Link>
+      </Card>
+    )
+  }
+
+  // OnlyFans-like horizontal thin layout
+  if (onlyFans) {
+    return (
+      <Card className="overflow-hidden rounded-lg transition-all" style={{ background: 'var(--color-card)', borderColor: 'var(--color-border)' }}>
+        {/* Banner con imagen de cover */}
+        <div className="relative w-full h-28 md:h-36">
+          <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/50" />
+
+          {/* Contenido sobre el banner: avatar solapado, nombre y botón */}
+          <div className="absolute inset-0 flex items-end justify-between px-4 pb-3">
+            <Link href={`/profile/${username}`} className="flex items-center gap-3">
+              <div className="relative -mb-6">
+                <Avatar className="h-16 w-16 border-2 shadow-lg" style={{ borderColor: 'var(--primary-foreground)' }}>
+                  <AvatarImage src={avatar || "/placeholder.svg"} alt={name} />
+                  <AvatarFallback className="bg-[color:var(--primary)] text-[color:var(--primary-foreground)]">{name[0]}</AvatarFallback>
+                </Avatar>
+                {/* Badge pequeño (ej. Free) sobre el avatar */}
+                <div className="absolute -top-2 -left-1 text-xs font-semibold rounded-full px-2 py-0.5" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>Free</div>
+              </div>
+              <div className="text-left -mb-4">
+                <p className="font-semibold text-sm drop-shadow-md" style={{ color: 'var(--color-card-foreground)' }}>{name}</p>
+                <p className="text-xs" style={{ color: 'var(--color-muted-foreground)' }}>@{username} · <span className="font-semibold" style={{ color: 'var(--color-card-foreground)' }}>{subscribers.toLocaleString()}</span></p>
+              </div>
+            </Link>
+
+            <div className="ml-3 -mb-4">
+              {showMenuIcon ? (
+                <MenuOverlay username={username} />
+              ) : (
+                <Button
+                  className={`px-4 py-1 ${isSubscribed ? 'border-[var(--primary)] bg-transparent text-[var(--primary-foreground)] hover:bg-[rgba(212,175,55,0.08)]' : 'bg-[var(--primary)] text-[var(--primary-foreground)]'}`}
+                  variant={isSubscribed ? "outline" : "default"}
+                  style={isSubscribed ? { borderColor: 'var(--primary)' } : undefined}
+                >
+                  {isSubscribed ? "Suscrito" : "Suscribirse"}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
       </Card>
     )
   }
