@@ -9,8 +9,9 @@ import Link from "next/link"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Heart, MessageCircle, Share2, Lock, MoreHorizontal, Bookmark } from "lucide-react"
+import { Heart, MessageCircle, Share2, Lock, MoreHorizontal, Bookmark, MoreVertical, Edit3, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { FollowButton } from "@/components/profile/follow-button"
 
 interface PostCardProps {
@@ -348,6 +349,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
 
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState("")
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingText, setEditingText] = useState("")
 
   const handleReplySubmit = async (parentId: string) => {
     if (!replyText.trim()) return
@@ -401,8 +404,85 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               ) : (
                 <span className="text-xs text-[#D4AF37]/50">{new Date(c.created_at).toLocaleDateString()}</span>
               )}
+
+              {/* Three-dot popover in header - only visible for the comment owner */}
+              {(c.profiles?.id === 'me' || c.profiles?.id === currentUserId) && (
+                <div className="ml-auto">
+                  <Popover>
+                    <PopoverTrigger>
+                      <button aria-label="Mostrar opciones" className="p-1 rounded-full text-[#D4AF37]/60 hover:text-[#D4AF37]">
+                        {/* three vertical dots similar to YouTube */}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
+                          <circle cx="12" cy="5" r="1.5" fill="currentColor" />
+                          <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                          <circle cx="12" cy="19" r="1.5" fill="currentColor" />
+                        </svg>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <div className="flex flex-col">
+                        <>
+                          <button
+                            className="flex items-center gap-2 px-2 py-1 text-sm hover:bg-[#D4AF37]/5 rounded"
+                            onClick={() => { setEditingId(c.id); setEditingText(c.content) }}
+                          >
+                            <Edit3 className="h-4 w-4" /> Editar
+                          </button>
+                          <button
+                            className="flex items-center gap-2 px-2 py-1 text-sm text-red-400 hover:bg-red-400/5 rounded mt-1"
+                            onClick={() => handleCommentDelete(c.id)}
+                          >
+                            <Trash2 className="h-4 w-4" /> Eliminar
+                          </button>
+                        </>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
             </div>
-            <p className="text-sm text-[#D4AF37]/90 leading-relaxed mb-2">{c.content}</p>
+            {/* Comment content or inline edit */}
+            {editingId === c.id ? (
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  value={editingText}
+                  onChange={(e) => setEditingText(e.target.value)}
+                  className="flex-1 rounded-full bg-black/40 border border-[#D4AF37]/20 px-3 py-1 text-sm text-[#D4AF37] placeholder:text-[#D4AF37]/50 focus:border-[#D4AF37]/50 focus:outline-none"
+                />
+                <button
+                  className="rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-semibold text-black hover:bg-[#C9A961] transition-colors"
+                  onClick={async () => {
+                    if (!editingText.trim()) return
+                    try {
+                      const res = await fetch('/api/comments', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: c.id, text: editingText.trim() }) })
+                      const json = await res.json()
+                      if (res.ok && json?.comment) {
+                        setCommentList((l) => l.map(item => item.id === c.id ? { ...json.comment, like_count: item.like_count ?? 0, liked: item.liked ?? false } : item))
+                        setEditingId(null)
+                        setEditingText('')
+                      } else {
+                        toast({ title: 'No se pudo editar', description: json?.error || 'Error' })
+                      }
+                    } catch (err) {
+                      toast({ title: 'No se pudo editar', description: 'Error de red' })
+                    }
+                  }}
+                >
+                  Guardar
+                </button>
+                <button
+                  className="text-xs text-[#D4AF37]/60 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
+                  onClick={() => { setEditingId(null); setEditingText('') }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-start justify-between mb-2">
+                <p className="text-sm text-[#D4AF37]/90 leading-relaxed">{c.content}</p>
+                {/* secondary popover removed; header popover provides the options */}
+              </div>
+            )}
             <div className="flex items-center gap-4 text-xs">
               <button
                 className={`flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-200 ${
@@ -422,7 +502,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               >
                 Responder
               </button>
-              {c.profiles?.id === "me" && (
+              {(c.profiles?.id === "me" || c.profiles?.id === currentUserId) && (
                 <button
                   className="text-red-400/70 hover:text-red-400 px-2 py-1 rounded-full hover:bg-red-400/10 transition-all duration-200"
                   onClick={() => handleCommentDelete(c.id)}

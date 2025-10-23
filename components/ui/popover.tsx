@@ -14,7 +14,9 @@ function Popover({
 function PopoverTrigger({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
+  // Use asChild so consumers can pass their own button element without
+  // producing nested <button> elements (avoids hydration/DOM nesting errors).
+  return <PopoverPrimitive.Trigger asChild data-slot="popover-trigger" {...props} />
 }
 
 function PopoverContent({

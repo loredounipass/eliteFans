@@ -64,6 +64,40 @@ export async function DELETE(req: Request) {
   }
 }
 
+export async function PATCH(req: Request) {
+  try {
+    const body = await req.json()
+    const commentId = body?.id
+    const text = (body?.text || "").toString().trim()
+
+    if (!commentId || !text) return NextResponse.json({ error: "id and text are required" }, { status: 400 })
+
+    const supabase = await createServerClient()
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+
+    // Update only if the user is the owner
+    const { data, error } = await supabase
+      .from("comments")
+      .update({ content: text })
+      .eq("id", commentId)
+      .eq("user_id", user.id)
+      .select(`*, profiles:user_id(id, username, full_name, avatar_url)`)
+      .single()
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    return NextResponse.json({ ok: true, comment: data })
+  } catch (err: any) {
+    console.error("Comments PATCH error:", err)
+    return NextResponse.json({ error: err?.message ?? String(err) }, { status: 500 })
+  }
+}
+
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
