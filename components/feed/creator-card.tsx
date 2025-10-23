@@ -82,7 +82,12 @@ export function CreatorCard({
               </div>
               <div className="text-left -mb-4">
                 <p className="font-semibold text-sm drop-shadow-md" style={{ color: 'var(--color-card-foreground)' }}>{name}</p>
-                <p className="text-xs" style={{ color: 'var(--color-muted-foreground)' }}>@{username} · <span className="font-semibold" style={{ color: 'var(--color-card-foreground)' }}>{subscribers.toLocaleString()}</span></p>
+                <p className="text-xs" style={{ color: 'var(--color-muted-foreground)' }}>
+                  @{username}
+                  {subscribers ? (
+                    <>{' '} · <span className="font-semibold" style={{ color: 'var(--color-card-foreground)' }}>{subscribers.toLocaleString()}</span></>
+                  ) : null}
+                </p>
               </div>
             </Link>
 
@@ -130,7 +135,9 @@ export function CreatorCard({
               </div>
               <p className="text-xs text-[#D4AF37]/60">@{username}</p>
             </Link>
-            <p className="mt-1 text-xs text-[#D4AF37]/50">{subscribers.toLocaleString()} suscriptores</p>
+            {subscribers ? (
+              <p className="mt-1 text-xs text-[#D4AF37]/50">{subscribers.toLocaleString()} suscriptores</p>
+            ) : null}
           </div>
         </div>
         <div className="mt-3">
