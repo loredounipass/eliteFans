@@ -73,6 +73,27 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   const { toast } = useToast()
   const COMMENTS_PAGE = 10
 
+  // Small helpers to keep render compact and consistent
+  const formatDate = (d?: string) => (d ? new Date(d).toLocaleDateString() : "")
+  const isOwner = (c: Comment) => c.profiles?.id === "me" || c.profiles?.id === currentUserId
+
+  const saveEdit = async (id: string, text: string) => {
+    if (!text.trim()) return false
+    try {
+      const res = await fetch('/api/comments', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, text: text.trim() }) })
+      const json = await res.json().catch(() => ({}))
+      if (res.ok && json?.comment) {
+        setCommentList((l) => l.map(item => item.id === id ? { ...json.comment, like_count: item.like_count ?? 0, liked: item.liked ?? false } : item))
+        return true
+      }
+      toast({ title: 'No se pudo editar', description: json?.error || 'Error' })
+      return false
+    } catch (err) {
+      toast({ title: 'No se pudo editar', description: 'Error de red' })
+      return false
+    }
+  }
+
   // --- Helpers to reduce repetition and keep behavior identical ---
   const postJson = async (url: string, body?: any, method = "POST") => {
     const res = await fetch(url, {
@@ -400,34 +421,24 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 {c.profiles?.full_name || `@${c.profiles?.username}`}
               </span>
               {c.parent_id && parent ? (
-                <span className="text-xs text-[#D4AF37]/50 ml-2">respondiendo a <span className="font-semibold text-[#D4AF37]">{parent.profiles?.full_name || `@${parent.profiles?.username}`}</span> <span className="ml-2">{new Date(c.created_at).toLocaleDateString()}</span></span>
+                <span className="text-xs text-[#D4AF37]/50 ml-2">respondiendo a <span className="font-semibold text-[#D4AF37]">{parent.profiles?.full_name || `@${parent.profiles?.username}`}</span> <span className="ml-2">{formatDate(c.created_at)}</span></span>
               ) : (
-                <span className="text-xs text-[#D4AF37]/50">{new Date(c.created_at).toLocaleDateString()}</span>
+                <span className="text-xs text-[#D4AF37]/50">{formatDate(c.created_at)}</span>
               )}
 
               {/* Three-dot popover in header - only visible for the comment owner */}
-              {(c.profiles?.id === 'me' || c.profiles?.id === currentUserId) && (
+              {isOwner(c) && (
                 <div className="ml-auto">
                   <Popover>
                     <PopoverTrigger>
                       <button aria-label="Mostrar opciones" className="p-1 rounded-full text-[#D4AF37]/60 hover:text-[#D4AF37]">
-                        {/* three vertical dots similar to YouTube */}
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
-                          <circle cx="12" cy="5" r="1.5" fill="currentColor" />
-                          <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-                          <circle cx="12" cy="19" r="1.5" fill="currentColor" />
-                        </svg>
+                        <MoreVertical className="h-4 w-4" />
                       </button>
                     </PopoverTrigger>
                     <PopoverContent>
                       <div className="flex flex-col">
                         <>
-                          <button
-                            className="flex items-center gap-2 px-2 py-1 text-sm hover:bg-[#D4AF37]/5 rounded"
-                            onClick={() => { setEditingId(c.id); setEditingText(c.content) }}
-                          >
-                            <Edit3 className="h-4 w-4" /> Editar
-                          </button>
+                          <button className="flex items-center gap-2 px-2 py-1 text-sm hover:bg-[#D4AF37]/5 rounded" onClick={() => { setEditingId(c.id); setEditingText(c.content) }}><Edit3 className="h-4 w-4" /> Editar</button>
                           <button
                             className="flex items-center gap-2 px-2 py-1 text-sm text-red-400 hover:bg-red-400/5 rounded mt-1"
                             onClick={() => handleCommentDelete(c.id)}
@@ -449,27 +460,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                   onChange={(e) => setEditingText(e.target.value)}
                   className="flex-1 rounded-full bg-black/40 border border-[#D4AF37]/20 px-3 py-1 text-sm text-[#D4AF37] placeholder:text-[#D4AF37]/50 focus:border-[#D4AF37]/50 focus:outline-none"
                 />
-                <button
-                  className="rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-semibold text-black hover:bg-[#C9A961] transition-colors"
-                  onClick={async () => {
-                    if (!editingText.trim()) return
-                    try {
-                      const res = await fetch('/api/comments', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: c.id, text: editingText.trim() }) })
-                      const json = await res.json()
-                      if (res.ok && json?.comment) {
-                        setCommentList((l) => l.map(item => item.id === c.id ? { ...json.comment, like_count: item.like_count ?? 0, liked: item.liked ?? false } : item))
-                        setEditingId(null)
-                        setEditingText('')
-                      } else {
-                        toast({ title: 'No se pudo editar', description: json?.error || 'Error' })
-                      }
-                    } catch (err) {
-                      toast({ title: 'No se pudo editar', description: 'Error de red' })
-                    }
-                  }}
-                >
-                  Guardar
-                </button>
+                <button className="rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-semibold text-black hover:bg-[#C9A961] transition-colors" onClick={async () => { const ok = await saveEdit(c.id, editingText); if (ok) { setEditingId(null); setEditingText('') } }}>Guardar</button>
                 <button
                   className="text-xs text-[#D4AF37]/60 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
                   onClick={() => { setEditingId(null); setEditingText('') }}
@@ -502,7 +493,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               >
                 Responder
               </button>
-              {(c.profiles?.id === "me" || c.profiles?.id === currentUserId) && (
+              {isOwner(c) && (
                 <button
                   className="text-red-400/70 hover:text-red-400 px-2 py-1 rounded-full hover:bg-red-400/10 transition-all duration-200"
                   onClick={() => handleCommentDelete(c.id)}
