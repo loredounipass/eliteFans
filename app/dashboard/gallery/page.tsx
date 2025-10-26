@@ -53,12 +53,26 @@ export default async function GalleryPage() {
     );
   }
 
-  // Transform the data to flatten the counts
-  const transformedPosts = posts?.map(post => ({
+  // Normalize different shapes that Supabase might return for related counts
+  function normalizeCount(field: any) {
+    if (field == null) return 0
+    if (typeof field === "number") return field
+    if (Array.isArray(field)) {
+      if (field.length === 0) return 0
+      const first = field[0]
+      // Some PostgREST/Supabase shapes return [{ count: 8 }] or rows array
+      if (first && typeof first === "object" && "count" in first) return Number(first.count) || field.length
+      return field.length
+    }
+    if (typeof field === "object" && "count" in field) return Number(field.count) || 0
+    return 0
+  }
+
+  const transformedPosts = (posts || []).map((post: any) => ({
     ...post,
-    likes_count: Array.isArray(post.likes_count) ? post.likes_count.length : 0,
-    comments_count: Array.isArray(post.comments_count) ? post.comments_count.length : 0,
-  })) || [];
+    likes_count: normalizeCount(post.likes_count),
+    comments_count: normalizeCount(post.comments_count),
+  }))
 
   return (
     <PrivateRoute>
