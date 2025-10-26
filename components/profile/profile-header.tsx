@@ -141,23 +141,23 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
             </div>
 
             <div className="flex flex-wrap justify-center gap-4 text-sm mt-1">
-              <div className="text-center">
+              <div id="stats-followers" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{followersCount}</div>
                 <div className="text-[#D4AF37]/70 text-xs">seguidores</div>
               </div>
-              <div className="text-center">
+              <div id="stats-following" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{followingCount}</div>
                 <div className="text-[#D4AF37]/70 text-xs">siguiendo</div>
               </div>
-              <div className="text-center">
+              <div id="stats-subscribers" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{profile.subscriber_count ?? 0}</div>
                 <div className="text-[#D4AF37]/70 text-xs">suscriptores</div>
               </div>
-              <div className="text-center">
+              <div id="stats-posts" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{profile.post_count ?? 0}</div>
                 <div className="text-[#D4AF37]/70 text-xs">publicaciones</div>
               </div>
-              <div className="text-center">
+              <div id="stats-likes" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{likesCount}</div>
                 <div className="text-[#D4AF37]/70 text-xs">likes</div>
               </div>

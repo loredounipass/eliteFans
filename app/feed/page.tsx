@@ -26,7 +26,7 @@ type PostRow = {
   isOwn?: boolean
 }
 
-const FEED_LIMIT = 20
+// NOTE: Removed hardcoded FEED_LIMIT so the server/API decides how many posts to return.
 
 type CreatorPreview = {
   username?: string
@@ -44,7 +44,6 @@ async function getFeedData() {
     .from("posts")
     .select(`*, profiles:profiles(id, username, full_name, avatar_url, subscription_price)`)
     .order("created_at", { ascending: false })
-    .limit(FEED_LIMIT)
 
   if (error) {
     console.error("Error fetching posts:", error)

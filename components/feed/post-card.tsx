@@ -75,11 +75,17 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   const [subscriberCount, setSubscriberCount] = useState<number>(0)
   const [coverImage, setCoverImage] = useState<string | null>(null)
   const { toast } = useToast()
-  const COMMENTS_PAGE = 10
+  // Removed hardcoded comments page size here so API controls pagination/limits.
 
   // Small helpers to keep render compact and consistent
   const formatDate = (d?: string) => (d ? new Date(d).toLocaleDateString() : "")
-  const isOwner = (c: Comment) => c.profiles?.id === "me" || c.profiles?.id === currentUserId
+  const isOwner = (c: Comment) => {
+    // A comment is owned by the current user if the profile id matches the current user id
+    // or if it's a temporary optimistic comment with a temp- prefix.
+    const pid = c.profiles?.id
+    if (!pid) return false
+    return (currentUserId && pid === currentUserId) || String(pid).startsWith("temp-")
+  }
 
   const saveEdit = async (id: string, text: string) => {
     if (!text.trim()) return false
@@ -206,11 +212,13 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     const prevComments = comments
     setComments((c) => c + 1)
     // optimistic add to list if visible
+    const tempId = `temp-${Date.now()}`
     const tempComment: Comment = {
-      id: `temp-${Date.now()}`,
+      id: tempId,
       content: commentText.trim(),
       created_at: new Date().toISOString(),
-      profiles: { id: "me", username: "you", full_name: "You", avatar_url: "" },
+      // mark the profile id with the same temp id so isOwner can detect optimistic comments
+      profiles: { id: tempId, username: "you", full_name: "You", avatar_url: "" },
       like_count: 0,
       liked: false,
     }
@@ -242,7 +250,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     setLoadingComments(true)
     try {
       const offset = reset ? 0 : commentsOffset
-      const q = `/api/comments?postId=${encodeURIComponent(postId)}&limit=${COMMENTS_PAGE}&offset=${offset}`
+  const q = `/api/comments?postId=${encodeURIComponent(postId)}&offset=${offset}`
       const r = await fetch(q)
       const j = await r.json().catch(() => ({}))
       if (r.ok && j?.comments) {

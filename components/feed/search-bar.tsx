@@ -51,7 +51,7 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
     setLoading(true)
     const id = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search/users?q=${encodeURIComponent(query)}&limit=6`)
+  const res = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`)
         const json = await res.json()
         setResults(json?.users || [])
         setOpen(true)

@@ -39,8 +39,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   // CALCULAR LIKES TOTALES SOBRE LAS PUBLICACIONES
   const totalLikes = (posts || []).reduce((acc: number, p: any) => acc + (p.like_count ?? 0), 0)
 
-  // FORZAR EL CONTADOR DE PUBLICACIONES A 6 (SOLICITADO)
-  const forcedPostCount = 6
+  // Usar el contador real de publicaciones
+  const actualPostCount = posts?.length || profile.post_count || 0
   // OBTENER USUARIO ACTUAL PARA VERIFICAR SUSCRIPCION
   const {
     data: { user },
@@ -65,12 +65,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   }
 
   // OBTENER CREADORES SUGERIDOS (EXCLUYENDO EL ACTUAL)
+  // Request suggested creators without a hardcoded client-side limit; server will decide defaults
   const { data: suggestedCreators } = await supabase
     .from("profiles")
     .select("username, full_name, avatar_url, cover_url, subscriber_count")
     .eq("is_creator", true)
     .neq("id", profile.id)
-    .limit(4)
 
   return (
     <PrivateRoute>
@@ -128,7 +128,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-[#D4AF37]/80">Publicaciones</span>
-                    <span className="text-sm font-semibold text-[#D4AF37]">{forcedPostCount}</span>
+                    <span className="text-sm font-semibold text-[#D4AF37]">{actualPostCount}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-[#D4AF37]/80">Total Likes</span>
@@ -142,12 +142,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           {/* Contenido principal */}
           <section className="flex-1 space-y-6 overflow-y-auto scrollbar-hide pr-2 h-full">
             <ProfileHeader
-              profile={{ ...profile, post_count: forcedPostCount, likes: totalLikes }}
+              profile={{ ...profile, post_count: actualPostCount, likes: totalLikes }}
               isSubscribed={isSubscribed}
               isOwnProfile={isOwnProfile}
             />
             <ProfileTabs 
-              profile={{ ...profile, post_count: forcedPostCount, likes: totalLikes }} 
+              profile={{ ...profile, post_count: actualPostCount, likes: totalLikes }} 
               posts={posts || []} 
               isSubscribed={isSubscribed} 
               isOwnProfile={isOwnProfile} 
@@ -192,8 +192,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   <Heart className="h-5 w-5" />
                   Actividad Reciente
                 </h3>
-                <div className="space-y-3">
-                  {(posts || []).slice(0, 3).map((post: any) => (
+                {/* Make Recent Activity scrollable so it doesn't push to page bottom */}
+                <div className="space-y-3 max-h-[52vh] overflow-y-auto scrollbar-hide pr-2">
+                  {(posts || []).map((post: any) => (
                     <div
                       key={post.id}
                       className="flex items-center gap-3 p-2.5 rounded-xl bg-black/30 hover:bg-black/50 transition-all duration-200 cursor-pointer group"
