@@ -1,0 +1,200 @@
+{
+  "dashboard": {
+    "title": "Панель управления",
+    "welcome": "Добро пожаловать, {{name}}",
+    "subtitle": "Управляйте своим контентом и общайтесь с фанатами",
+    "stats": {
+      "subscribers": { "title": "Подписчики", "description": "Подписчики" },
+      "revenue": { "title": "Общий доход", "description": "Общий заработок" },
+      "likes": { "title": "Лайки", "description": "Всего лайков на ваших постах" },
+      "content_published": { "title": "Опубликовано", "description": "Всего опубликованных постов" }
+    },
+    "quick_actions": {
+      "title": "Быстрые действия",
+      "upload": { "title": "Загрузить контент", "description": "Поделитесь новым контентом с фанатами", "button": "Загрузить" },
+      "gallery": { "title": "Галерея", "description": "Управляйте фото и видео", "button": "Просмотреть галерею" },
+      "subscribers": { "title": "Подписчики", "description": "Управляйте сообществом", "button": "Просмотреть подписки" }
+    },
+    "recent_activity": { "title": "Последняя активность", "empty": "Нет недавней активности" }
+  },
+  "feed": {
+    "title": "Лента",
+    "suggested_creators": "Рекомендуемые авторы",
+    "no_posts_yet": "Пока нет постов",
+    "start_sharing": "Начните делиться потрясающим контентом со своими подписчиками!",
+    "this_creator_no_posts": "Этот автор еще не публиковал контент.",
+    "search_placeholder": "Искать авторов, контент...",
+    "filters": {
+      "label": "Фильтры",
+      "active_filters": "Активные фильтры:",
+      "all": "Все",
+      "only_images": "Только изображения",
+      "only_videos": "Только видео",
+      "premium_content": "Премиум контент",
+      "clear": "Очистить"
+    },
+    "sections": {
+      "for_you": "Для вас",
+      "following": "Подписки",
+      "popular": "Популярное"
+    },
+    "no_content": "Нет контента",
+    "explore_creators": "Исследовать авторов",
+    "posts_in_gallery": "{{count}} постов в вашей галерее",
+    "filters_active_count": "{{active}} из {{total}} постов"
+  },
+  "account": {
+    "my_account": "Мой аккаунт",
+    "profile": "Профиль",
+    "settings": "Настройки",
+    "logout": "Выйти",
+    "profile_unavailable": "Профиль недоступен",
+    "username_not_found": "Имя пользователя не найдено",
+    "signed_out_title": "Вы вышли",
+    "signed_out_description": "Вы успешно вышли из системы."
+  },
+  "creator_card": {
+    "subscribe": "Подписаться",
+    "subscribed": "Подписаны",
+    "free": "Бесплатно",
+    "copy_link": "Скопировать ссылку на профиль",
+    "block": "Заблокировать",
+    "remove": "Удалить",
+    "report": "Пожаловаться"
+  },
+  "ui": {
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "confirm": "Подтвердить",
+    "close": "Закрыть",
+    "loading": "Загрузка",
+    "no_results": "Нет результатов",
+    "load_more": "Загрузить еще",
+    "see_more": "Показать ещё",
+    "follow": "Подписаться",
+    "following": "Подписки",
+    "unfollow": "Отписаться",
+    "copy": "Копировать",
+    "delete": "Удалить",
+    "download": "Скачать",
+    "view": "Просмотреть",
+    "upload_files": "Загрузить файлы",
+    "subscriptions": "Подписки",
+    "chat": "Чат",
+    "subscriptions_and_chat": "Подписки и чат"
+  },
+  "language": {
+    "es": "Испанский",
+    "en": "Английский",
+    "zh": "Китайский",
+  "chinese": "Mandarin",
+    "russian": "Russian",
+    "label": "Язык"
+  },
+  "create_post": {
+    "title": "Создать пост",
+    "description": "Поделитесь контентом с вашими фанатами",
+    "uploading": "Загрузка файлов...",
+    "files_selected": "Выбрано {{count}} файл(ов)",
+    "submit_error": "Вы должны добавить контент или файлы",
+    "publish_success": "Ваш контент успешно опубликован",
+    "publish_error": "Не удалось опубликовать контент",
+    "placeholder": "Что вы хотите поделиться?",
+    "invalid_files": "Неверные файлы",
+    "file_too_large": "Файл слишком большой",
+    "exclusive_label": "Эксклюзивный контент",
+    "exclusive_hint": "Только для подписчиков или платный просмотр"
+  },
+  "gallery": {
+    "empty_title": "Ваша галерея пуста",
+    "empty_description": "Начните создавать эксклюзивный контент для ваших подписчиков. Ваш первый пост ждет вас!",
+    "download": "Скачать",
+    "no_media": "Нет медиа",
+    "video": "Видео",
+    "my_title": "Моя Elite Галерея",
+    "my_description": "Управляйте и просматривайте весь эксклюзивный контент в одном месте",
+    "stats": {
+      "posts": "Посты",
+      "total_likes": "Всего лайков",
+      "comments": "Комментарии"
+    },
+    "publication": "публикация",
+    "publications": "публикации"
+  },
+  "post_card": {
+    "premium_title": "Эксклюзивный контент",
+    "subscribe_prompt": "Подпишитесь, чтобы разблокировать этот премиум-контент и получить доступ ко всему эксклюзивному материалу"
+  },
+  "search": {
+    "no_creators_found": "Авторы не найдены"
+  },
+  "gallery_extra": {
+    "exclusive_description": "Управляйте и просматривайте весь эксклюзивный контент в одном месте"
+  },
+  "activity": {
+    "new_like": "Новый лайк",
+    "like_description": "@{{username}} понравился ваш пост",
+    "new_subscription": "Новая подписка",
+    "subscription_description": "@{{username}} подписался",
+    "payment_received": "Платеж получен",
+    "payment_description": "Вы получили ${{amount}} ({{type}}) от @{{username}}",
+    "new_comment": "Новый комментарий",
+    "comment_description": "@{{username}}: {{content}}"
+  },
+  "profile": {
+    "posts": "Посты",
+    "about": "О себе",
+    "profile_info": "Информация профиля",
+    "no_posts_yet": "Пока нет постов",
+    "start_sharing": "Начните делиться потрясающим контентом со своими подписчиками!",
+    "subscriptions": "Подписки",
+    "chat": "Чат",
+    "sidebar": {
+      "navigation": "Навигация",
+      "posts": "Посты",
+      "about": "О себе",
+      "messages": "Сообщения",
+      "statistics": "Статистика",
+      "similar_creators": "Похожие авторы",
+      "recent_activity": "Последняя активность"
+    },
+    "labels": {
+      "username": "Имя пользователя",
+      "full_name": "Полное имя",
+      "subscription_price": "Цена подписки",
+      "member_since": "В сети с",
+      "bio": "Биография",
+      "create_first_post": "Создать первый пост"
+    },
+    "stats": {
+      "subscribers": "Подписчики",
+      "posts": "Посты",
+      "total_likes": "Всего лайков"
+    }
+  },
+  "activity_ui": {
+    "new_post": "Новый пост",
+    "likes_count": "{{count}} лайков"
+  },
+  "profile_header": {
+    "followers": "подписчики",
+    "following": "подписки",
+    "subscribers": "подписчики",
+    "posts": "посты",
+    "likes": "лайки",
+    "edit_profile": "Редактировать профиль",
+    "processing": "Обработка...",
+    "subscribe_action": "Подписаться {{price}}",
+    "subscription_price_label": "{{price}}/месяц"
+  },
+  "edit_profile": {
+    "title": "Редактировать профиль",
+    "description": "Настройте свой профиль и сделайте его уникальным для своих подписчиков",
+    "change_cover": "Сменить обложку",
+    "change_avatar": "Сменить аватар",
+    "allowed_formats": "Допустимые форматы: JPG, PNG, WebP, GIF",
+    "max_size": "Максимальный размер: 5МБ",
+    "save_success": "Профиль обновлен!",
+    "save_error": "Ошибка при сохранении профиля"
+  }
+}

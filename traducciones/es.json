@@ -117,6 +117,8 @@
   "language": {
     "es": "Español",
     "en": "Inglés",
+  "chinese": "Mandarin",
+    "russian": "Russian",
     "label": "Idioma"
   },
   "create_post": {

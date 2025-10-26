@@ -22,6 +22,7 @@ export function DashboardHeader() {
   const { toast } = useToast()
   const supabase = getSupabaseBrowserClient()
   const { t } = useTranslation()
+  const currentLang = (i18n.language || 'es').substring(0,2).toLowerCase()
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -49,6 +50,56 @@ export function DashboardHeader() {
             <Home className="h-4 w-4" />
             <span>{t('feed.title')}</span>
           </Link>
+          {/* Language selector placed right after Feed with a visible short code */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="text-[#D4AF37] hover:bg-[#D4AF37]/10 flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                <span className="text-sm font-semibold">{currentLang}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
+              <DropdownMenuLabel>{t('language.label')}</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-[#D4AF37]/20" />
+              <DropdownMenuItem
+                onClick={() => {
+                  i18n.changeLanguage('es')
+                  try { localStorage.setItem('i18nextLng', 'es') } catch (e) { /* ignore */ }
+                }}
+                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
+              >
+                {t('language.es')}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  i18n.changeLanguage('en')
+                  try { localStorage.setItem('i18nextLng', 'en') } catch (e) { /* ignore */ }
+                }}
+                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
+              >
+                {t('language.en')}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  i18n.changeLanguage('zh')
+                  try { localStorage.setItem('i18nextLng', 'zh') } catch (e) { /* ignore */ }
+                }}
+                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
+              >
+                {t('language.chinese') || 'Mandarin'}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  i18n.changeLanguage('ru')
+                  try { localStorage.setItem('i18nextLng', 'ru') } catch (e) { /* ignore */ }
+                }}
+                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
+              >
+                {t('language.russian') || 'Russian'}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="text-[#D4AF37] hover:bg-[#D4AF37]/10">
@@ -79,36 +130,6 @@ export function DashboardHeader() {
               <DropdownMenuItem onClick={handleLogout} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
                 <LogOut className="mr-2 h-4 w-4" />
                 {t('account.logout')}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {/* Language selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-[#D4AF37] hover:bg-[#D4AF37]/10">
-                <Globe className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
-              <DropdownMenuLabel>{t('language.label')}</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-[#D4AF37]/20" />
-              <DropdownMenuItem
-                onClick={() => {
-                  i18n.changeLanguage('es')
-                  try { localStorage.setItem('i18nextLng', 'es') } catch (e) { /* ignore */ }
-                }}
-                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
-              >
-                {t('language.es')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  i18n.changeLanguage('en')
-                  try { localStorage.setItem('i18nextLng', 'en') } catch (e) { /* ignore */ }
-                }}
-                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
-              >
-                {t('language.en')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

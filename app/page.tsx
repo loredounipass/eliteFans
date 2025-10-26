@@ -5,14 +5,26 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
 import { AuthDialog } from "@/components/auth/auth-dialog"
 import { PublicRoute } from "@/components/auth/public-route"
-import { Crown, Lock, Star, TrendingUp, Users, Zap, Sparkles,  Diamond } from "lucide-react"
+import { Crown, Lock, Star, TrendingUp, Users, Zap, Sparkles,  Diamond, Globe } from "lucide-react"
+import i18n from '@/lib/i18n'
+import { useTranslation } from 'react-i18next'
 
 export default function HomePage() {
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState<"login" | "signup">("login")
   const [mounted, setMounted] = useState(false)
+  const { t } = useTranslation()
+  const currentLang = (i18n.language || 'es').substring(0,2).toLowerCase()
 
   useEffect(() => {
     setMounted(true)
@@ -64,6 +76,22 @@ export default function HomePage() {
               </span>
             </div>
             <div className={`flex items-center gap-3 transition-all duration-700 delay-200 ${mounted ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="text-[#D4AF37] hover:bg-[#D4AF37]/10 flex items-center gap-2">
+                    <Globe className="h-5 w-5" />
+                    <span className="uppercase text-sm font-semibold">{currentLang}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
+                  <DropdownMenuLabel>{t('language.label')}</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-[#D4AF37]/20" />
+                  <DropdownMenuItem onClick={() => { i18n.changeLanguage('es'); try { localStorage.setItem('i18nextLng','es') } catch(e){} }} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">{t('language.es')}</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { i18n.changeLanguage('en'); try { localStorage.setItem('i18nextLng','en') } catch(e){} }} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">{t('language.en')}</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { i18n.changeLanguage('zh'); try { localStorage.setItem('i18nextLng','zh') } catch(e){} }} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">{t('language.chinese') || 'Mandarin'}</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { i18n.changeLanguage('ru'); try { localStorage.setItem('i18nextLng','ru') } catch(e){} }} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">{t('language.russian') || 'Russian'}</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant="ghost"
                 onClick={() => openAuth("login")}

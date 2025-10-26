@@ -4,6 +4,8 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import en from '../traducciones/en.json'
 import es from '../traducciones/es.json'
+import zh from '../traducciones/zh.json'
+import ru from '../traducciones/ru.json'
 
 // Try to read a previously selected language from localStorage so the
 // user's choice persists across reloads and sessions.
@@ -25,6 +27,8 @@ if (!i18n.isInitialized) {
     resources: {
       en: { translation: en },
       es: { translation: es },
+  zh: { translation: zh },
+  ru: { translation: ru },
     },
     lng: initialLng,
     fallbackLng: 'es',

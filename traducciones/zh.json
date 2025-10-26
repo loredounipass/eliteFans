@@ -1,0 +1,200 @@
+{
+  "dashboard": {
+    "title": "仪表板",
+    "welcome": "欢迎，{{name}}",
+    "subtitle": "管理您的内容并与粉丝互动",
+    "stats": {
+      "subscribers": { "title": "订阅者", "description": "订阅者" },
+      "revenue": { "title": "总收入", "description": "总收益" },
+      "likes": { "title": "点赞", "description": "帖子总点赞数" },
+      "content_published": { "title": "已发布内容", "description": "已发布帖子总数" }
+    },
+    "quick_actions": {
+      "title": "快速操作",
+      "upload": { "title": "上传内容", "description": "与粉丝分享新内容", "button": "立即上传" },
+      "gallery": { "title": "图库", "description": "管理您的照片和视频", "button": "查看图库" },
+      "subscribers": { "title": "订阅者", "description": "管理您的社群", "button": "查看订阅者" }
+    },
+    "recent_activity": { "title": "近期活动", "empty": "暂无近期活动" }
+  },
+  "feed": {
+    "title": "动态",
+    "suggested_creators": "推荐创作者",
+    "no_posts_yet": "还没有帖子",
+    "start_sharing": "开始与您的粉丝分享精彩内容！",
+    "this_creator_no_posts": "该创作者尚未发布任何内容。",
+    "search_placeholder": "搜索创作者、内容...",
+    "filters": {
+      "label": "筛选",
+      "active_filters": "已启用筛选：",
+      "all": "全部",
+      "only_images": "仅图片",
+      "only_videos": "仅视频",
+      "premium_content": "付费内容",
+      "clear": "清除"
+    },
+    "sections": {
+      "for_you": "为你",
+      "following": "关注",
+      "popular": "热门"
+    },
+    "no_content": "没有内容",
+    "explore_creators": "探索创作者",
+    "posts_in_gallery": "您的图库中有 {{count}} 条帖子",
+    "filters_active_count": "{{active}} / {{total}} 个帖子"
+  },
+  "account": {
+    "my_account": "我的账户",
+    "profile": "个人资料",
+    "settings": "设置",
+    "logout": "登出",
+    "profile_unavailable": "个人资料不可用",
+    "username_not_found": "未找到用户名",
+    "signed_out_title": "已登出",
+    "signed_out_description": "您已成功登出。"
+  },
+  "creator_card": {
+    "subscribe": "订阅",
+    "subscribed": "已订阅",
+    "free": "免费",
+    "copy_link": "复制个人资料链接",
+    "block": "屏蔽",
+    "remove": "移除",
+    "report": "举报"
+  },
+  "ui": {
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "close": "关闭",
+    "loading": "加载中",
+    "no_results": "无结果",
+    "load_more": "加载更多",
+    "see_more": "查看更多",
+    "follow": "关注",
+    "following": "已关注",
+    "unfollow": "取关",
+    "copy": "复制",
+    "delete": "删除",
+    "download": "下载",
+    "view": "查看",
+    "upload_files": "上传文件",
+    "subscriptions": "订阅",
+    "chat": "聊天",
+    "subscriptions_and_chat": "订阅与聊天"
+  },
+  "language": {
+    "es": "西班牙语",
+    "en": "英语",
+    "zh": "中文",
+  "chinese": "Mandarin",
+    "russian": "Russian",
+    "label": "语言"
+  },
+  "create_post": {
+    "title": "创建帖子",
+    "description": "与粉丝分享内容",
+    "uploading": "正在上传文件...",
+    "files_selected": "已选择 {{count}} 个文件",
+    "submit_error": "您必须添加内容或文件",
+    "publish_success": "您的内容已发布成功",
+    "publish_error": "无法发布内容",
+    "placeholder": "您想分享什么？",
+    "invalid_files": "无效文件",
+    "file_too_large": "文件过大",
+    "exclusive_label": "独家内容",
+    "exclusive_hint": "仅限订阅者或付费查看"
+  },
+  "gallery": {
+    "empty_title": "您的图库为空",
+    "empty_description": "开始为您的粉丝创建独家内容。您的第一条帖子正等着您！",
+    "download": "下载",
+    "no_media": "暂无媒体",
+    "video": "视频",
+    "my_title": "我的 Elite 画廊",
+    "my_description": "在此管理并查看您所有的独家内容",
+    "stats": {
+      "posts": "帖子",
+      "total_likes": "总点赞",
+      "comments": "评论"
+    },
+    "publication": "发布",
+    "publications": "发布"
+  },
+  "post_card": {
+    "premium_title": "专属内容",
+    "subscribe_prompt": "订阅以解锁此付费内容并访问所有独家素材"
+  },
+  "search": {
+    "no_creators_found": "未找到创作者"
+  },
+  "gallery_extra": {
+    "exclusive_description": "在此管理并查看您所有的独家内容"
+  },
+  "activity": {
+    "new_like": "新的点赞",
+    "like_description": "@{{username}} 赞了您的帖子",
+    "new_subscription": "新的订阅",
+    "subscription_description": "@{{username}} 已订阅",
+    "payment_received": "收到付款",
+    "payment_description": "您从 @{{username}} 收到 ${{amount}} ({{type}})",
+    "new_comment": "新的评论",
+    "comment_description": "@{{username}}: {{content}}"
+  },
+  "profile": {
+    "posts": "帖子",
+    "about": "关于",
+    "profile_info": "个人资料信息",
+    "no_posts_yet": "还没有帖子",
+    "start_sharing": "开始与您的粉丝分享精彩内容！",
+    "subscriptions": "订阅",
+    "chat": "聊天",
+    "sidebar": {
+      "navigation": "导航",
+      "posts": "帖子",
+      "about": "关于",
+      "messages": "消息",
+      "statistics": "统计",
+      "similar_creators": "相似创作者",
+      "recent_activity": "近期活动"
+    },
+    "labels": {
+      "username": "用户名",
+      "full_name": "全名",
+      "subscription_price": "订阅价格",
+      "member_since": "加入时间",
+      "bio": "个人简介",
+      "create_first_post": "创建第一条帖子"
+    },
+    "stats": {
+      "subscribers": "订阅者",
+      "posts": "帖子",
+      "total_likes": "总点赞"
+    }
+  },
+  "activity_ui": {
+    "new_post": "新帖子",
+    "likes_count": "{{count}} 个点赞"
+  },
+  "profile_header": {
+    "followers": "关注者",
+    "following": "关注中",
+    "subscribers": "订阅者",
+    "posts": "帖子",
+    "likes": "点赞",
+    "edit_profile": "编辑个人资料",
+    "processing": "处理中...",
+    "subscribe_action": "订阅 {{price}}",
+    "subscription_price_label": "{{price}}/月"
+  },
+  "edit_profile": {
+    "title": "编辑个人资料",
+    "description": "自定义您的个人资料，让它对粉丝更具吸引力",
+    "change_cover": "更换封面",
+    "change_avatar": "更换头像",
+    "allowed_formats": "支持格式：JPG、PNG、WebP、GIF",
+    "max_size": "最大大小：5MB",
+    "save_success": "已更新个人资料！",
+    "save_error": "保存个人资料时出错"
+  }
+}
