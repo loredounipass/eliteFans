@@ -64,6 +64,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   const [commentText, setCommentText] = useState("")
   const [comments, setComments] = useState(content.comments)
   const [commenting, setCommenting] = useState(false)
+  const [liking, setLiking] = useState(false)
   const [showComments, setShowComments] = useState(false)
   const [commentList, setCommentList] = useState<Comment[]>([])
   const [loadingComments, setLoadingComments] = useState(false)
@@ -184,11 +185,14 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   }, [creator.username])
 
   const handleLike = async () => {
-    // optimistic UI
+    // prevent duplicate requests
+    if (liking) return
+    setLiking(true)
     const prevLiked = liked
     const prevLikes = likes
+    // optimistic UI using previous value
     setLiked((s) => !s)
-    setLikes((l) => (liked ? Math.max(0, l - 1) : l + 1))
+    setLikes((l) => (prevLiked ? Math.max(0, l - 1) : l + 1))
     try {
       const { ok, json } = await postJson("/api/likes", { postId })
       if (!ok) {
@@ -202,6 +206,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     } catch (e) {
       setLiked(prevLiked)
       setLikes(prevLikes)
+    } finally {
+      setLiking(false)
     }
   }
 
@@ -231,6 +237,10 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         if (showComments) setCommentList((l) => l.filter((c) => c.id !== tempComment.id))
       } else {
         setCommentText("")
+        // Sync comments count from server if available
+        if (json && typeof json.comment_count === 'number') {
+          setComments(Number(json.comment_count))
+        }
         if (showComments && json?.comment) {
           // Load like info for the new comment
           const newComment = { ...json.comment, like_count: 0, liked: false }
@@ -395,9 +405,14 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   const handleCommentDelete = async (commentId: string) => {
     try {
       const r = await fetch(`/api/comments?id=${encodeURIComponent(commentId)}`, { method: "DELETE" })
+      const j = await r.json().catch(() => ({}))
       if (r.ok) {
         setCommentList((l) => l.filter((c) => c.id !== commentId))
-        setComments((c) => Math.max(0, c - 1))
+        if (j && typeof j.comment_count === 'number') {
+          setComments(Number(j.comment_count))
+        } else {
+          setComments((c) => Math.max(0, c - 1))
+        }
       }
     } catch (err) {
       // ignore
@@ -754,11 +769,13 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               variant="ghost"
               size="sm"
               onClick={handleLike}
+              disabled={liking}
+              aria-disabled={liking}
               className={`gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${
                 liked
                   ? "text-red-500 bg-red-500/10 hover:bg-red-500/20 scale-110"
                   : "text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105"
-              }`}
+              } ${liking ? 'opacity-50 pointer-events-none' : ''}`}
             >
               <Heart className={`h-4 w-4 transition-all duration-200 ${liked ? "fill-current animate-pulse" : ""}`} />
               <span className="font-semibold">{likes}</span>

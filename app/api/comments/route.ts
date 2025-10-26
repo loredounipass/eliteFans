@@ -33,8 +33,10 @@ export async function POST(req: Request) {
       .select(`*, profiles:user_id(id, username, full_name, avatar_url)`)
       .single()
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    // Fetch updated comment count for the post to allow client sync
+    const { data: postData } = await supabase.from("posts").select("comment_count").eq("id", postId).maybeSingle()
 
-    return NextResponse.json({ ok: true, comment: data })
+    return NextResponse.json({ ok: true, comment: data, comment_count: postData?.comment_count ?? null })
   } catch (err: any) {
     console.error("Comments API error:", err)
     return NextResponse.json({ error: err?.message ?? String(err) }, { status: 500 })
@@ -53,11 +55,26 @@ export async function DELETE(req: Request) {
     } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
 
-    // Ensure the user is owner (RLS should also enforce this) then delete
-    const { error } = await supabase.from("comments").delete().eq("id", commentId).eq("user_id", user.id)
+    // Ensure the user is owner (RLS should also enforce this) then delete and return updated comment_count
+    const { data: deleted, error } = await supabase
+      .from("comments")
+      .delete()
+      .eq("id", commentId)
+      .eq("user_id", user.id)
+      .select("post_id")
+      .maybeSingle()
+
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    return NextResponse.json({ ok: true })
+    // If we know the post_id, fetch the updated comment count
+    let comment_count = null
+    if (deleted && (deleted as any).post_id) {
+      const postIdDeleted = (deleted as any).post_id
+      const { data: postData } = await supabase.from("posts").select("comment_count").eq("id", postIdDeleted).maybeSingle()
+      comment_count = postData?.comment_count ?? null
+    }
+
+    return NextResponse.json({ ok: true, comment_count })
   } catch (err: any) {
     console.error("Comments DELETE error:", err)
     return NextResponse.json({ error: err?.message ?? String(err) }, { status: 500 })
