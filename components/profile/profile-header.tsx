@@ -83,7 +83,7 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
   return (
     <div className="mb-8 relative">
       {/* Cover Image con efectos mejorados */}
-      <div className="relative h-48 md:h-64 overflow-hidden rounded-2xl border border-[#D4AF37]/20 shadow-2xl shadow-[#D4AF37]/10">
+    <div className="relative h-40 md:h-56 overflow-hidden rounded-2xl border border-[#D4AF37]/20 shadow-2xl shadow-[#D4AF37]/10">
         {profile.cover_url ? (
           <Image
             src={profile.cover_url || "/placeholder.svg"}
@@ -114,24 +114,24 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
       </div>
 
       {/* Profile Info: estilo centrado tipo OnlyFans */}
-      <div className="relative -mt-20 mx-4">
-        <div className="max-w-4xl mx-auto rounded-2xl border border-[#D4AF37]/15 bg-gradient-to-br from-black/90 to-black/70 backdrop-blur-sm p-6 shadow-2xl shadow-[#D4AF37]/10">
-          <div className={`flex flex-col items-center text-center gap-4 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} transition-all duration-700`}>
+  <div className="relative -mt-12">
+        <div className="relative z-20 mt-4 max-w-5xl mx-auto w-full rounded-2xl border border-[#D4AF37]/15 bg-gradient-to-br from-black/90 to-black/70 backdrop-blur-sm p-4 shadow-2xl shadow-[#D4AF37]/10 overflow-visible">
+          <div className={`flex flex-col items-center text-center gap-3 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} transition-all duration-700`}>
             <div className="relative">
-              <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-[#D4AF37] shadow-2xl shadow-[#D4AF37]/20 transition-transform duration-300">
+              <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-[#D4AF37] shadow-2xl shadow-[#D4AF37]/20 transition-transform duration-300">
                 <AvatarImage src={profile.avatar_url || "/placeholder.svg"} alt={profile.full_name || "User"} />
                 <AvatarFallback className="bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/10 text-2xl text-[#D4AF37] font-bold">
                   {(profile.full_name || profile.username)?.[0]?.toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute -bottom-2 -right-2 w-5 h-5 bg-[#D4AF37] rounded-full border-2 border-black flex items-center justify-center">
-                <div className="w-2 h-2 bg-black rounded-full animate-pulse" />
+              <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-[#D4AF37] rounded-full border-2 border-black flex items-center justify-center">
+                <div className="w-1 h-1 bg-black rounded-full animate-pulse" />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-center gap-2">
-                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#F4BF37] to-[#D4AF37] bg-clip-text text-transparent">
+                <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#F4BF37] to-[#D4AF37] bg-clip-text text-transparent">
                   {profile.full_name || profile.username}
                 </h1>
                 {profile.is_creator && <Crown className="h-5 w-5 text-[#D4AF37]" />}
@@ -140,25 +140,25 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
               <p className="text-[#D4AF37]/80 mt-1">@{profile.username}</p>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-6 text-sm mt-2">
+            <div className="flex flex-wrap justify-center gap-4 text-sm mt-1">
               <div className="text-center">
-                <div className="font-bold text-[#D4AF37] text-lg">{followersCount}</div>
+                <div className="font-bold text-[#D4AF37] text-base">{followersCount}</div>
                 <div className="text-[#D4AF37]/70 text-xs">seguidores</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-[#D4AF37] text-lg">{followingCount}</div>
+                <div className="font-bold text-[#D4AF37] text-base">{followingCount}</div>
                 <div className="text-[#D4AF37]/70 text-xs">siguiendo</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-[#D4AF37] text-lg">{profile.subscriber_count ?? 0}</div>
+                <div className="font-bold text-[#D4AF37] text-base">{profile.subscriber_count ?? 0}</div>
                 <div className="text-[#D4AF37]/70 text-xs">suscriptores</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-[#D4AF37] text-lg">{profile.post_count ?? 0}</div>
+                <div className="font-bold text-[#D4AF37] text-base">{profile.post_count ?? 0}</div>
                 <div className="text-[#D4AF37]/70 text-xs">publicaciones</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-[#D4AF37] text-lg">{likesCount}</div>
+                <div className="font-bold text-[#D4AF37] text-base">{likesCount}</div>
                 <div className="text-[#D4AF37]/70 text-xs">likes</div>
               </div>
             </div>
@@ -217,37 +217,37 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
 
           {/* Bio con efectos */}
           {profile.bio && (
-            <div className={`mt-6 p-4 rounded-xl bg-black/30 border border-[#D4AF37]/10 transition-all duration-700 delay-800 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <div className={`mt-4 p-3 rounded-xl bg-black/30 border border-[#D4AF37]/10 transition-all duration-700 delay-800 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
               <p className="text-[#D4AF37]/90 leading-relaxed">{profile.bio}</p>
             </div>
           )}
 
           {/* Social links */}
           {(profile.facebook_url || profile.instagram_url || profile.tiktok_url || profile.x_url || profile.youtube_url) && (
-            <div className={`mt-4 flex items-center gap-4 transition-all duration-700 delay-900 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <div className={`mt-3 flex items-center gap-3 transition-all duration-700 delay-900 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
               {profile.facebook_url && (
                 <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
-                  <Facebook className="h-6 w-6" />
+                  <Facebook className="h-5 w-5" />
                 </a>
               )}
               {profile.instagram_url && (
                 <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
-                  <Instagram className="h-6 w-6" />
+                  <Instagram className="h-5 w-5" />
                 </a>
               )}
               {profile.tiktok_url && (
                 <a href={profile.tiktok_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
-                  <img src="https://cdn.simpleicons.org/tiktok/FFD400" alt="TikTok" className="h-6 w-6" />
+                  <img src="https://cdn.simpleicons.org/tiktok/FFD400" alt="TikTok" className="h-5 w-5" />
                 </a>
               )}
               {profile.x_url && (
                 <a href={profile.x_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
-                  <Twitter className="h-6 w-6" />
+                  <Twitter className="h-5 w-5" />
                 </a>
               )}
               {profile.youtube_url && (
                 <a href={profile.youtube_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
-                  <Youtube className="h-6 w-6" />
+                  <Youtube className="h-5 w-5" />
                 </a>
               )}
             </div>
