@@ -339,7 +339,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Content */}
           <div className="space-y-2">
-            <Label htmlFor="content">Contenido</Label>
+            <Label htmlFor="content">{t('create_post.content_label')}</Label>
             <Textarea
               id="content"
               placeholder={t('create_post.placeholder')}
@@ -351,7 +351,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
 
           {/* File Upload */}
           <div className="space-y-2">
-            <Label>Archivos</Label>
+            <Label>{t('create_post.files_label')}</Label>
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -438,16 +438,16 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
               disabled={uploading}
               className="border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/10"
             >
-              Cancelar
+              {t('create_post.cancel')}
             </Button>
             <Button type="submit" disabled={uploading} className="bg-[#D4AF37] text-black hover:bg-[#C9A961]">
               {uploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Publicando...
+                  {t('create_post.publishing')}
                 </>
               ) : (
-                "Publicar"
+                t('create_post.publish')
               )}
             </Button>
           </DialogFooter>
