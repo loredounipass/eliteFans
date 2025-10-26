@@ -594,9 +594,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 <p className="text-sm text-[#D4AF37]/70 hover:text-[#D4AF37]/90 transition-colors">@{creator.username}</p>
               </Link>
               {content.type === "locked" && (
-                <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-[#D4AF37]/20 to-[#D4AF37]/10 px-3 py-1 border border-[#D4AF37]/30">
+                <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-[#D4AF37]/20 to-[#D4AF37]/10 px-2 py-0.5 border border-[#D4AF37]/30">
                   <Lock className="h-3 w-3 text-[#D4AF37]" />
-                  <span className="text-xs font-semibold text-[#D4AF37]">Premium</span>
+                  <span className="text-[11px] font-semibold text-[#D4AF37]">Premium</span>
                 </div>
               )}
             </div>
@@ -609,7 +609,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
             {!isSubscribed && creatorProfileId && (
               <FollowButton 
                 userId={creatorProfileId}
-                className="font-semibold px-3 py-1.5 rounded-full shadow-md shadow-[#D4AF37]/25 transition-all duration-200 hover:scale-105"
+                className="text-xs px-2 py-1 rounded-full shadow-md shadow-[#D4AF37]/25 transition-all duration-200 hover:scale-105"
               />
             )}
 
@@ -617,7 +617,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
             {creatorProfileId && subscriptionPrice != null && content.type === 'locked' && (
               <button
                 type="button"
-                className="bg-[#D4AF37] text-black px-3 py-1.5 rounded-full font-semibold hover:bg-[#C9A961] transition-all duration-200"
+                className="bg-[#D4AF37] text-black px-2 py-1 rounded-full text-xs font-semibold hover:bg-[#C9A961] transition-all duration-200"
                 onClick={(e) => {
                   // Intentionally no functionality for now; prevent propagation
                   e.stopPropagation()
