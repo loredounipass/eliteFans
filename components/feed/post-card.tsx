@@ -70,8 +70,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   const [commentsOffset, setCommentsOffset] = useState(0)
   const [bookmarked, setBookmarked] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [currentUserAvatar, setCurrentUserAvatar] = useState<string | null>(null)
   const [creatorProfileId, setCreatorProfileId] = useState<string | null>(null)
-  const [subscriberCount, setSubscriberCount] = useState<number | null>(null)
+  const [subscriberCount, setSubscriberCount] = useState<number>(0)
   const [coverImage, setCoverImage] = useState<string | null>(null)
   const { toast } = useToast()
   const COMMENTS_PAGE = 10
@@ -140,6 +141,18 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
         setCurrentUserId(user.id)
+        
+        // Obtener el avatar_url del usuario actual
+        const { data: currentUserProfile } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', user.id)
+          .maybeSingle()
+        
+        if (currentUserProfile && currentUserProfile.avatar_url) {
+          setCurrentUserAvatar(currentUserProfile.avatar_url)
+        }
+        
         const targetId = await getProfileId(creator.username)
         if (targetId) {
           setCreatorProfileId(targetId)
@@ -424,19 +437,23 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         }`}
       >
         <div className="flex items-start gap-3">
-          <Avatar className="h-8 w-8 border border-[#D4AF37]/30">
-            <AvatarImage src={c.profiles?.avatar_url || "/placeholder.svg"} />
-            <AvatarFallback className="bg-[#D4AF37]/20 text-[#D4AF37] text-xs">
-              {(c.profiles?.full_name || `@${c.profiles?.username}` || "?")[0]}
-            </AvatarFallback>
-          </Avatar>
+          <Link href={`/profile/${c.profiles?.username}`}>
+            <Avatar className="h-8 w-8 border border-[#D4AF37]/30 cursor-pointer hover:opacity-80 transition-all duration-200">
+              <AvatarImage src={c.profiles?.avatar_url || "/placeholder.svg"} />
+              <AvatarFallback className="bg-[#D4AF37]/20 text-[#D4AF37] text-xs">
+                {(c.profiles?.full_name || `@${c.profiles?.username}` || "?")[0]}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-[#D4AF37] text-sm">
-                {c.profiles?.full_name || `@${c.profiles?.username}`}
-              </span>
+              <Link href={`/profile/${c.profiles?.username}`} className="hover:opacity-80 transition-all duration-200">
+                <span className="font-semibold text-[#D4AF37] text-sm">
+                  {c.profiles?.full_name || `@${c.profiles?.username}`}
+                </span>
+              </Link>
               {c.parent_id && parent ? (
-                <span className="text-xs text-[#D4AF37]/50 ml-2">respondiendo a <span className="font-semibold text-[#D4AF37]">{parent.profiles?.full_name || `@${parent.profiles?.username}`}</span> <span className="ml-2">{formatDate(c.created_at)}</span></span>
+                <span className="text-xs text-[#D4AF37]/50 ml-2">respondiendo a <Link href={`/profile/${parent.profiles?.username}`} className="hover:opacity-80 transition-all duration-200"><span className="font-semibold text-[#D4AF37]">{parent.profiles?.full_name || `@${parent.profiles?.username}`}</span></Link> <span className="ml-2">{formatDate(c.created_at)}</span></span>
               ) : (
                 <span className="text-xs text-[#D4AF37]/50">{formatDate(c.created_at)}</span>
               )}
@@ -547,7 +564,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   }
 
   return (
-  <Card className="group overflow-hidden border-0 bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-2xl shadow-[#D4AF37]/5 transition-all duration-300 hover:shadow-[#D4AF37]/10 hover:scale-[1.02] rounded-3xl w-full">
+    <Card className="group overflow-hidden border-0 bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-2xl shadow-[#D4AF37]/5 transition-all duration-300 hover:shadow-[#D4AF37]/10 hover:scale-[1.02] rounded-3xl w-full relative">
+      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#D4AF37]/5 via-[#D4AF37]/30 to-[#D4AF37]/5"></div>
+      <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#D4AF37]/5 via-[#D4AF37]/30 to-[#D4AF37]/5"></div>
       {/* Header con perfil del creador */}
   <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
         <div className="flex items-center gap-4 flex-1">
@@ -684,7 +703,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                   width={1920}
                   height={1080}
                   onLoadingComplete={() => setMediaLoaded(true)}
-                  className={`max-h-[520px] sm:max-h-[600px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                  className={`max-h-[420px] sm:max-h-[500px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
                   sizes="(max-width: 640px) 100vw, 1200px"
                   priority={false}
                 />
@@ -693,7 +712,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 src={content.url || "/placeholder.svg?height=600&width=600"}
                 alt="Post content"
                 onLoad={() => setMediaLoaded(true)}
-                className={`max-h-[680px] sm:max-h-[720px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                className={`max-h-[520px] sm:max-h-[600px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
                 loading="lazy"
               />
                 )}
@@ -791,7 +810,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           <div className="px-6 py-4 border-b border-[#D4AF37]/10">
             <form onSubmit={handleCommentSubmit} className="flex items-center gap-3">
               <Avatar className="h-8 w-8 border-2 border-[#D4AF37]/30">
-                <AvatarImage src="/placeholder.svg" />
+                <AvatarImage src={currentUserAvatar || "/placeholder.svg"} />
                 <AvatarFallback className="bg-[#D4AF37]/20 text-[#D4AF37] text-xs">Tú</AvatarFallback>
               </Avatar>
               <div className="flex-1 relative">
@@ -829,6 +848,10 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           </div>
         </div>
       )}
+      <div className="relative w-full h-1">
+        <div className="absolute left-0 bottom-0 w-1 h-4 bg-[#D4AF37]/20"></div>
+        <div className="absolute right-0 bottom-0 w-1 h-4 bg-[#D4AF37]/20"></div>
+      </div>
     </Card>
   )
 }

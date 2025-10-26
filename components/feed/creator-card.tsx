@@ -63,9 +63,9 @@ export function CreatorCard({
   // OnlyFans-like horizontal thin layout
   if (onlyFans) {
     return (
-      <Card className="overflow-hidden rounded-lg transition-all" style={{ background: 'var(--color-card)', borderColor: 'var(--color-border)' }}>
+      <Card className="overflow-hidden rounded-md transition-all border-0 w-[90%] mx-auto" style={{ background: 'black', borderColor: 'var(--color-border)' }}>
         {/* Banner con imagen de cover */}
-        <div className="relative w-full h-28 md:h-36">
+        <div className="relative w-full h-20 md:h-28">
           <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/50" />
 
@@ -73,7 +73,7 @@ export function CreatorCard({
           <div className="absolute inset-0 flex items-end justify-between px-4 pb-3">
             <Link href={`/profile/${username}`} className="flex items-center gap-3">
               <div className="relative -mb-6">
-                <Avatar className="h-16 w-16 border-2 shadow-lg" style={{ borderColor: 'var(--primary-foreground)' }}>
+                <Avatar className="h-12 w-12 border-2 shadow-lg" style={{ borderColor: 'var(--primary-foreground)' }}>
                   <AvatarImage src={avatar || "/placeholder.svg"} alt={name} />
                   <AvatarFallback className="bg-[color:var(--primary)] text-[color:var(--primary-foreground)]">{name[0]}</AvatarFallback>
                 </Avatar>
@@ -81,8 +81,8 @@ export function CreatorCard({
                 <div className="absolute -top-2 -left-1 text-xs font-semibold rounded-full px-2 py-0.5" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>Free</div>
               </div>
               <div className="text-left -mb-4">
-                <p className="font-semibold text-sm drop-shadow-md" style={{ color: 'var(--color-card-foreground)' }}>{name}</p>
-                <p className="text-xs" style={{ color: 'var(--color-muted-foreground)' }}>
+                <p className="font-semibold text-xs drop-shadow-md" style={{ color: 'var(--color-card-foreground)' }}>{name}</p>
+                <p className="text-[10px]" style={{ color: 'var(--color-muted-foreground)' }}>
                   @{username}
                   {subscribers ? (
                     <>{' '} · <span className="font-semibold" style={{ color: 'var(--color-card-foreground)' }}>{subscribers.toLocaleString()}</span></>
@@ -96,7 +96,7 @@ export function CreatorCard({
                 <MenuOverlay username={username} />
               ) : (
                 <Button
-                  className={`px-4 py-1 ${isSubscribed ? 'border-[var(--primary)] bg-transparent text-[var(--primary-foreground)] hover:bg-[rgba(212,175,55,0.08)]' : 'bg-[var(--primary)] text-[var(--primary-foreground)]'}`}
+                  className={`px-3 py-0.5 text-sm ${isSubscribed ? 'border-[var(--primary)] bg-transparent text-[var(--primary-foreground)] hover:bg-[rgba(212,175,55,0.08)]' : 'bg-[var(--primary)] text-[var(--primary-foreground)]'}`}
                   variant={isSubscribed ? "outline" : "default"}
                   style={isSubscribed ? { borderColor: 'var(--primary)' } : undefined}
                 >
@@ -111,7 +111,7 @@ export function CreatorCard({
   }
 
   return (
-    <Card className="overflow-hidden border-[#D4AF37]/20 bg-black/50 transition-all hover:border-[#D4AF37]/40">
+    <Card className="overflow-hidden bg-black/50 transition-all p-1 border-0">
       <Link href={`/profile/${username}`}>
         <div className="relative h-28 md:h-32 w-full">
           <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
