@@ -6,6 +6,8 @@ import { FeedFilters, FilterState } from "@/components/feed/feed-filters"
 import { SubscriptionsBox } from "@/components/feed/subscriptions-box"
 import { MobileSidebar } from "@/components/feed/mobile-sidebar"
 
+const POPULAR_THRESHOLD = 4
+
 type PostRow = {
   id: string
   creator_id: string
@@ -121,8 +123,13 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
         // Fallback a usar la propiedad isSubscribed si ninguna lista está disponible
         return filteredPosts.filter(p => p.isSubscribed)
       case 'popular':
-        // Mostrar solo el/los post(s) con más likes (máximo)
+        // Mostrar posts con al menos POPULAR_THRESHOLD likes, ordenados por likes desc.
+        // Si no hay posts que alcancen el umbral, caer al comportamiento anterior (posts con max likes).
         if (filteredPosts.length === 0) return filteredPosts
+        const popularPosts = filteredPosts
+          .filter(p => (p.like_count || 0) >= POPULAR_THRESHOLD)
+          .sort((a, b) => (b.like_count || 0) - (a.like_count || 0))
+        if (popularPosts.length > 0) return popularPosts
         const maxLikes = filteredPosts.reduce((m, p) => Math.max(m, p.like_count || 0), 0)
         return filteredPosts.filter(p => (p.like_count || 0) === maxLikes)
         default:
