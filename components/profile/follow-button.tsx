@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useTranslation } from 'react-i18next'
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 
@@ -143,6 +144,7 @@ interface FollowButtonProps {
 
 export function FollowButton({ userId, onFollowChange, className }: FollowButtonProps) {
   const { following, loading, canFollow, ready, toggleFollow } = useFollow({ userId, onFollowChange })
+  const { t } = useTranslation()
 
   // When ready and not allowed to follow, hide the button
   if (ready && !canFollow) return null
@@ -161,7 +163,7 @@ export function FollowButton({ userId, onFollowChange, className }: FollowButton
       className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 ${className || ""}`}
       aria-pressed={following}
     >
-      {loading ? "..." : following ? "Siguiendo" : "Seguir"}
+      {loading ? "..." : following ? t('ui.following') : t('ui.follow')}
     </button>
   )
 }

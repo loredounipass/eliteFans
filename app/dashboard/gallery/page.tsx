@@ -2,13 +2,14 @@ import { PrivateRoute } from "@/components/auth/private-route"
 import { createServerClient } from "@/lib/supabase/server"
 import { MyGallery } from "@/components/dashboard/my-gallery"
 import { DashboardHeader } from "@/components/dashboard/header"
-import { Images, Sparkles, Crown, TrendingUp } from "lucide-react"
+import { Images, Sparkles } from "lucide-react"
+import GalleryHeader from '@/components/dashboard/gallery-header'
 
 export default async function GalleryPage() {
   const supabase = await createServerClient()
-  
+
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   if (!user) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -53,14 +54,12 @@ export default async function GalleryPage() {
     );
   }
 
-  // Normalize different shapes that Supabase might return for related counts
   function normalizeCount(field: any) {
     if (field == null) return 0
     if (typeof field === "number") return field
     if (Array.isArray(field)) {
       if (field.length === 0) return 0
       const first = field[0]
-      // Some PostgREST/Supabase shapes return [{ count: 8 }] or rows array
       if (first && typeof first === "object" && "count" in first) return Number(first.count) || field.length
       return field.length
     }
@@ -79,65 +78,23 @@ export default async function GalleryPage() {
       <div className="min-h-screen bg-black relative overflow-hidden">
         {/* Background decorative elements */}
         <div className="fixed inset-0 pointer-events-none">
-          {/* Floating particles */}
           <div className="absolute top-20 left-10 w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse opacity-60" />
           <div className="absolute top-40 right-20 w-1 h-1 bg-[#D4AF37] rounded-full animate-ping opacity-40" />
           <div className="absolute top-60 left-1/4 w-3 h-3 bg-[#D4AF37] rounded-full animate-bounce opacity-30" />
           <div className="absolute bottom-40 right-1/3 w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse opacity-50" />
           <div className="absolute bottom-20 left-1/2 w-1 h-1 bg-[#D4AF37] rounded-full animate-ping opacity-60" />
-          
-          {/* Gradient orbs */}
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-[#D4AF37]/10 to-transparent rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-l from-[#D4AF37]/8 to-transparent rounded-full blur-3xl animate-bounce" />
         </div>
 
         <DashboardHeader />
-        
+
         <main className="container mx-auto px-4 py-8 relative z-10">
-          {/* Enhanced header section */}
-          <div className="mb-12 text-center">
-            <div className="inline-flex items-center gap-3 mb-6">
-              <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 rounded-full flex items-center justify-center">
-                  <Images className="w-8 h-8 text-[#D4AF37]" />
-                </div>
-                <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-[#D4AF37] animate-pulse" />
-              </div>
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold text-[#D4AF37] mb-4 hover:scale-105 transition-transform duration-300">
-              Mi Galería Elite
-            </h1>
-            
-            <p className="text-[#D4AF37]/70 text-lg max-w-2xl mx-auto mb-6">
-              Gestiona y visualiza todo tu contenido exclusivo en un solo lugar
-            </p>
-
-            {/* Stats bar */}
-            <div className="flex items-center justify-center gap-8 mb-8">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#D4AF37]">{transformedPosts.length}</div>
-                <div className="text-sm text-[#D4AF37]/60">Publicaciones</div>
-              </div>
-              <div className="w-px h-8 bg-[#D4AF37]/20" />
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#D4AF37]">
-                  {transformedPosts.reduce((sum, post) => sum + (post.likes_count || 0), 0)}
-                </div>
-                <div className="text-sm text-[#D4AF37]/60">Total Likes</div>
-              </div>
-              <div className="w-px h-8 bg-[#D4AF37]/20" />
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#D4AF37]">
-                  {transformedPosts.reduce((sum, post) => sum + (post.comments_count || 0), 0)}
-                </div>
-                <div className="text-sm text-[#D4AF37]/60">Comentarios</div>
-              </div>
-            </div>
-
-            {/* Decorative line */}
-            <div className="w-32 h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto rounded-full" />
-          </div>
+          <GalleryHeader
+            postsCount={transformedPosts.length}
+            likesTotal={transformedPosts.reduce((sum, post) => sum + (post.likes_count || 0), 0)}
+            commentsTotal={transformedPosts.reduce((sum, post) => sum + (post.comments_count || 0), 0)}
+          />
 
           {/* Gallery component */}
           <MyGallery posts={transformedPosts} />

@@ -5,6 +5,7 @@ import SearchBar from "@/components/feed/search-bar"
 import { FilteredFeed } from "@/components/feed/filtered-feed"
 import { Users, Heart } from "lucide-react"
 import CreatorCarousel from "@/components/feed/creator-carousel"
+import RightSidebar from '@/components/feed/right-sidebar'
 import { createServerClient } from "@/lib/supabase/server"
 
 type PostRow = {
@@ -178,29 +179,3 @@ function HeaderSearch() {
   return null
 }
 
-function RightSidebar({ creators, posts }: { creators: any[]; posts: PostRow[] }) {
-  return (
-  <aside className="hidden lg:block lg:w-72 lg:ml-4">
-      <div className="sticky top-0 space-y-4">
-        <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
-            <div className="relative">
-            <SearchBar isSidebar={true} />
-          </div>
-        </div>
-        <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
-          <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Creadores Sugeridos
-          </h3>
-          <div>
-            {/* CARROUSEL QUE MUESTRA 3 ITEMS POR VISTA Y HACE SCROLL HORIZONTAL */}
-            {/* IMPORTAR EL COMPONENTE CLIENTE DINÁMICAMENTE PARA EVITAR DESAJUSTE SERVER/CLIENT */}
-            <CreatorCarousel creators={creators} />
-          </div>
-        </div>
-
-        
-      </div>
-    </aside>
-  )
-}

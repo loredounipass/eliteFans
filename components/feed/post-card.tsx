@@ -10,6 +10,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Heart, MessageCircle, Share2, Lock, MoreHorizontal, Bookmark, MoreVertical, Edit3, Trash2 } from "lucide-react"
+import { useTranslation } from 'react-i18next'
 import { useToast } from "@/hooks/use-toast"
 import { CreatorCard } from "@/components/feed/creator-card"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
@@ -76,6 +77,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   const [subscriberCount, setSubscriberCount] = useState<number>(0)
   const [coverImage, setCoverImage] = useState<string | null>(null)
   const { toast } = useToast()
+  const { t } = useTranslation()
   // Removed hardcoded comments page size here so API controls pagination/limits.
 
   // Small helpers to keep render compact and consistent
@@ -647,7 +649,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 }}
                 aria-label={`Precio de suscripción ${subscriptionPrice}`}
               >
-                ${subscriptionPrice}/mes
+                {t('profile_header.subscription_price_label', { price: `$${(Math.round((subscriptionPrice || 0) * 100) / 100).toFixed(2)}` })}
               </button>
             )}
           </div>
@@ -670,9 +672,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               <div className="mb-6 inline-flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border-2 border-[#D4AF37]/40">
                 <Lock className="h-10 w-10 text-[#D4AF37]" />
               </div>
-              <h3 className="mb-3 text-2xl font-bold text-[#D4AF37]">Contenido Exclusivo</h3>
+              <h3 className="mb-3 text-2xl font-bold text-[#D4AF37]">{t('post_card.premium_title')}</h3>
               <p className="mb-6 text-[#D4AF37]/80 text-lg max-w-sm mx-auto leading-relaxed">
-                Suscríbete para desbloquear este contenido premium y acceder a todo el material exclusivo
+                {t('post_card.subscribe_prompt')}
               </p>
               {/* Botón de desbloqueo removido según solicitud */}
             </div>

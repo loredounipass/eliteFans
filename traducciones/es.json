@@ -1,0 +1,197 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Bienvenido, {{name}}",
+    "subtitle": "Gestiona tu contenido y conéctate con tus fans",
+    "stats": {
+      "subscribers": { "title": "Suscriptores", "description": "Suscriptores" },
+      "revenue": { "title": "Ingresos Totales", "description": "Ingresos totales" },
+      "likes": { "title": "Likes", "description": "Total de likes en tus publicaciones" },
+      "content_published": { "title": "Contenido Publicado", "description": "Total de publicaciones" }
+    },
+    "quick_actions": {
+      "title": "Acciones Rápidas",
+      "upload": { "title": "Subir Contenido", "description": "Comparte nuevo contenido con tus fans", "button": "Subir ahora" },
+      "gallery": { "title": "Galería", "description": "Administra tus fotos y videos", "button": "Ver galería" },
+      "subscribers": { "title": "Suscriptores", "description": "Administra tu comunidad", "button": "Ver suscriptores" }
+    },
+    "recent_activity": { "title": "Actividad Reciente", "empty": "No hay actividad reciente" }
+  },
+  "feed": {
+    "title": "Feed",
+    "suggested_creators": "Creadores Sugeridos",
+    "no_posts_yet": "No hay publicaciones aún",
+    "start_sharing": "¡Comienza a compartir contenido increíble con tus seguidores!",
+    "this_creator_no_posts": "Este creador aún no ha publicado contenido.",
+    "search_placeholder": "Buscar creadores, contenido...",
+    "filters": {
+      "label": "Filtros",
+      "active_filters": "Filtros activos:",
+      "all": "Todos",
+      "only_images": "Solo imágenes",
+      "only_videos": "Solo videos",
+      "premium_content": "Contenido premium",
+      "clear": "Limpiar"
+    },
+    "sections": {
+      "for_you": "Para ti",
+      "following": "Siguiendo",
+      "popular": "Popular"
+    },
+    "no_content": "No hay contenido",
+    "explore_creators": "Explorar creadores",
+    "posts_in_gallery": "{{count}} publicaciones en tu galería",
+    "filters_active_count": "{{active}} de {{total}} posts"
+  },
+  "profile": {
+    "posts": "Publicaciones",
+    "about": "Acerca de",
+    "profile_info": "Información del Perfil",
+    "no_posts_yet": "No hay publicaciones aún",
+    "start_sharing": "¡Comienza a compartir contenido increíble con tus seguidores!",
+    "subscriptions": "Suscripciones",
+    "chat": "Chat",
+    "sidebar": {
+      "navigation": "Navegación",
+      "posts": "Publicaciones",
+      "about": "Acerca de",
+      "messages": "Mensajes",
+      "statistics": "Estadísticas",
+      "similar_creators": "Creadores Similares",
+      "recent_activity": "Actividad Reciente"
+    },
+    "labels": {
+      "username": "Nombre de usuario",
+      "full_name": "Nombre completo",
+      "subscription_price": "Precio de suscripción",
+      "member_since": "Miembro desde",
+      "bio": "Biografía",
+      "create_first_post": "Crear primera publicación"
+    },
+    "stats": {
+      "subscribers": "Suscriptores",
+      "posts": "Publicaciones",
+      "total_likes": "Total de likes"
+    }
+  },
+  "account": {
+    "my_account": "Mi Cuenta",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión",
+    "profile_unavailable": "Perfil no disponible",
+    "username_not_found": "No se encontró el username",
+    "signed_out_title": "Sesión cerrada",
+    "signed_out_description": "Has cerrado sesión exitosamente."
+  },
+  "creator_card": {
+    "subscribe": "Suscribirse",
+    "subscribed": "Suscrito",
+    "free": "Gratis",
+    "copy_link": "Copiar enlace al perfil",
+    "block": "Bloquear",
+    "remove": "Eliminar",
+    "report": "Reportar"
+  },
+  "ui": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "loading": "Cargando",
+    "no_results": "Sin resultados",
+    "load_more": "Cargar más",
+    "see_more": "Ver más",
+    "follow": "Seguir",
+    "following": "Siguiendo",
+    "unfollow": "Dejar de seguir",
+    "copy": "Copiar",
+    "delete": "Eliminar",
+    "download": "Descargar",
+    "view": "Ver",
+    "upload_files": "Subir Archivos",
+    "subscriptions": "Suscripciones",
+    "chat": "Chat",
+    "subscriptions_and_chat": "Suscripciones y Chat"
+  },
+  "language": {
+    "es": "Español",
+    "en": "Inglés",
+    "label": "Idioma"
+  },
+  "create_post": {
+    "title": "Crear Publicación",
+    "description": "Comparte contenido con tus fans",
+    "uploading": "Subiendo archivos...",
+    "files_selected": "{{count}} archivo(s) seleccionado(s)",
+    "submit_error": "Debes agregar contenido o archivos",
+    "publish_success": "Tu contenido ha sido publicado exitosamente",
+    "publish_error": "No se pudo publicar el contenido",
+    "placeholder": "¿Qué quieres compartir?",
+    "invalid_files": "Archivos inválidos",
+    "file_too_large": "Archivo demasiado grande",
+    "exclusive_label": "Contenido Exclusivo",
+    "exclusive_hint": "Solo para suscriptores o pago por ver"
+  },
+  "gallery": {
+    "empty_title": "Tu galería está vacía",
+    "empty_description": "Comienza a crear contenido exclusivo para tus seguidores. ¡Tu primera publicación te espera!",
+    "download": "Descargar",
+    "no_media": "Sin contenido multimedia",
+    "video": "Video",
+    "my_title": "Mi Galería Elite",
+    "my_description": "Gestiona y visualiza todo tu contenido exclusivo en un solo lugar",
+    "stats": {
+      "posts": "Publicaciones",
+      "total_likes": "Total Likes",
+      "comments": "Comentarios"
+    },
+    "publication": "publicación",
+    "publications": "publicaciones"
+  },
+  "post_card": {
+    "premium_title": "Contenido Exclusivo",
+    "subscribe_prompt": "Suscríbete para desbloquear este contenido premium y acceder a todo el material exclusivo"
+  },
+  "search": {
+    "no_creators_found": "No se encontraron creadores"
+  },
+  "gallery_extra": {
+    "exclusive_description": "Gestiona y visualiza todo tu contenido exclusivo en un solo lugar"
+  },
+  "activity": {
+    "new_like": "Nuevo Like",
+    "like_description": "@{{username}} le gustó tu publicación",
+    "new_subscription": "Nueva Suscripción",
+    "subscription_description": "@{{username}} se suscribió",
+    "payment_received": "Pago Recibido",
+    "payment_description": "Has recibido ${{amount}} ({{type}}) de @{{username}}",
+    "new_comment": "Nuevo Comentario",
+    "comment_description": "@{{username}}: {{content}}"
+  },
+  "activity_ui": {
+    "new_post": "Nueva publicación",
+    "likes_count": "{{count}} likes"
+  },
+  "profile_header": {
+    "followers": "seguidores",
+    "following": "siguiendo",
+    "subscribers": "suscriptores",
+    "posts": "publicaciones",
+    "likes": "likes",
+    "edit_profile": "Editar Perfil",
+    "processing": "Procesando...",
+    "subscribe_action": "Suscribirse {{price}}",
+    "subscription_price_label": "{{price}}/mes"
+  },
+  "edit_profile": {
+    "title": "Editar Perfil",
+    "description": "Personaliza tu perfil y hazlo único para tus seguidores",
+    "change_cover": "Cambiar Portada",
+    "change_avatar": "Cambiar Avatar",
+    "allowed_formats": "Formatos permitidos: JPG, PNG, WebP, GIF",
+    "max_size": "Tamaño máximo: 5MB",
+    "save_success": "¡Perfil actualizado!",
+    "save_error": "Error al guardar"
+  }
+}

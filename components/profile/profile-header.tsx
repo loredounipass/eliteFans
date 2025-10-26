@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Crown, Calendar, Sparkles, Diamond, Star, Facebook, Instagram, Twitter, Youtube } from "lucide-react"
+import { useTranslation } from 'react-i18next'
 import { createBrowserClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
@@ -47,6 +48,8 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
   const [followersCount, setFollowersCount] = useState(profile.followers_count || 0)
   const [followingCount, setFollowingCount] = useState(profile.following_count || 0)
   const [likesCount, setLikesCount] = useState(profile.likes || 0)
+
+  const { t } = useTranslation()
 
   useEffect(() => {
     setMounted(true)
@@ -143,28 +146,28 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
             <div className="flex flex-wrap justify-center gap-4 text-sm mt-1">
               <div id="stats-followers" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{followersCount}</div>
-                <div className="text-[#D4AF37]/70 text-xs">seguidores</div>
+                <div className="text-[#D4AF37]/70 text-xs">{t('profile_header.followers')}</div>
               </div>
               <div id="stats-following" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{followingCount}</div>
-                <div className="text-[#D4AF37]/70 text-xs">siguiendo</div>
+                <div className="text-[#D4AF37]/70 text-xs">{t('profile_header.following')}</div>
               </div>
               <div id="stats-subscribers" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{profile.subscriber_count ?? 0}</div>
-                <div className="text-[#D4AF37]/70 text-xs">suscriptores</div>
+                <div className="text-[#D4AF37]/70 text-xs">{t('profile_header.subscribers')}</div>
               </div>
               <div id="stats-posts" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{profile.post_count ?? 0}</div>
-                <div className="text-[#D4AF37]/70 text-xs">publicaciones</div>
+                <div className="text-[#D4AF37]/70 text-xs">{t('profile_header.posts')}</div>
               </div>
               <div id="stats-likes" className="text-center">
                 <div className="font-bold text-[#D4AF37] text-base">{likesCount}</div>
-                <div className="text-[#D4AF37]/70 text-xs">likes</div>
+                <div className="text-[#D4AF37]/70 text-xs">{t('profile_header.likes')}</div>
               </div>
             </div>
 
             <div className="flex items-center gap-3 mt-3">
-              {!isOwnProfile ? (
+                  {!isOwnProfile ? (
                 <>
                   <FollowButton
                     userId={profile.id}
@@ -176,7 +179,7 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
                       <Button
                         className="px-3 py-2 text-sm rounded-full font-semibold transition-all duration-200 shadow-lg bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
                       >
-                        {fairPriceDisplay}
+                        {t('profile_header.subscription_price_label', { price: fairPriceDisplay })}
                       </Button>
                   )}
                   {profile.is_creator && (
@@ -186,7 +189,7 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
                       className={`px-4 py-2 text-sm rounded-full font-semibold transition-all duration-200 shadow-lg ${isSubscribed ? 'bg-transparent border border-[#D4AF37] text-[#D4AF37]' : 'bg-[#D4AF37] text-black hover:bg-[#C9A961]'}`}
                       variant={isSubscribed ? 'outline' : 'default'}
                     >
-                      {isLoading ? 'Procesando...' : isSubscribed ? 'Suscrito' : `Suscribirse $${profile.subscription_price ?? 0}`}
+                      {isLoading ? t('profile_header.processing') : isSubscribed ? t('creator_card.subscribed') : t('profile_header.subscribe_action', { price: fairPriceDisplay })}
                     </Button>
                   )}
                 </>
@@ -197,7 +200,7 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
                     className="px-4 py-2 text-sm rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
                     onClick={() => setShowEdit(true)}
                   >
-                    Editar Perfil
+                    {t('profile_header.edit_profile')}
                   </Button>
                   {showEdit && (
                     // @ts-ignore - dynamic import

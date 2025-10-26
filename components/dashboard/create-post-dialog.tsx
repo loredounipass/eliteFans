@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { Loader2, Upload, X } from "lucide-react"
+import { useTranslation } from 'react-i18next'
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 
@@ -35,6 +36,7 @@ const CHUNK_SIZE = 5 * 1024 * 1024 // 5 MB
 
 
 export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) {
+  const { t } = useTranslation()
   const [content, setContent] = useState("")
   const [files, setFiles] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
@@ -61,8 +63,8 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
 
     if (validFiles.length !== selectedFiles.length) {
       toast({
-        title: "Archivos inválidos",
-        description: "Solo se permiten imágenes y videos",
+        title: t('create_post.invalid_files'),
+        description: t('create_post.invalid_files'),
         variant: "destructive",
       })
     }
@@ -71,10 +73,8 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
     if (oversized.length > 0) {
       const names = oversized.map((f) => f.name).join(", ")
       toast({
-        title: "Archivo demasiado grande",
-        description: `Los siguientes archivos exceden el límite de ${Math.round(
-            MAX_UPLOAD_SIZE / (1024 * 1024),
-          )} MB: ${names}. Si necesitas subir ficheros más grandes considera hacer uploads en el servidor o usar chunked/resumable uploads.`,
+        title: t('create_post.file_too_large'),
+        description: t('create_post.file_too_large'),
         variant: "destructive",
       })
     }
@@ -280,7 +280,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
 
       if (error) throw error
 
-      toast({ title: "¡Publicado!", description: "Tu contenido ha sido publicado exitosamente" })
+  toast({ title: "¡Publicado!", description: t('create_post.publish_success') })
 
       // RESET FORM
       setContent("")
@@ -296,7 +296,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
       console.error("Error creating post:", error)
       toast({
         title: "Error",
-        description: "No se pudo publicar el contenido",
+  description: t('create_post.publish_error'),
         variant: "destructive",
       })
     } finally {
@@ -320,13 +320,13 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl border-[#D4AF37]/20 bg-black text-[#D4AF37]">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Crear Publicación</DialogTitle>
-          <DialogDescription className="text-[#D4AF37]/70">Comparte contenido con tus fans</DialogDescription>
+          <DialogTitle className="text-2xl">{t('create_post.title')}</DialogTitle>
+          <DialogDescription className="text-[#D4AF37]/70">{t('create_post.description')}</DialogDescription>
         </DialogHeader>
 
         {uploading && (
           <div className="px-4">
-            <div className="mb-2 text-sm text-[#D4AF37]/70">Subiendo archivos...</div>
+            <div className="mb-2 text-sm text-[#D4AF37]/70">{t('create_post.uploading')}</div>
             <div className="w-full rounded bg-white/5">
               <div
                 className="h-2 rounded bg-[#D4AF37] transition-all"
@@ -342,7 +342,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
             <Label htmlFor="content">Contenido</Label>
             <Textarea
               id="content"
-              placeholder="¿Qué quieres compartir?"
+              placeholder={t('create_post.placeholder')}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="min-h-[120px] border-[#D4AF37]/20 bg-black/50 text-[#D4AF37] placeholder:text-[#D4AF37]/40"
@@ -360,7 +360,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
                 onClick={() => document.getElementById("file-upload")?.click()}
               >
                 <Upload className="mr-2 h-4 w-4" />
-                Subir Archivos
+                {t('create_post.upload_files')}
               </Button>
               <input
                 id="file-upload"
@@ -370,7 +370,7 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <span className="text-sm text-[#D4AF37]/60">{files.length} archivo(s) seleccionado(s)</span>
+              <span className="text-sm text-[#D4AF37]/60">{t('create_post.files_selected', { count: files.length })}</span>
             </div>
 
             {/* File Previews */}
@@ -406,8 +406,8 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
           {/* Lock Content */}
           <div className="flex items-center justify-between rounded-lg border border-[#D4AF37]/20 bg-black/50 p-4">
             <div className="space-y-0.5">
-              <Label htmlFor="locked">Contenido Exclusivo</Label>
-              <p className="text-sm text-[#D4AF37]/60">Solo para suscriptores o pago por ver</p>
+              <Label htmlFor="locked">{t('create_post.exclusive_label')}</Label>
+              <p className="text-sm text-[#D4AF37]/60">{t('create_post.exclusive_hint')}</p>
             </div>
             <Switch id="locked" checked={isLocked} onCheckedChange={setIsLocked} />
           </div>

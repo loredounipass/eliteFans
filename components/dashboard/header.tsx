@@ -12,19 +12,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { LogOut, Settings, User, Grid, Home } from "lucide-react"
+import { LogOut, Settings, User, Grid, Home, Globe } from "lucide-react"
+import i18n from "@/lib/i18n"
+import { useTranslation } from 'react-i18next'
 import { useToast } from "@/hooks/use-toast"
 
 export function DashboardHeader() {
   const router = useRouter()
   const { toast } = useToast()
   const supabase = getSupabaseBrowserClient()
+  const { t } = useTranslation()
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
     toast({
-      title: "Sesión cerrada",
-      description: "Has cerrado sesión exitosamente.",
+      title: t('account.signed_out_title'),
+      description: t('account.signed_out_description'),
     })
     router.push("/")
   }
@@ -40,11 +43,11 @@ export function DashboardHeader() {
         <nav className="flex items-center gap-6">
           <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
             <Grid className="h-4 w-4" />
-            <span>Dashboard</span>
+            <span>{t('dashboard.title')}</span>
           </Link>
           <Link href="/feed" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
             <Home className="h-4 w-4" />
-            <span>Feed</span>
+            <span>{t('feed.title')}</span>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -53,29 +56,47 @@ export function DashboardHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
-              <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('account.my_account')}</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-[#D4AF37]/20" />
               <DropdownMenuItem
                 onClick={async () => {
                   const { data: { user } } = await supabase.auth.getUser()
-                  if (user && (user.user_metadata as any)?.username) {
+                    if (user && (user.user_metadata as any)?.username) {
                     router.push(`/profile/${(user.user_metadata as any).username}`)
                   } else {
-                    toast({ title: "Perfil no disponible", description: "No se encontró el username" })
+                    toast({ title: t('account.profile_unavailable'), description: t('account.username_not_found') })
                   }
                 }}
                 className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
               >
                 <User className="mr-2 h-4 w-4" />
-                Perfil
+                {t('account.profile')}
               </DropdownMenuItem>
               <DropdownMenuItem className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
                 <Settings className="mr-2 h-4 w-4" />
-                Configuración
+                {t('account.settings')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleLogout} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
                 <LogOut className="mr-2 h-4 w-4" />
-                Cerrar Sesión
+                {t('account.logout')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* Language selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-[#D4AF37] hover:bg-[#D4AF37]/10">
+                <Globe className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
+              <DropdownMenuLabel>{t('language.label')}</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-[#D4AF37]/20" />
+              <DropdownMenuItem onClick={() => i18n.changeLanguage('es')} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
+                {t('language.es')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => i18n.changeLanguage('en')} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
+                {t('language.en')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

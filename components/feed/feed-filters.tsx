@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from 'react-i18next'
 import { Star } from "lucide-react"
 
 interface FilterState {
@@ -15,6 +16,7 @@ interface FeedFiltersProps {
 }
 
 export function FeedFilters({ onFiltersChange, initialFilters }: FeedFiltersProps) {
+  const { t } = useTranslation()
   const [filters, setFilters] = useState<FilterState>(initialFilters ?? {
     onlyImages: false,
     onlyVideos: false,
@@ -50,7 +52,7 @@ export function FeedFilters({ onFiltersChange, initialFilters }: FeedFiltersProp
     <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
       <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
         <Star className="h-5 w-5" />
-        Filtros
+        {t('feed.filters.label')}
       </h3>
       <div className="mb-3">
         <label className="flex items-center gap-3 cursor-pointer group">
@@ -64,7 +66,7 @@ export function FeedFilters({ onFiltersChange, initialFilters }: FeedFiltersProp
             }}
             className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20 transition-all duration-200"
           />
-          <span className="text-sm text-[#D4AF37]/80 group-hover:text-[#D4AF37] transition-colors duration-200">All</span>
+          <span className="text-sm text-[#D4AF37]/80 group-hover:text-[#D4AF37] transition-colors duration-200">{t('feed.filters.all')}</span>
         </label>
       </div>
       <div className="space-y-2">
@@ -76,7 +78,7 @@ export function FeedFilters({ onFiltersChange, initialFilters }: FeedFiltersProp
             className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20 transition-all duration-200" 
           />
           <span className="text-sm text-[#D4AF37]/80 group-hover:text-[#D4AF37] transition-colors duration-200">
-            Solo imágenes
+            {t('feed.filters.only_images')}
           </span>
         </label>
         <label className="flex items-center gap-3 cursor-pointer group">
@@ -87,7 +89,7 @@ export function FeedFilters({ onFiltersChange, initialFilters }: FeedFiltersProp
             className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20 transition-all duration-200" 
           />
           <span className="text-sm text-[#D4AF37]/80 group-hover:text-[#D4AF37] transition-colors duration-200">
-            Solo videos
+            {t('feed.filters.only_videos')}
           </span>
         </label>
         <label className="flex items-center gap-3 cursor-pointer group">
@@ -98,7 +100,7 @@ export function FeedFilters({ onFiltersChange, initialFilters }: FeedFiltersProp
             className="rounded border-[#D4AF37]/30 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]/20 transition-all duration-200" 
           />
           <span className="text-sm text-[#D4AF37]/80 group-hover:text-[#D4AF37] transition-colors duration-200">
-            Contenido premium
+            {t('feed.filters.premium_content')}
           </span>
         </label>
       </div>

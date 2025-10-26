@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { X, Upload, Image, User, FileText, Crown, Sparkles, Camera, Edit3 } from "lucide-react"
+import { useTranslation } from 'react-i18next'
 
 interface EditProfileDialogProps {
   profile: any
@@ -34,6 +35,8 @@ export default function EditProfileDialog({ profile, onClose, onSaved }: EditPro
   const [saving, setSaving] = useState(false)
   const [mounted, setMounted] = useState(false)
   const { toast } = useToast()
+
+  const { t } = useTranslation()
 
   useEffect(() => {
     setMounted(true)
@@ -192,10 +195,10 @@ export default function EditProfileDialog({ profile, onClose, onSaved }: EditPro
               </div>
               <div>
                 <DialogTitle className="text-4xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#F4BF37] to-[#D4AF37] bg-clip-text text-transparent">
-                  Editar Perfil
+                  {t('edit_profile.title')}
                 </DialogTitle>
                 <DialogDescription className="text-[#D4AF37]/70 mt-2 text-lg">
-                  Personaliza tu perfil y hazlo único para tus seguidores
+                  {t('edit_profile.description')}
                 </DialogDescription>
               </div>
             </div>
@@ -209,9 +212,9 @@ export default function EditProfileDialog({ profile, onClose, onSaved }: EditPro
             <div className="mb-8">
               <Label className="text-2xl font-bold text-[#D4AF37] flex items-center gap-3 mb-3">
                 <Image className="h-7 w-7" />
-                Imagen de Portada
+                {t('edit_profile.change_cover')}
               </Label>
-              <p className="text-[#D4AF37]/60 text-base">Esta imagen aparecerá en la parte superior de tu perfil y será lo primero que vean tus visitantes</p>
+              <p className="text-[#D4AF37]/60 text-base">{t('edit_profile.description')}</p>
             </div>
             <div className="relative">
               <div className="h-64 w-full overflow-hidden rounded-3xl border-2 border-[#D4AF37]/30 bg-gradient-to-br from-[#D4AF37]/10 to-transparent shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-300">
@@ -245,7 +248,7 @@ export default function EditProfileDialog({ profile, onClose, onSaved }: EditPro
                 onClick={() => coverInputRef.current?.click()}
               >
                 <Camera className="mr-2 h-5 w-5" />
-                Cambiar Portada
+                {t('edit_profile.change_cover')}
               </Button>
             </div>
           </div>
@@ -257,9 +260,9 @@ export default function EditProfileDialog({ profile, onClose, onSaved }: EditPro
               <div className="mb-8">
                 <Label className="text-2xl font-bold text-[#D4AF37] flex items-center gap-3 mb-3">
                   <User className="h-7 w-7" />
-                  Foto de Perfil
+                  {t('edit_profile.change_avatar')}
                 </Label>
-                <p className="text-[#D4AF37]/60 text-base">Tu avatar principal que identificará tu marca personal</p>
+                <p className="text-[#D4AF37]/60 text-base">{t('edit_profile.description')}</p>
               </div>
               
               <div className="flex flex-col items-center space-y-8">
@@ -295,11 +298,11 @@ export default function EditProfileDialog({ profile, onClose, onSaved }: EditPro
                     onClick={() => avatarInputRef.current?.click()}
                   >
                     <Upload className="mr-3 h-5 w-5 group-hover:animate-bounce" />
-                    Cambiar Avatar
+                    {t('edit_profile.change_avatar')}
                   </Button>
                   <div className="text-sm text-[#D4AF37]/60 space-y-2 bg-[#D4AF37]/5 p-4 rounded-xl border border-[#D4AF37]/20">
-                    <p><strong>Formatos permitidos:</strong> JPG, PNG, WebP, GIF</p>
-                    <p><strong>Tamaño máximo:</strong> 5MB</p>
+                    <p>{t('edit_profile.allowed_formats')}</p>
+                    <p>{t('edit_profile.max_size')}</p>
                     <p><strong>Recomendación:</strong> Imagen cuadrada de alta calidad</p>
                   </div>
                 </div>

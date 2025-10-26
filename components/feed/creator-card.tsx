@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Crown } from "lucide-react"
 import { MoreHorizontal } from "lucide-react"
+import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 
 interface CreatorCardProps {
@@ -34,6 +35,7 @@ export function CreatorCard({
   onlyFans = false,
   showMenuIcon = false,
 }: CreatorCardProps) {
+  const { t } = useTranslation()
   // Compact style for sidebar suggestions
   if (compact) {
     return (
@@ -78,14 +80,14 @@ export function CreatorCard({
                   <AvatarFallback className="bg-[color:var(--primary)] text-[color:var(--primary-foreground)]">{name[0]}</AvatarFallback>
                 </Avatar>
                 {/* Badge pequeño (ej. Free) sobre el avatar */}
-                <div className="absolute -top-2 -left-1 text-xs font-semibold rounded-full px-2 py-0.5" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>Free</div>
+                <div className="absolute -top-2 -left-1 text-xs font-semibold rounded-full px-2 py-0.5" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>{t('creator_card.free')}</div>
               </div>
               <div className="text-left -mb-4">
                 <p className="font-semibold text-xs drop-shadow-md" style={{ color: 'var(--color-card-foreground)' }}>{name}</p>
                 <p className="text-[10px]" style={{ color: 'var(--color-muted-foreground)' }}>
                   @{username}
                   {subscribers ? (
-                    <>{' '} · <span className="font-semibold" style={{ color: 'var(--color-card-foreground)' }}>{subscribers.toLocaleString()}</span></>
+                    <> · <span className="font-semibold" style={{ color: 'var(--color-card-foreground)' }}>{subscribers.toLocaleString()}</span></>
                   ) : null}
                 </p>
               </div>
@@ -100,7 +102,7 @@ export function CreatorCard({
                   variant={isSubscribed ? "outline" : "default"}
                   style={isSubscribed ? { borderColor: 'var(--primary)' } : undefined}
                 >
-                  {isSubscribed ? "Suscrito" : "Suscribirse"}
+                  {isSubscribed ? t('creator_card.subscribed') : t('creator_card.subscribe')}
                 </Button>
               )}
             </div>
@@ -148,8 +150,8 @@ export function CreatorCard({
                 : "w-full bg-[#D4AF37] text-black hover:bg-[#C9A961]"
             }
             variant={isSubscribed ? "outline" : "default"}
-          >
-            {isSubscribed ? "Suscrito" : "Suscribirse"}
+            >
+            {isSubscribed ? t('creator_card.subscribed') : t('creator_card.subscribe')}
           </Button>
         </div>
       </CardContent>
@@ -161,6 +163,8 @@ function MenuOverlay({ username }: { username: string }) {
   const [open, setOpen] = useState(false)
   const btnRef = useRef<HTMLButtonElement | null>(null)
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null)
+
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!open) return
@@ -218,10 +222,10 @@ function MenuOverlay({ username }: { username: string }) {
           <div className="w-48 bg-background border border-[#D4AF37]/20 rounded-md shadow-xl py-1">
             <div className="px-3 py-2 text-xs text-[#D4AF37]/80 font-semibold">@{username}</div>
             <div className="border-t border-[#D4AF37]/10" />
-            <button onClick={closeAnd(copyLink)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">Copy link to profile</button>
-            <button onClick={closeAnd(blockUser)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">Block</button>
-            <button onClick={closeAnd(removeUser)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">Remove</button>
-            <button onClick={closeAnd(reportUser)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">Report</button>
+            <button onClick={closeAnd(copyLink)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">{t('creator_card.copy_link')}</button>
+            <button onClick={closeAnd(blockUser)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">{t('creator_card.block')}</button>
+            <button onClick={closeAnd(removeUser)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">{t('creator_card.remove')}</button>
+            <button onClick={closeAnd(reportUser)} className="w-full text-left px-3 py-2 text-sm hover:bg-[#D4AF37]/5">{t('creator_card.report')}</button>
           </div>
         </div>,
         document.body

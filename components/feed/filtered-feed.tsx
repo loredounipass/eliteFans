@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from 'react-i18next'
 import { PostCard } from "@/components/feed/post-card"
 import { FeedFilters, FilterState } from "@/components/feed/feed-filters"
 import { SubscriptionsBox } from "@/components/feed/subscriptions-box"
@@ -97,6 +98,8 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
 
   const filteredPosts = filterPosts(posts, filters)
 
+  const { t } = useTranslation()
+
   // Estado para la pestaña activa del feed
   const [activeTab, setActiveTab] = useState<'parati' | 'siguiendo' | 'popular'>('parati')
   const [showMobileFilters, setShowMobileFilters] = useState(false)
@@ -147,23 +150,23 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
-              Secciones
+              {t('feed.title')}
             </h3>
             <ul className="space-y-2">
               <li
                 onClick={() => setActiveTab('parati')}
                 className={`cursor-pointer rounded-full px-3 py-1.5 transition-all duration-200 font-medium ${activeTab === 'parati' ? 'text-[#F4BF37] bg-[#D4AF37]/10' : 'text-[#D4AF37]/80 hover:bg-[#D4AF37]/10'}`}>
-                Para ti
+                {t('feed.sections.for_you')}
               </li>
               <li
                 onClick={() => setActiveTab('siguiendo')}
                 className={`cursor-pointer rounded-full px-3 py-1.5 transition-all duration-200 ${activeTab === 'siguiendo' ? 'text-[#F4BF37] bg-[#D4AF37]/10' : 'text-[#D4AF37]/80 hover:bg-[#D4AF37]/10'}`}>
-                Siguiendo
+                {t('feed.sections.following')}
               </li>
               <li
                 onClick={() => setActiveTab('popular')}
                 className={`cursor-pointer rounded-full px-3 py-1.5 transition-all duration-200 ${activeTab === 'popular' ? 'text-[#F4BF37] bg-[#D4AF37]/10' : 'text-[#D4AF37]/80 hover:bg-[#D4AF37]/10'}`}>
-                Popular
+                {t('feed.sections.popular')}
               </li>
             </ul>
           </div>
@@ -186,29 +189,27 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
           <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-3 mb-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-                <span className="text-sm font-semibold text-[#D4AF37]">Filtros activos:</span>
+                <span className="text-sm font-semibold text-[#D4AF37]">{t('feed.filters.active_filters')}</span>
                 <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
                   {filters.onlyImages && (
                     <span className="px-3 py-1 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full border border-[#D4AF37]/30">
-                      Solo imágenes
+                      {t('feed.filters.only_images')}
                     </span>
                   )}
                   {filters.onlyVideos && (
                     <span className="px-3 py-1 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full border border-[#D4AF37]/30">
-                      Solo videos
+                      {t('feed.filters.only_videos')}
                     </span>
                   )}
                   {filters.premiumContent && (
                     <span className="px-3 py-1 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full border border-[#D4AF37]/30">
-                      Contenido premium
+                      {t('feed.filters.premium_content')}
                     </span>
                   )}
                 </div>
               </div>
               <div className="flex items-center gap-3 w-full sm:w-auto justify-start sm:justify-end">
-                <span className="text-xs text-[#D4AF37]/70">
-                  {postsForTab.length} de {posts.length} posts
-                </span>
+                <span className="text-xs text-[#D4AF37]/70">{t('feed.filters_active_count', { active: postsForTab.length, total: posts.length })}</span>
                 <button
                   onClick={() => handleFiltersChange({
                     onlyImages: false,
@@ -217,7 +218,7 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
                   })}
                   className="text-xs text-[#D4AF37]/60 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
                 >
-                  Limpiar
+                  {t('feed.filters.clear')}
                 </button>
               </div>
             </div>
@@ -233,10 +234,10 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-[#D4AF37] mb-2">Aún no sigues a creadores</h3>
-              <p className="text-[#D4AF37]/70 mb-4">No hay publicaciones de creadores que sigues. Empieza a seguir a creadores para ver su contenido aquí.</p>
+              <h3 className="text-lg font-semibold text-[#D4AF37] mb-2">{t('feed.no_content')}</h3>
+              <p className="text-[#D4AF37]/70 mb-4">{t('feed.this_creator_no_posts')}</p>
               <div>
-                <a href="/feed" className="inline-block px-4 py-2 bg-[#D4AF37] text-black rounded-full font-medium">Explorar creadores</a>
+                <a href="/feed" className="inline-block px-4 py-2 bg-[#D4AF37] text-black rounded-full font-medium">{t('feed.explore_creators')}</a>
               </div>
             </div>
           ) : (
@@ -246,8 +247,8 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-[#D4AF37] mb-2">No hay contenido</h3>
-              <p className="text-[#D4AF37]/70">No se encontraron posts que coincidan con los filtros seleccionados.</p>
+              <h3 className="text-lg font-semibold text-[#D4AF37] mb-2">{t('feed.no_content')}</h3>
+              <p className="text-[#D4AF37]/70">{t('feed.no_posts_yet')}</p>
             </div>
           )
         ) : (

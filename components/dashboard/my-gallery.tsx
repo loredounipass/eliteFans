@@ -7,6 +7,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { deletePost } from "@/lib/actions/delete-post"
 import { Trash2, Play, Image as ImageIcon, Calendar, Eye, Heart, MessageCircle, Sparkles, Diamond, Download } from "lucide-react"
+import { useTranslation } from 'react-i18next'
 import { Badge } from "@/components/ui/badge"
 
 interface Post {
@@ -25,6 +26,8 @@ interface MyGalleryProps {
 export function MyGallery({ posts }: MyGalleryProps) {
   const [mounted, setMounted] = useState(false)
   const [hoveredPost, setHoveredPost] = useState<string | null>(null)
+
+  const { t } = useTranslation()
 
   useEffect(() => {
     setMounted(true)
@@ -65,10 +68,8 @@ export function MyGallery({ posts }: MyGalleryProps) {
           </div>
           <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-[#D4AF37] animate-pulse" />
         </div>
-        <h3 className="text-2xl font-bold text-[#D4AF37] mb-4">Tu galería está vacía</h3>
-        <p className="text-[#D4AF37]/70 text-lg max-w-md">
-          Comienza a crear contenido exclusivo para tus seguidores. ¡Tu primera publicación te espera!
-        </p>
+        <h3 className="text-2xl font-bold text-[#D4AF37] mb-4">{t('gallery.empty_title')}</h3>
+        <p className="text-[#D4AF37]/70 text-lg max-w-md">{t('gallery.empty_description')}</p>
         <div className="mt-8 flex gap-2">
           <div className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce" />
           <div className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
@@ -127,7 +128,7 @@ export function MyGallery({ posts }: MyGalleryProps) {
                                     <div className="absolute top-4 left-4 pointer-events-none">
                                       <Badge variant="secondary" className="bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/30">
                                         <Play className="w-3 h-3 mr-1" />
-                                        Video
+                                        {t('gallery.video')}
                                       </Badge>
                                     </div>
                                   </div>
@@ -135,7 +136,7 @@ export function MyGallery({ posts }: MyGalleryProps) {
                                   <div className="relative h-full w-full aspect-square">
                                     <Image 
                                       src={url} 
-                                      alt={post.content || 'Publicación'} 
+                                      alt={post.content || t('gallery.publication')} 
                                       fill 
                                       className="object-cover rounded-t-lg transition-transform duration-500 group-hover:scale-110" 
                                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -181,7 +182,7 @@ export function MyGallery({ posts }: MyGalleryProps) {
                           <div className="absolute top-4 left-4 pointer-events-none z-20">
                             <Badge variant="secondary" className="bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/30">
                               <Play className="w-3 h-3 mr-1" />
-                              Video
+                              {t('gallery.video')}
                             </Badge>
                           </div>
                         </div>
@@ -189,7 +190,7 @@ export function MyGallery({ posts }: MyGalleryProps) {
                         <div className="relative h-full w-full aspect-square">
                           <Image 
                             src={post.media_urls[0]} 
-                            alt={post.content || 'Publicación'} 
+                            alt={post.content || t('gallery.publication')} 
                             fill 
                             className="object-cover rounded-t-lg transition-transform duration-500 group-hover:scale-110" 
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -207,7 +208,7 @@ export function MyGallery({ posts }: MyGalleryProps) {
                     <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 to-transparent" />
                     <div className="text-center z-10">
                       <ImageIcon className="w-12 h-12 text-[#D4AF37]/60 mx-auto mb-2" />
-                      <p className="text-[#D4AF37]/60 text-sm">Sin contenido multimedia</p>
+                      <p className="text-[#D4AF37]/60 text-sm">{t('gallery.no_media')}</p>
                     </div>
                     {/* Animated particles */}
                     <div className="absolute top-4 left-4 w-2 h-2 bg-[#D4AF37]/30 rounded-full animate-pulse" />
@@ -301,9 +302,9 @@ export function MyGallery({ posts }: MyGalleryProps) {
                       <span className="text-xs text-[#D4AF37]">{post.comments_count}</span>
                     </div>
                   )}
-                  <div className="flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
+                    <div className="flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
                     <Eye className="w-3 h-3 text-[#D4AF37]" />
-                    <span className="text-xs text-[#D4AF37]">Ver</span>
+                    <span className="text-xs text-[#D4AF37]">{t('ui.view')}</span>
                   </div>
                 </div>
               </div>
@@ -329,9 +330,7 @@ export function MyGallery({ posts }: MyGalleryProps) {
       <div className="mt-12 text-center">
         <div className="inline-flex items-center gap-2 px-6 py-3 bg-[#D4AF37]/10 border border-[#D4AF37]/20 rounded-full">
           <Sparkles className="w-4 h-4 text-[#D4AF37] animate-pulse" />
-          <span className="text-[#D4AF37]/80 text-sm">
-            {posts.length} {posts.length === 1 ? 'publicación' : 'publicaciones'} en tu galería
-          </span>
+            <span className="text-[#D4AF37]/80 text-sm">{t('feed.posts_in_gallery', { count: posts.length })}</span>
           <Diamond className="w-4 h-4 text-[#D4AF37] animate-bounce" />
         </div>
       </div>

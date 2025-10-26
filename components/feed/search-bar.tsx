@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { Input } from "@/components/ui/input"
 import { Search, Loader2 } from "lucide-react"
+import { useTranslation } from 'react-i18next'
 import { useRouter } from "next/navigation"
 
 type UserSuggestion = {
@@ -28,6 +29,7 @@ function highlightMatch(text: string, query: string) {
 }
 
 export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
+  const { t } = useTranslation()
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<UserSuggestion[]>([])
   const [loading, setLoading] = useState(false)
@@ -137,7 +139,7 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
         onKeyDown={onKeyDown}
         aria-autocomplete="list"
         aria-expanded={open}
-        placeholder="Buscar creadores, contenido..."
+  placeholder={t('feed.search_placeholder')}
         className="border-[#D4AF37]/30 bg-black/50 backdrop-blur-sm pl-12 pr-12 py-2.5 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]/60 focus:ring-2 focus:ring-[#D4AF37]/20 rounded-full shadow-lg shadow-[#D4AF37]/10"
       />
 
@@ -156,7 +158,7 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
               {/* scrollable inner area to prevent dropdown from extending to bottom */}
               <div className="max-h-[60vh] overflow-auto">
                 {results.length === 0 && !loading ? (
-                  <div className="p-3 text-sm text-[#D4AF37]/70">No se encontraron creadores</div>
+                  <div className="p-3 text-sm text-[#D4AF37]/70">{t('search.no_creators_found')}</div>
                 ) : (
                   <ul role="listbox" className="divide-y divide-[#D4AF37]/10">
                     {results.map((u, idx) => (

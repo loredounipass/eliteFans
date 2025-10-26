@@ -1,0 +1,198 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {{name}}",
+    "subtitle": "Manage your content and connect with your fans",
+    "stats": {
+      "subscribers": { "title": "Subscribers", "description": "Subscribers" },
+      "revenue": { "title": "Total Revenue", "description": "Total earnings" },
+      "likes": { "title": "Likes", "description": "Total likes on your posts" },
+      "content_published": { "title": "Content Published", "description": "Total posts published" }
+    },
+    "quick_actions": {
+      "title": "Quick Actions",
+      "upload": { "title": "Upload Content", "description": "Share new content with your fans", "button": "Upload Now" },
+      "gallery": { "title": "Gallery", "description": "Manage your photos and videos", "button": "View Gallery" },
+      "subscribers": { "title": "Subscribers", "description": "Manage your community", "button": "View Subscribers" }
+    },
+    "recent_activity": { "title": "Recent Activity", "empty": "No recent activity" }
+  },
+  "feed": {
+    "title": "Feed",
+    "suggested_creators": "Suggested Creators",
+    "no_posts_yet": "No posts yet",
+    "start_sharing": "Start sharing amazing content with your followers!",
+    "this_creator_no_posts": "This creator hasn't posted any content yet.",
+    "search_placeholder": "Search creators, content...",
+    "filters": {
+      "label": "Filters",
+      "active_filters": "Active filters:",
+      "all": "All",
+      "only_images": "Only images",
+      "only_videos": "Only videos",
+      "premium_content": "Premium content",
+      "clear": "Clear"
+    },
+    "sections": {
+      "for_you": "For you",
+      "following": "Following",
+      "popular": "Popular"
+    },
+    "no_content": "No content",
+    "explore_creators": "Explore creators",
+    "posts_in_gallery": "{{count}} posts in your gallery",
+    "filters_active_count": "{{active}} of {{total}} posts"
+  },
+  
+  "account": {
+    "my_account": "My Account",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log out",
+    "profile_unavailable": "Profile not available",
+    "username_not_found": "Username not found",
+    "signed_out_title": "Signed out",
+    "signed_out_description": "You have successfully signed out."
+  },
+  "creator_card": {
+    "subscribe": "Subscribe",
+    "subscribed": "Subscribed",
+    "free": "Free",
+    "copy_link": "Copy link to profile",
+    "block": "Block",
+    "remove": "Remove",
+    "report": "Report"
+  },
+  "ui": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "loading": "Loading",
+    "no_results": "No results",
+    "load_more": "Load more",
+    "see_more": "See more",
+    "follow": "Follow",
+    "following": "Following",
+    "unfollow": "Unfollow",
+    "copy": "Copy",
+    "delete": "Delete",
+    "download": "Download",
+    "view": "View",
+    "upload_files": "Upload Files",
+    "subscriptions": "Subscriptions",
+    "chat": "Chat",
+    "subscriptions_and_chat": "Subscriptions & Chat"
+  },
+  "language": {
+    "es": "Español",
+    "en": "English",
+    "label": "Language"
+  },
+  "create_post": {
+    "title": "Create Post",
+    "description": "Share content with your fans",
+    "uploading": "Uploading files...",
+    "files_selected": "{{count}} file(s) selected",
+    "submit_error": "You must add content or files",
+    "publish_success": "Your content has been published successfully",
+    "publish_error": "Could not publish content",
+    "placeholder": "What do you want to share?",
+    "invalid_files": "Invalid files",
+    "file_too_large": "File too large",
+    "exclusive_label": "Exclusive Content",
+    "exclusive_hint": "Subscribers only or pay-per-view"
+  },
+  "gallery": {
+    "empty_title": "Your gallery is empty",
+    "empty_description": "Start creating exclusive content for your followers. Your first post awaits!",
+    "download": "Download",
+    "no_media": "No media",
+    "video": "Video",
+    "my_title": "My Elite Gallery",
+    "my_description": "Manage and view all your exclusive content in one place",
+    "stats": {
+      "posts": "Posts",
+      "total_likes": "Total Likes",
+      "comments": "Comments"
+    },
+    "publication": "publication",
+    "publications": "publications"
+  },
+  "post_card": {
+    "premium_title": "Exclusive Content",
+    "subscribe_prompt": "Subscribe to unlock this premium content and access all exclusive material"
+  },
+  "search": {
+    "no_creators_found": "No creators found"
+  },
+  "gallery_extra": {
+    "exclusive_description": "Manage and view all your exclusive content in one place"
+  },
+  "activity": {
+    "new_like": "New Like",
+    "like_description": "@{{username}} liked your post",
+    "new_subscription": "New Subscription",
+    "subscription_description": "@{{username}} subscribed",
+    "payment_received": "Payment Received",
+    "payment_description": "You received ${{amount}} ({{type}}) from @{{username}}",
+    "new_comment": "New Comment",
+    "comment_description": "@{{username}}: {{content}}"
+  },
+  "profile": {
+    "posts": "Posts",
+    "about": "About",
+    "profile_info": "Profile Information",
+    "no_posts_yet": "No posts yet",
+    "start_sharing": "Start sharing amazing content with your followers!",
+    "subscriptions": "Subscriptions",
+    "chat": "Chat",
+    "sidebar": {
+      "navigation": "Navigation",
+      "posts": "Posts",
+      "about": "About",
+      "messages": "Messages",
+      "statistics": "Statistics",
+      "similar_creators": "Similar Creators",
+      "recent_activity": "Recent Activity"
+    },
+    "labels": {
+      "username": "Username",
+      "full_name": "Full name",
+      "subscription_price": "Subscription price",
+      "member_since": "Member since",
+      "bio": "Biography",
+      "create_first_post": "Create first post"
+    },
+    "stats": {
+      "subscribers": "Subscribers",
+      "posts": "Posts",
+      "total_likes": "Total Likes"
+    }
+  },
+  "activity_ui": {
+    "new_post": "New post",
+    "likes_count": "{{count}} likes"
+  },
+  "profile_header": {
+    "followers": "followers",
+    "following": "following",
+    "subscribers": "subscribers",
+    "posts": "posts",
+    "likes": "likes",
+    "edit_profile": "Edit Profile",
+    "processing": "Processing...",
+    "subscribe_action": "Subscribe {{price}}",
+    "subscription_price_label": "{{price}}/month"
+  },
+  "edit_profile": {
+    "title": "Edit Profile",
+    "description": "Customize your profile and make it unique for your followers",
+    "change_cover": "Change Cover",
+    "change_avatar": "Change Avatar",
+    "allowed_formats": "Allowed formats: JPG, PNG, WebP, GIF",
+    "max_size": "Max size: 5MB",
+    "save_success": "Profile updated!",
+    "save_error": "Error saving profile"
+  }
+}
