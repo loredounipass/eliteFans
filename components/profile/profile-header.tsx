@@ -46,6 +46,7 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
   const [mounted, setMounted] = useState(false)
   const [followersCount, setFollowersCount] = useState(profile.followers_count || 0)
   const [followingCount, setFollowingCount] = useState(profile.following_count || 0)
+  const [likesCount, setLikesCount] = useState(profile.likes || 0)
 
   useEffect(() => {
     setMounted(true)
@@ -75,37 +76,35 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
   const handleFollowChange = (isFollowing: boolean) => setFollowersCount((p) => Math.max(0, p + (isFollowing ? 1 : -1)))
 
   const createdDate = new Date(profile.created_at).toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+  // Mostrar el "precio justo" (formateado) para mostrar a la derecha del botón de suscripción
+  const rawPrice = profile.subscription_price ?? 0
+  const fairPriceDisplay = `$${(Math.round(rawPrice * 100) / 100).toFixed(2)}`
 
   return (
     <div className="mb-8 relative">
       {/* Cover Image con efectos mejorados */}
       <div className="relative h-48 md:h-64 overflow-hidden rounded-2xl border border-[#D4AF37]/20 shadow-2xl shadow-[#D4AF37]/10">
         {profile.cover_url ? (
-          <Image 
-            src={profile.cover_url || "/placeholder.svg"} 
-            alt="Cover" 
-            fill 
-            className="object-cover transition-transform duration-500 hover:scale-105" 
+          <Image
+            src={profile.cover_url || "/placeholder.svg"}
+            alt="Cover"
+            fill
+            className="object-cover transition-transform duration-500 hover:scale-105"
           />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-[#D4AF37]/20 via-[#D4AF37]/10 to-transparent relative">
-            {/* Animated background elements */}
             <div className="absolute inset-0">
               <div className="absolute top-10 left-10 w-32 h-32 bg-[#D4AF37]/5 rounded-full blur-2xl animate-pulse" />
               <div className="absolute bottom-10 right-10 w-40 h-40 bg-[#D4AF37]/3 rounded-full blur-3xl animate-bounce" />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-[#D4AF37]/8 to-transparent rounded-full blur-3xl animate-pulse" />
             </div>
-            {/* Floating particles */}
             <div className="absolute top-8 right-8 w-2 h-2 bg-[#D4AF37] rounded-full animate-ping opacity-60" />
             <div className="absolute bottom-8 left-8 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse opacity-80" />
             <div className="absolute top-1/3 left-1/3 w-3 h-3 bg-[#D4AF37] rounded-full animate-bounce opacity-40" />
           </div>
         )}
-        
-        {/* Gradient overlay */}
+
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        
-        {/* Decorative elements */}
         <div className="absolute top-4 right-4">
           <Sparkles className="w-6 h-6 text-[#D4AF37] animate-pulse" />
         </div>
@@ -114,156 +113,90 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
         </div>
       </div>
 
-      {/* Profile Info con diseño mejorado */}
-      <div className="relative -mt-16 mx-4">
-        <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/90 to-black/70 backdrop-blur-sm p-6 shadow-2xl shadow-[#D4AF37]/10">
-          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-            <div className="flex gap-6">
-              {/* Avatar mejorado */}
-              <div className="relative group">
-                <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-[#D4AF37] shadow-2xl shadow-[#D4AF37]/20 transition-all duration-300 group-hover:scale-105">
-                  <AvatarImage src={profile.avatar_url || "/placeholder.svg"} alt={profile.full_name || "User"} />
-                  <AvatarFallback className="bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/10 text-2xl text-[#D4AF37] font-bold">
-                    {(profile.full_name || profile.username)?.[0]?.toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                {/* Ring animation */}
-                <div className="absolute inset-0 rounded-full border-2 border-[#D4AF37]/30 animate-ping opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                {/* Status indicator */}
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#D4AF37] rounded-full border-2 border-black flex items-center justify-center">
-                  <div className="w-2 h-2 bg-black rounded-full animate-pulse" />
-                </div>
-              </div>
-
-              <div className="flex-1">
-                <div className={`flex items-center gap-3 mb-2 transition-all duration-700 ${mounted ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
-                  <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#F4BF37] to-[#D4AF37] bg-clip-text text-transparent hover:scale-105 transition-transform duration-300">
-                    {profile.full_name || profile.username}
-                  </h1>
-                  {profile.is_creator && (
-                    <div className="relative">
-                      <Crown className="h-6 w-6 text-[#D4AF37] animate-pulse" />
-                      <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-lg animate-pulse" />
-                    </div>
-                  )}
-                  <Star className="h-5 w-5 text-[#D4AF37] animate-spin" style={{ animationDuration: '3s' }} />
-                </div>
-                
-                <p className={`text-[#D4AF37]/80 mb-4 transition-all duration-700 delay-200 ${mounted ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
-                  @{profile.username}
-                </p>
-
-                {/* Stats con animaciones - Incluye seguidores y siguiendo */}
-                <div className={`flex flex-wrap gap-6 text-sm transition-all duration-700 delay-400 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                  <div className="group cursor-pointer">
-                    <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
-                      {followersCount}
-                    </span>
-                    <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
-                      seguidores
-                    </span>
-                  </div>
-                  <div className="group cursor-pointer">
-                    <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
-                      {profile.subscriber_count ?? 0}
-                    </span>
-                    <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
-                      suscriptores
-                    </span>
-                  </div>
-                  <div className="group cursor-pointer">
-                    <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
-                      {followingCount}
-                    </span>
-                    <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
-                      siguiendo
-                    </span>
-                  </div>
-                  <div className="group cursor-pointer">
-                    <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
-                      {profile.post_count ?? 0}
-                    </span>
-                    <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
-                      publicaciones
-                    </span>
-                  </div>
-                  <div className="group cursor-pointer">
-                    <span className="font-bold text-[#D4AF37] text-lg group-hover:text-[#F4BF37] transition-colors duration-300">
-                      {profile.likes ?? 0}
-                    </span>
-                    <span className="text-[#D4AF37]/70 ml-1 group-hover:text-[#D4AF37] transition-colors duration-300">
-                      likes
-                    </span>
-                  </div>
-                </div>
+      {/* Profile Info: estilo centrado tipo OnlyFans */}
+      <div className="relative -mt-20 mx-4">
+        <div className="max-w-4xl mx-auto rounded-2xl border border-[#D4AF37]/15 bg-gradient-to-br from-black/90 to-black/70 backdrop-blur-sm p-6 shadow-2xl shadow-[#D4AF37]/10">
+          <div className={`flex flex-col items-center text-center gap-4 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} transition-all duration-700`}>
+            <div className="relative">
+              <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-[#D4AF37] shadow-2xl shadow-[#D4AF37]/20 transition-transform duration-300">
+                <AvatarImage src={profile.avatar_url || "/placeholder.svg"} alt={profile.full_name || "User"} />
+                <AvatarFallback className="bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/10 text-2xl text-[#D4AF37] font-bold">
+                  {(profile.full_name || profile.username)?.[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-2 -right-2 w-5 h-5 bg-[#D4AF37] rounded-full border-2 border-black flex items-center justify-center">
+                <div className="w-2 h-2 bg-black rounded-full animate-pulse" />
               </div>
             </div>
 
-            {/* Botones mejorados - Incluye botón de seguir */}
-            <div className={`flex gap-3 transition-all duration-700 delay-600 ${mounted ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
-              {!isOwnProfile && (
-                <div className="flex items-center gap-2">
-                  <FollowButton 
-                    userId={profile.id} 
+            <div>
+              <div className="flex items-center justify-center gap-2">
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#F4BF37] to-[#D4AF37] bg-clip-text text-transparent">
+                  {profile.full_name || profile.username}
+                </h1>
+                {profile.is_creator && <Crown className="h-5 w-5 text-[#D4AF37]" />}
+                <Star className="h-5 w-5 text-[#D4AF37] animate-spin" style={{ animationDuration: '3s' }} />
+              </div>
+              <p className="text-[#D4AF37]/80 mt-1">@{profile.username}</p>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-6 text-sm mt-2">
+              <div className="text-center">
+                <div className="font-bold text-[#D4AF37] text-lg">{followersCount}</div>
+                <div className="text-[#D4AF37]/70 text-xs">seguidores</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-[#D4AF37] text-lg">{followingCount}</div>
+                <div className="text-[#D4AF37]/70 text-xs">siguiendo</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-[#D4AF37] text-lg">{profile.subscriber_count ?? 0}</div>
+                <div className="text-[#D4AF37]/70 text-xs">suscriptores</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-[#D4AF37] text-lg">{profile.post_count ?? 0}</div>
+                <div className="text-[#D4AF37]/70 text-xs">publicaciones</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-[#D4AF37] text-lg">{likesCount}</div>
+                <div className="text-[#D4AF37]/70 text-xs">likes</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 mt-3">
+              {!isOwnProfile ? (
+                <>
+                  <FollowButton
+                    userId={profile.id}
                     onFollowChange={handleFollowChange}
+                    className="px-4 py-2 text-sm rounded-full bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all"
                   />
-
-                  {/* Botón que muestra solo el precio de la suscripción (visible siempre para perfiles de terceros) */}
-                  <Button
-                    aria-label={`Precio de suscripción ${profile.subscription_price ?? 0} dólares por mes`}
-                    title={`Precio: $${profile.subscription_price ?? 0}/mes`}
-                    onClick={() => { /* botón informativo, sin acción por ahora */ }}
-                    variant="outline"
-                    className="border-[#D4AF37] text-[#D4AF37] bg-gradient-to-r from-[#D4AF37]/10 via-[#F4BF37]/5 to-transparent hover:from-[#D4AF37]/20 hover:via-[#F4BF37]/10 hover:shadow-lg hover:shadow-[#D4AF37]/20 transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">${profile.subscription_price ?? 0}</span>
-                      <span className="text-xs text-[#D4AF37]/80">/mes</span>
-                    </div>
-                  </Button>
-
-                  {/* Botón principal de suscripción solo para creadores */}
+                  {/* Si no es el propio perfil y hay un precio, mostrar Precio justo junto al FollowButton */}
+                  {profile.subscription_price != null && (
+                      <Button
+                        className="px-3 py-2 text-sm rounded-full font-semibold transition-all duration-200 shadow-lg bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                      >
+                        {fairPriceDisplay}
+                      </Button>
+                  )}
                   {profile.is_creator && (
                     <Button
                       onClick={handleSubscribe}
                       disabled={isLoading}
-                      className={`group transition-all duration-300 hover:scale-110 shadow-lg ${
-                        isSubscribed
-                          ? "border-[#D4AF37] bg-transparent text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:shadow-[#D4AF37]/25"
-                          : "bg-[#D4AF37] text-black hover:bg-[#C9A961] hover:shadow-[#D4AF37]/50"
-                      }`}
-                      variant={isSubscribed ? "outline" : "default"}
+                      className={`px-4 py-2 text-sm rounded-full font-semibold transition-all duration-200 shadow-lg ${isSubscribed ? 'bg-transparent border border-[#D4AF37] text-[#D4AF37]' : 'bg-[#D4AF37] text-black hover:bg-[#C9A961]'}`}
+                      variant={isSubscribed ? 'outline' : 'default'}
                     >
-                      {isLoading ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          Procesando...
-                        </div>
-                      ) : isSubscribed ? (
-                        <>
-                          <Crown className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
-                          Suscrito
-                          <Sparkles className="ml-2 h-4 w-4 group-hover:animate-spin" />
-                        </>
-                      ) : (
-                        <>
-                          <Star className="mr-2 h-4 w-4 group-hover:animate-pulse" />
-                          Suscribirse
-                          <Diamond className="ml-2 h-4 w-4 group-hover:animate-bounce" />
-                        </>
-                      )}
+                      {isLoading ? 'Procesando...' : isSubscribed ? 'Suscrito' : `Suscribirse $${profile.subscription_price ?? 0}`}
                     </Button>
                   )}
-                </div>
-              )}
-              {isOwnProfile && (
+                </>
+              ) : (
                 <>
                   <Button
                     variant="outline"
-                    className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 bg-transparent hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/25 group"
+                    className="px-4 py-2 text-sm rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
                     onClick={() => setShowEdit(true)}
                   >
-                    <Sparkles className="mr-2 h-4 w-4 group-hover:animate-spin" />
                     Editar Perfil
                   </Button>
                   {showEdit && (
@@ -320,11 +253,7 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
             </div>
           )}
 
-          {/* Fecha de unión */}
-          <div className={`mt-4 flex items-center gap-2 text-sm text-[#D4AF37]/60 transition-all duration-700 delay-1000 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <Calendar className="h-4 w-4" />
-            <span>Se unió en {createdDate}</span>
-          </div>
+          {/* Fecha de unión eliminada por solicitud */}
         </div>
       </div>
     </div>
