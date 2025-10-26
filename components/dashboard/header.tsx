@@ -89,13 +89,25 @@ export function DashboardHeader() {
                 <Globe className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
+              <DropdownMenuContent align="end" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
               <DropdownMenuLabel>{t('language.label')}</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-[#D4AF37]/20" />
-              <DropdownMenuItem onClick={() => i18n.changeLanguage('es')} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
+              <DropdownMenuItem
+                onClick={() => {
+                  i18n.changeLanguage('es')
+                  try { localStorage.setItem('i18nextLng', 'es') } catch (e) { /* ignore */ }
+                }}
+                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
+              >
                 {t('language.es')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => i18n.changeLanguage('en')} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
+              <DropdownMenuItem
+                onClick={() => {
+                  i18n.changeLanguage('en')
+                  try { localStorage.setItem('i18nextLng', 'en') } catch (e) { /* ignore */ }
+                }}
+                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
+              >
                 {t('language.en')}
               </DropdownMenuItem>
             </DropdownMenuContent>
