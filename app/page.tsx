@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { AuthDialog } from "@/components/auth/auth-dialog"
 import { PublicRoute } from "@/components/auth/public-route"
-import { Crown, Lock, Star, TrendingUp, Users, Zap, Sparkles,  Diamond, Globe } from "lucide-react"
+import { Crown, Lock, Star, TrendingUp, Users, Zap, Sparkles, Diamond, Globe } from "lucide-react"
 import i18n from '@/lib/i18n'
 import { useTranslation } from 'react-i18next'
 
@@ -61,19 +61,17 @@ export default function HomePage() {
           <div className="container mx-auto flex h-16 items-center justify-between px-4">
             <div className={`flex items-center gap-0 transition-all duration-700 ${mounted ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
               <div className="relative">
-                <img 
+                <Image 
                   src="/favicon.ico?v=2" 
-                  alt="ElitFans" 
-                  width={72} 
-                  height={72} 
-                  className="h-[72px] w-[72px] brightness-110 animate-pulse bg-transparent" 
+                  alt="EliteFans" 
+                  width={200} 
+                  height={60} 
+
+                  className="h-[69px] w-[69px] brightness-110 bg- " 
                   style={{ backgroundColor: 'transparent', mixBlendMode: 'screen' }}
                 />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#D4AF37] rounded-full animate-ping opacity-75" />
               </div>
-              <span className="-ml-1 text-2xl font-extrabold tracking-wide hover:scale-105 transition-transform duration-300 brand">
-                EliteFans
-              </span>
             </div>
             <div className={`flex items-center gap-3 transition-all duration-700 delay-200 ${mounted ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
               <DropdownMenu>
@@ -109,7 +107,7 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Hero Section */}
+        {/* Hero Section - Welcome Message */}
         <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 pt-16">
           {/* Enhanced Background decoration */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 via-transparent to-transparent" />
@@ -122,103 +120,164 @@ export default function HomePage() {
             <div className="absolute inset-40 border border-[#D4AF37]/3 rounded-full animate-spin" style={{ animationDuration: '25s' }} />
           </div>
 
-          <div className="relative z-10 mx-auto max-w-5xl text-center">
-            <div className={`mb-8 flex justify-center transition-all duration-1000 ${mounted ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
-              <div className="relative group">
-                <Image 
-                  src="/elitfans-logo.png" 
-                  alt="ElitFans Logo" 
-                  width={300} 
-                  height={300} 
-                  className="h-48 w-auto hover:scale-110 transition-transform duration-500 drop-shadow-2xl bg-transparent" 
-                  style={{ backgroundColor: 'transparent', mixBlendMode: 'screen' }}
-                />
-                <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <Sparkles className="absolute -top-4 -right-4 w-8 h-8 text-[#D4AF37] animate-pulse" />
-                <Diamond className="absolute -bottom-2 -left-2 w-6 h-6 text-[#D4AF37] animate-bounce" />
+          <div className="relative z-10 mx-auto max-w-6xl">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left side - Logo and Welcome */}
+              <div className="space-y-8">
+                <div className={`flex items-center space-x-4 transition-all duration-1000 ${mounted ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
+                  <Image
+                    src="/elitfans-logo.png"
+                    alt="EliteFans Logo"
+                    width={400}
+                    height={150}
+                    className="object-contain hover:scale-105 transition-transform duration-500"
+                    priority
+                  />
+                </div>
+                
+                <div className="space-y-6">
+                  <h1 className={`text-5xl lg:text-6xl font-bold text-white leading-tight transition-all duration-1000 delay-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                    ¡Bienvenido a{" "}
+                    <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
+                      EliteFans
+                    </span>
+                    !
+                  </h1>
+                  
+                  <p className={`text-xl text-[#D4AF37]/80 leading-relaxed transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                    Únete a la comunidad premium de creadores de contenido. 
+                    Descubre, conecta y apoya a tus creadores favoritos en una 
+                    plataforma exclusiva diseñada para ti.
+                  </p>
+                  
+                  <div className={`flex flex-col sm:flex-row gap-4 pt-6 transition-all duration-1000 delay-700 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                    <Button 
+                      onClick={() => openAuth("signup")}
+                      className="px-8 py-4 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] text-black font-semibold rounded-lg hover:from-[#C9A961] hover:to-[#B8985A] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#D4AF37]/50 group"
+                    >
+                      <Crown className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+                      Explorar Creadores
+                    </Button>
+                    <Button 
+                      onClick={() => openAuth("login")}
+                      variant="outline"
+                      className="px-8 py-4 border-2 border-[#D4AF37] text-[#D4AF37] font-semibold rounded-lg hover:bg-[#D4AF37]/10 transition-all duration-300 group"
+                    >
+                      <Star className="mr-2 h-5 w-5 group-hover:animate-pulse" />
+                      Comenzar Ahora
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right side - Features */}
+              <div className="space-y-8">
+                <div className="grid gap-6">
+                  <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
+                        <Lock className="w-6 h-6 text-black" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-[#D4AF37]">Contenido Exclusivo</h3>
+                    </div>
+                    <p className="text-[#D4AF37]/70">
+                      Accede a contenido premium y exclusivo de tus creadores favoritos.
+                    </p>
+                  </div>
+
+                  <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
+                        <Users className="w-6 h-6 text-black" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-[#D4AF37]">Comunidad Elite</h3>
+                    </div>
+                    <p className="text-[#D4AF37]/70">
+                      Únete a una comunidad selecta de fans y creadores de contenido.
+                    </p>
+                  </div>
+
+                  <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
+                        <Zap className="w-6 h-6 text-black" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-[#D4AF37]">Plataforma Segura</h3>
+                    </div>
+                    <p className="text-[#D4AF37]/70">
+                      Disfruta de una experiencia segura y privada en nuestra plataforma.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <h1 className={`mb-6 text-balance text-5xl font-bold leading-tight text-[#D4AF37] md:text-7xl transition-all duration-1000 delay-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <span className="inline-block hover:scale-110 transition-transform duration-300">Exclusive</span>{" "}
-              <span className="inline-block hover:scale-110 transition-transform duration-300 delay-100">Content</span>
-              <br />
-              <span className="text-white inline-block hover:scale-110 transition-transform duration-300 delay-200">For</span>{" "}
-              <span className="text-white inline-block hover:scale-110 transition-transform duration-300 delay-300 brand">EliteFans</span>{" "}
-            </h1>
-            
-            <p className={`mb-8 text-balance text-xl text-[#D4AF37]/80 md:text-2xl transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              Connect with your favorite creators and access premium content you won&apos;t find anywhere else
-            </p>
-            
-            <div className={`flex flex-col items-center justify-center gap-4 sm:flex-row transition-all duration-1000 delay-700 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <Button
-                size="lg"
-                onClick={() => openAuth("signup")}
-                className="bg-[#D4AF37] px-8 text-lg text-black hover:bg-[#C9A961] hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-[#D4AF37]/50 group"
-              >
-                <Crown className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-                Get Started
-                <Sparkles className="ml-2 h-4 w-4 group-hover:animate-spin" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => openAuth("login")}
-                className="border-[#D4AF37] px-8 text-lg text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:scale-110 transition-all duration-300 group"
-              >
-                <Star className="mr-2 h-5 w-5 group-hover:animate-pulse" />
-                Explore Creators
-              </Button>
+
+            {/* Bottom stats */}
+            <div className={`mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center transition-all duration-1000 delay-1000 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              <div className="hover:scale-105 transition-transform duration-300">
+                <div className="text-3xl font-bold text-[#D4AF37] mb-2">10K+</div>
+                <div className="text-[#D4AF37]/60">Creadores Activos</div>
+              </div>
+              <div className="hover:scale-105 transition-transform duration-300">
+                <div className="text-3xl font-bold text-[#D4AF37] mb-2">500K+</div>
+                <div className="text-[#D4AF37]/60">Usuarios Registrados</div>
+              </div>
+              <div className="hover:scale-105 transition-transform duration-300">
+                <div className="text-3xl font-bold text-[#D4AF37] mb-2">1M+</div>
+                <div className="text-[#D4AF37]/60">Contenidos Compartidos</div>
+              </div>
+              <div className="hover:scale-105 transition-transform duration-300">
+                <div className="text-3xl font-bold text-[#D4AF37] mb-2">24/7</div>
+                <div className="text-[#D4AF37]/60">Soporte Disponible</div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Features Section */}
         <section className="border-t border-[#D4AF37]/20 bg-black py-24 relative overflow-hidden">
-          {/* Section background effects */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37]/5 to-transparent" />
           
           <div className="container mx-auto px-4 relative z-10">
             <h2 className="mb-16 text-center text-4xl font-bold text-[#D4AF37] hover:scale-105 transition-transform duration-300">
-              Why ElitFans?
+              ¿Por qué EliteFans?
               <div className="w-24 h-1 bg-gradient-to-r from-[#D4AF37] to-transparent mx-auto mt-4 rounded-full" />
             </h2>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               <FeatureCard
                 icon={<Lock className="h-8 w-8" />}
-                title="Exclusive Content"
-                description="Access premium and exclusive content from your favorite creators"
+                title="Contenido Exclusivo"
+                description="Accede a contenido premium y exclusivo de tus creadores favoritos"
                 delay="0"
               />
               <FeatureCard
                 icon={<Users className="h-8 w-8" />}
-                title="Elite Community"
-                description="Join a select community of fans and content creators"
+                title="Comunidad Elite"
+                description="Únete a una comunidad selecta de fans y creadores de contenido"
                 delay="100"
               />
               <FeatureCard
                 icon={<Star className="h-8 w-8" />}
-                title="Premium Experience"
-                description="Enjoy a platform designed to deliver the best experience"
+                title="Experiencia Premium"
+                description="Disfruta de una plataforma diseñada para ofrecer la mejor experiencia"
                 delay="200"
               />
               <FeatureCard
                 icon={<TrendingUp className="h-8 w-8" />}
-                title="Monetize Your Content"
-                description="Creators: turn your passion into sustainable income"
+                title="Monetiza tu Contenido"
+                description="Creadores: convierte tu pasión en ingresos sostenibles"
                 delay="300"
               />
               <FeatureCard
                 icon={<Zap className="h-8 w-8" />}
-                title="Secure Payments"
-                description="Secure transactions for your peace of mind"
+                title="Pagos Seguros"
+                description="Transacciones seguras para tu tranquilidad"
                 delay="400"
               />
               <FeatureCard
                 icon={<Crown className="h-8 w-8" />}
-                title="VIP Support"
-                description="Personalized support for creators and subscribers"
+                title="Soporte VIP"
+                description="Soporte personalizado para creadores y suscriptores"
                 delay="500"
               />
             </div>
@@ -227,7 +286,6 @@ export default function HomePage() {
 
         {/* CTA Section */}
         <section className="border-t border-[#D4AF37]/20 bg-gradient-to-b from-black to-[#D4AF37]/5 py-24 relative overflow-hidden">
-          {/* Animated background elements */}
           <div className="absolute inset-0">
             <div className="absolute top-10 left-10 w-32 h-32 bg-[#D4AF37]/5 rounded-full blur-2xl animate-pulse" />
             <div className="absolute bottom-10 right-10 w-40 h-40 bg-[#D4AF37]/3 rounded-full blur-3xl animate-bounce" />
@@ -235,11 +293,11 @@ export default function HomePage() {
           
           <div className="container mx-auto px-4 text-center relative z-10">
             <h2 className="mb-6 text-4xl font-bold text-[#D4AF37] md:text-5xl hover:scale-105 transition-transform duration-300">
-              Ready to join the elite?
+              ¿Listo para unirte a la elite?
               <Sparkles className="inline-block ml-4 w-10 h-10 animate-spin" />
             </h2>
             <p className="mb-8 text-xl text-[#D4AF37]/80 hover:text-[#D4AF37] transition-colors duration-300">
-              Create your account today and discover a world of exclusive content
+              Crea tu cuenta hoy y descubre un mundo de contenido exclusivo
             </p>
             <Button
               size="lg"
@@ -247,7 +305,7 @@ export default function HomePage() {
               className="bg-[#D4AF37] px-12 text-lg text-black hover:bg-[#C9A961] hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-[#D4AF37]/50 group"
             >
               <Crown className="mr-2 h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
-              Sign Up Free
+              Registrarse Gratis
               <Diamond className="ml-2 h-5 w-5 group-hover:animate-bounce" />
             </Button>
           </div>
@@ -258,7 +316,7 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#D4AF37]/5 to-transparent" />
           <div className="container mx-auto px-4 text-center text-[#D4AF37]/60 relative z-10">
             <p className="hover:text-[#D4AF37] transition-colors duration-300">
-              © 2025 ElitFans. All rights reserved.
+              © 2025 EliteFans. Todos los derechos reservados.
             </p>
           </div>
         </footer>

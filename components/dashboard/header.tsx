@@ -38,8 +38,8 @@ export function DashboardHeader() {
     <header className="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-black/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/dashboard" className="flex items-center gap-0">
-            <img src="/favicon.ico?v=2" alt="EliteFans" width={72} height={72} className="h-[72px] w-[72px] object-contain" />
-          <span className="-ml-1 text-2xl font-extrabold tracking-wide brand">EliteFans</span>
+            <img src="/favicon.ico?v=2" alt="EliteFans" width={72} height={72} className="h-[69px] w-[69px] object-contain" />
+         
         </Link>
         <nav className="flex items-center gap-6">
           <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
