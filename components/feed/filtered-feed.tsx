@@ -184,46 +184,7 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
 
       {/* Contenido principal */}
       <section className="flex-1 space-y-6 overflow-y-auto scrollbar-hide pr-2 h-full">
-        {/* Indicador de filtros activos */}
-        {(filters.onlyImages || filters.onlyVideos || filters.premiumContent) && (
-          <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-3 mb-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-                <span className="text-sm font-semibold text-[#D4AF37]">{t('feed.filters.active_filters')}</span>
-                <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
-                  {filters.onlyImages && (
-                    <span className="px-3 py-1 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full border border-[#D4AF37]/30">
-                      {t('feed.filters.only_images')}
-                    </span>
-                  )}
-                  {filters.onlyVideos && (
-                    <span className="px-3 py-1 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full border border-[#D4AF37]/30">
-                      {t('feed.filters.only_videos')}
-                    </span>
-                  )}
-                  {filters.premiumContent && (
-                    <span className="px-3 py-1 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full border border-[#D4AF37]/30">
-                      {t('feed.filters.premium_content')}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-3 w-full sm:w-auto justify-start sm:justify-end">
-                <span className="text-xs text-[#D4AF37]/70">{t('feed.filters_active_count', { active: postsForTab.length, total: posts.length })}</span>
-                <button
-                  onClick={() => handleFiltersChange({
-                    onlyImages: false,
-                    onlyVideos: false,
-                    premiumContent: false
-                  })}
-                  className="text-xs text-[#D4AF37]/60 hover:text-[#D4AF37] px-2 py-1 rounded-full hover:bg-[#D4AF37]/10 transition-all duration-200"
-                >
-                  {t('feed.filters.clear')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* (Indicador de filtros removido por petición) */}
 
         {/* Lista de posts filtrados */}
         {postsForTab.length === 0 ? (
