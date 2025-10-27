@@ -1,10 +1,8 @@
 import { PrivateRoute } from "@/components/auth/private-route"
 import { DashboardHeader } from "@/components/dashboard/header"
-import { CreatorCard } from "@/components/feed/creator-card"
-import SearchBar from "@/components/feed/search-bar"
+// CreatorCard and SearchBar were removed from this file because they're not used here.
 import { FilteredFeed } from "@/components/feed/filtered-feed"
-import { Users, Heart } from "lucide-react"
-import CreatorCarousel from "@/components/feed/creator-carousel"
+// Icons and CreatorCarousel are used in sidebar components; imported where needed.
 import RightSidebar from '@/components/feed/right-sidebar'
 import { createServerClient } from "@/lib/supabase/server"
 

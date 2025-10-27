@@ -130,7 +130,7 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
 
   return (
     <div ref={ref} className={isSidebar ? "relative w-full" : "relative max-w-xl mx-auto"}>
-      <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#D4AF37]/50" />
+  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#D4AF37]/50 pointer-events-none" />
 
       <Input
         value={query}
@@ -139,11 +139,11 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
         onKeyDown={onKeyDown}
         aria-autocomplete="list"
         aria-expanded={open}
-  placeholder={t('feed.search_placeholder')}
-        className="border-[#D4AF37]/30 bg-black/50 backdrop-blur-sm pl-12 pr-12 py-2.5 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]/60 focus:ring-2 focus:ring-[#D4AF37]/20 rounded-full shadow-lg shadow-[#D4AF37]/10"
+        placeholder={t('feed.search_placeholder')}
+        className="relative z-10 border-[#D4AF37]/30 bg-black/50 backdrop-blur-sm pl-12 pr-12 py-2.5 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]/60 focus:ring-2 focus:ring-[#D4AF37]/20 rounded-full shadow-lg shadow-[#D4AF37]/10"
       />
 
-      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
         {loading ? <Loader2 className="h-4 w-4 animate-spin text-[#D4AF37]" /> : null}
       </div>
 
