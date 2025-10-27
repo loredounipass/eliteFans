@@ -95,13 +95,13 @@ export default function HomePage() {
                 onClick={() => openAuth("login")}
                 className="text-[#D4AF37] font-semibold tracking-wide uppercase hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] hover:scale-105 transition-all duration-300"
               >
-                Sign In
+                {t('landing.sign_in')}
               </Button>
               <Button 
                 onClick={() => openAuth("signup")} 
                 className="bg-[#D4AF37] text-black font-semibold tracking-wide uppercase hover:bg-[#C9A961] hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/25"
               >
-                Sign Up
+                {t('landing.sign_up')}
               </Button>
             </div>
           </div>
@@ -137,17 +137,26 @@ export default function HomePage() {
                 
                 <div className="space-y-6">
                   <h1 className={`text-5xl lg:text-6xl font-bold text-white leading-tight transition-all duration-1000 delay-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                    ¡Bienvenido a{" "}
-                    <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
-                      EliteFans
-                    </span>
-                    !
+                    {/** Highlight 'EliteFans' inside the translated title when present */}
+                    {(() => {
+                      const title = t('landing.welcome_title')
+                      const brand = 'EliteFans'
+                      if (title.includes(brand)) {
+                        const parts = title.split(brand)
+                        return (
+                          <>
+                            {parts[0]}
+                            <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">{brand}</span>
+                            {parts[1]}
+                          </>
+                        )
+                      }
+                      return title
+                    })()}
                   </h1>
-                  
+
                   <p className={`text-xl text-[#D4AF37]/80 leading-relaxed transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                    Únete a la comunidad premium de creadores de contenido. 
-                    Descubre, conecta y apoya a tus creadores favoritos en una 
-                    plataforma exclusiva diseñada para ti.
+                    {t('landing.welcome_subtitle')}
                   </p>
                   
                   <div className={`flex flex-col sm:flex-row gap-4 pt-6 transition-all duration-1000 delay-700 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
@@ -156,7 +165,7 @@ export default function HomePage() {
                       className="px-8 py-4 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] text-black font-semibold rounded-lg hover:from-[#C9A961] hover:to-[#B8985A] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#D4AF37]/50 group"
                     >
                       <Crown className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-                      Explorar Creadores
+                      {t('landing.explore_creators')}
                     </Button>
                     <Button 
                       onClick={() => openAuth("login")}
@@ -164,7 +173,7 @@ export default function HomePage() {
                       className="px-8 py-4 border-2 border-[#D4AF37] text-[#D4AF37] font-semibold rounded-lg hover:bg-[#D4AF37]/10 transition-all duration-300 group"
                     >
                       <Star className="mr-2 h-5 w-5 group-hover:animate-pulse" />
-                      Comenzar Ahora
+                      {t('landing.get_started')}
                     </Button>
                   </div>
                 </div>
@@ -178,11 +187,9 @@ export default function HomePage() {
                       <div className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
                         <Lock className="w-6 h-6 text-black" />
                       </div>
-                      <h3 className="text-xl font-semibold text-[#D4AF37]">Contenido Exclusivo</h3>
+                      <h3 className="text-xl font-semibold text-[#D4AF37]">{t('landing.exclusive_content_title')}</h3>
                     </div>
-                    <p className="text-[#D4AF37]/70">
-                      Accede a contenido premium y exclusivo de tus creadores favoritos.
-                    </p>
+                    <p className="text-[#D4AF37]/70">{t('landing.exclusive_content_description')}</p>
                   </div>
 
                   <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
@@ -190,11 +197,9 @@ export default function HomePage() {
                       <div className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
                         <Users className="w-6 h-6 text-black" />
                       </div>
-                      <h3 className="text-xl font-semibold text-[#D4AF37]">Comunidad Elite</h3>
+                      <h3 className="text-xl font-semibold text-[#D4AF37]">{t('landing.elite_community')}</h3>
                     </div>
-                    <p className="text-[#D4AF37]/70">
-                      Únete a una comunidad selecta de fans y creadores de contenido.
-                    </p>
+                    <p className="text-[#D4AF37]/70">{t('landing.elite_community_description')}</p>
                   </div>
 
                   <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
@@ -202,11 +207,9 @@ export default function HomePage() {
                       <div className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
                         <Zap className="w-6 h-6 text-black" />
                       </div>
-                      <h3 className="text-xl font-semibold text-[#D4AF37]">Plataforma Segura</h3>
+                      <h3 className="text-xl font-semibold text-[#D4AF37]">{t('landing.secure_platform')}</h3>
                     </div>
-                    <p className="text-[#D4AF37]/70">
-                      Disfruta de una experiencia segura y privada en nuestra plataforma.
-                    </p>
+                    <p className="text-[#D4AF37]/70">{t('landing.secure_platform_description')}</p>
                   </div>
                 </div>
               </div>
@@ -214,21 +217,21 @@ export default function HomePage() {
 
             {/* Bottom stats */}
             <div className={`mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center transition-all duration-1000 delay-1000 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <div className="hover:scale-105 transition-transform duration-300">
+                <div className="hover:scale-105 transition-transform duration-300">
                 <div className="text-3xl font-bold text-[#D4AF37] mb-2">10K+</div>
-                <div className="text-[#D4AF37]/60">Creadores Activos</div>
+                <div className="text-[#D4AF37]/60">{t('landing.stats.creators_active_label')}</div>
               </div>
               <div className="hover:scale-105 transition-transform duration-300">
                 <div className="text-3xl font-bold text-[#D4AF37] mb-2">500K+</div>
-                <div className="text-[#D4AF37]/60">Usuarios Registrados</div>
+                <div className="text-[#D4AF37]/60">{t('landing.stats.registered_users_label')}</div>
               </div>
               <div className="hover:scale-105 transition-transform duration-300">
                 <div className="text-3xl font-bold text-[#D4AF37] mb-2">1M+</div>
-                <div className="text-[#D4AF37]/60">Contenidos Compartidos</div>
+                <div className="text-[#D4AF37]/60">{t('landing.stats.contents_shared_label')}</div>
               </div>
               <div className="hover:scale-105 transition-transform duration-300">
                 <div className="text-3xl font-bold text-[#D4AF37] mb-2">24/7</div>
-                <div className="text-[#D4AF37]/60">Soporte Disponible</div>
+                <div className="text-[#D4AF37]/60">{t('landing.stats.support_available_label')}</div>
               </div>
             </div>
           </div>
@@ -240,44 +243,44 @@ export default function HomePage() {
           
           <div className="container mx-auto px-4 relative z-10">
             <h2 className="mb-16 text-center text-4xl font-bold text-[#D4AF37] hover:scale-105 transition-transform duration-300">
-              ¿Por qué EliteFans?
+              {t('landing.why_title')}
               <div className="w-24 h-1 bg-gradient-to-r from-[#D4AF37] to-transparent mx-auto mt-4 rounded-full" />
             </h2>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               <FeatureCard
                 icon={<Lock className="h-8 w-8" />}
-                title="Contenido Exclusivo"
-                description="Accede a contenido premium y exclusivo de tus creadores favoritos"
+                title={t('landing.why_exclusive')}
+                description={t('landing.why_exclusive_desc')}
                 delay="0"
               />
               <FeatureCard
                 icon={<Users className="h-8 w-8" />}
-                title="Comunidad Elite"
-                description="Únete a una comunidad selecta de fans y creadores de contenido"
+                title={t('landing.why_community')}
+                description={t('landing.why_community_desc')}
                 delay="100"
               />
               <FeatureCard
                 icon={<Star className="h-8 w-8" />}
-                title="Experiencia Premium"
-                description="Disfruta de una plataforma diseñada para ofrecer la mejor experiencia"
+                title={t('landing.why_premium_experience')}
+                description={t('landing.why_premium_experience_desc')}
                 delay="200"
               />
               <FeatureCard
                 icon={<TrendingUp className="h-8 w-8" />}
-                title="Monetiza tu Contenido"
-                description="Creadores: convierte tu pasión en ingresos sostenibles"
+                title={t('landing.monetize')}
+                description={t('landing.monetize_desc')}
                 delay="300"
               />
               <FeatureCard
                 icon={<Zap className="h-8 w-8" />}
-                title="Pagos Seguros"
-                description="Transacciones seguras para tu tranquilidad"
+                title={t('landing.secure_payments')}
+                description={t('landing.secure_payments_desc')}
                 delay="400"
               />
               <FeatureCard
                 icon={<Crown className="h-8 w-8" />}
-                title="Soporte VIP"
-                description="Soporte personalizado para creadores y suscriptores"
+                title={t('landing.vip_support')}
+                description={t('landing.vip_support_desc')}
                 delay="500"
               />
             </div>
@@ -293,11 +296,11 @@ export default function HomePage() {
           
           <div className="container mx-auto px-4 text-center relative z-10">
             <h2 className="mb-6 text-4xl font-bold text-[#D4AF37] md:text-5xl hover:scale-105 transition-transform duration-300">
-              ¿Listo para unirte a la elite?
+              {t('landing.ready_title')}
               <Sparkles className="inline-block ml-4 w-10 h-10 animate-spin" />
             </h2>
             <p className="mb-8 text-xl text-[#D4AF37]/80 hover:text-[#D4AF37] transition-colors duration-300">
-              Crea tu cuenta hoy y descubre un mundo de contenido exclusivo
+              {t('landing.ready_subtitle')}
             </p>
             <Button
               size="lg"
@@ -305,7 +308,7 @@ export default function HomePage() {
               className="bg-[#D4AF37] px-12 text-lg text-black hover:bg-[#C9A961] hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-[#D4AF37]/50 group"
             >
               <Crown className="mr-2 h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
-              Registrarse Gratis
+              {t('landing.register_free')}
               <Diamond className="ml-2 h-5 w-5 group-hover:animate-bounce" />
             </Button>
           </div>
@@ -315,9 +318,7 @@ export default function HomePage() {
         <footer className="border-t border-[#D4AF37]/20 bg-black py-8 relative">
           <div className="absolute inset-0 bg-gradient-to-t from-[#D4AF37]/5 to-transparent" />
           <div className="container mx-auto px-4 text-center text-[#D4AF37]/60 relative z-10">
-            <p className="hover:text-[#D4AF37] transition-colors duration-300">
-              © 2025 EliteFans. Todos los derechos reservados.
-            </p>
+            <p className="hover:text-[#D4AF37] transition-colors duration-300">{t('landing.footer_copyright')}</p>
           </div>
         </footer>
 
