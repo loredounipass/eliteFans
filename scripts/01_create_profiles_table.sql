@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   subscription_price DECIMAL(10, 2) DEFAULT 0,
   subscriber_count INTEGER DEFAULT 0,
   post_count INTEGER DEFAULT 0,
+  total_likes INTEGER DEFAULT 0,
   total_earnings DECIMAL(10, 2) DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

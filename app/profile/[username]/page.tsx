@@ -38,11 +38,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     .eq("creator_id", profile.id)
     .order("created_at", { ascending: false })
 
-  // CALCULAR LIKES TOTALES SOBRE LAS PUBLICACIONES
-  const totalLikes = (posts || []).reduce((acc: number, p: any) => acc + (p.like_count ?? 0), 0)
+  // CALCULAR LIKES TOTALES SOBRE LAS PUBLICACIONES (visible posts fallback)
+  const visibleLikes = (posts || []).reduce((acc: number, p: any) => acc + (p.like_count ?? 0), 0)
 
-  // Usar el contador real de publicaciones
-  const actualPostCount = posts?.length || profile.post_count || 0
+  // Usar el contador total de publicaciones almacenado en profile cuando exista (evita que RLS reduzca el contador visible)
+  const actualPostCount = profile.post_count ?? posts?.length ?? 0
   // OBTENER USUARIO ACTUAL PARA VERIFICAR SUSCRIPCION
   const {
     data: { user },
@@ -94,17 +94,17 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         <DashboardHeader />
 
         <main className="relative container mx-auto px-3 py-6 flex gap-6 h-[calc(100vh-6rem)]">
-          <LeftSidebar profile={profile} actualPostCount={actualPostCount} />
+          <LeftSidebar profile={{ ...profile, post_count: actualPostCount, likes: profile.total_likes ?? visibleLikes }} actualPostCount={actualPostCount} />
 
           {/* Contenido principal */}
           <section className="flex-1 space-y-6 overflow-y-auto scrollbar-hide pr-2 h-full">
             <ProfileHeader
-              profile={{ ...profile, post_count: actualPostCount, likes: totalLikes }}
+              profile={{ ...profile, post_count: actualPostCount, likes: profile.total_likes ?? visibleLikes }}
               isSubscribed={isSubscribed}
               isOwnProfile={isOwnProfile}
             />
             <ProfileTabs 
-              profile={{ ...profile, post_count: actualPostCount, likes: totalLikes }} 
+              profile={{ ...profile, post_count: actualPostCount, likes: profile.total_likes ?? visibleLikes }} 
               posts={posts || []} 
               isSubscribed={isSubscribed} 
               isOwnProfile={isOwnProfile} 

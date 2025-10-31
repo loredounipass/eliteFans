@@ -33,8 +33,16 @@ RETURNS TRIGGER AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
     UPDATE posts SET like_count = like_count + 1 WHERE id = NEW.post_id;
+    -- Increment total_likes on the creator's profile
+    UPDATE profiles
+    SET total_likes = total_likes + 1
+    WHERE id = (SELECT creator_id FROM posts WHERE id = NEW.post_id);
   ELSIF TG_OP = 'DELETE' THEN
     UPDATE posts SET like_count = like_count - 1 WHERE id = OLD.post_id;
+    -- Decrement total_likes on the creator's profile
+    UPDATE profiles
+    SET total_likes = total_likes - 1
+    WHERE id = (SELECT creator_id FROM posts WHERE id = OLD.post_id);
   END IF;
   RETURN NULL;
 END;

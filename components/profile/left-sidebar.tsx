@@ -10,6 +10,8 @@ interface LeftSidebarProps {
 
 export default function LeftSidebar({ profile, actualPostCount }: LeftSidebarProps) {
   const { t } = useTranslation()
+  
+  const totalLikes = profile.total_likes ?? profile.likes ?? 0
 
   return (
     <aside className="hidden lg:block lg:w-72">
@@ -51,7 +53,7 @@ export default function LeftSidebar({ profile, actualPostCount }: LeftSidebarPro
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-[#D4AF37]/80">{t('profile.stats.total_likes')}</span>
-              <span className="text-sm font-semibold text-[#D4AF37]">{profile.likes || 0}</span>
+              <span className="text-sm font-semibold text-[#D4AF37]">{totalLikes}</span>
             </div>
           </div>
         </div>
