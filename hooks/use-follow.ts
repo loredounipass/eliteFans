@@ -62,13 +62,16 @@ export function useFollow({ userId, onFollowChange }: UseFollowProps) {
         onFollowChange?.(previous)
         throw new Error(json?.error || 'Failed')
       }
-      const newState = json.action === 'followed'
-      setIsFollowing(newState)
-      onFollowChange?.(newState)
+  const newState = json.action === 'followed'
+  setIsFollowing(newState)
+  // Avoid calling onFollowChange again after success since we already
+  // called it optimistically above. This prevents duplicate increments
+  // of follower counts in the UI.
       toast({ title: newState ? 'Siguiendo' : 'Dejaste de seguir' })
     } catch (err: any) {
-      setIsFollowing(previous)
-      onFollowChange?.(previous)
+  setIsFollowing(previous)
+  // Revert optimistic change in parent
+  onFollowChange?.(previous)
       toast({ title: 'Error', description: err?.message || String(err), variant: 'destructive' })
     } finally {
       setIsLoading(false)

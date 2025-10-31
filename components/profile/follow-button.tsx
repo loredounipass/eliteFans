@@ -113,18 +113,20 @@ export function useFollow({ userId, onFollowChange }: UseFollowProps): UseFollow
         throw new Error(json?.error || "Failed to update follow status")
       }
 
-      const newState = json.action === "followed"
-      setFollowing(newState)
-      onFollowChange?.(newState)
-      dispatchFollowChanged(newState)
+  const newState = json.action === "followed"
+  setFollowing(newState)
+  // We already called onFollowChange optimistically above.
+  // Avoid calling it again here to prevent double-counting the follower count.
+  dispatchFollowChanged(newState)
 
       toast({
         title: newState ? "Siguiendo" : "Dejaste de seguir",
         description: newState ? "Ahora sigues a este usuario" : "Ya no sigues a este usuario",
       })
     } catch (err: any) {
-      setFollowing(prev)
-      onFollowChange?.(prev)
+  setFollowing(prev)
+  // Revert the optimistic change in the parent via callback
+  onFollowChange?.(prev)
       toast({ title: "Error", description: err?.message ?? "Error", variant: "destructive" })
     } finally {
       setLoading(false)
