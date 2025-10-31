@@ -131,6 +131,7 @@ export default function HomePage() {
                     width={400}
                     height={150}
                     className="object-contain hover:scale-105 transition-transform duration-500"
+                    style={{ width: 'auto', height: 'auto' }}
                     priority
                   />
                 </div>
@@ -180,36 +181,36 @@ export default function HomePage() {
               </div>
 
               {/* Right side - Features */}
-              <div className="space-y-8">
-                <div className="grid gap-6">
-                  <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
-                        <Lock className="w-6 h-6 text-black" />
+              <div className="space-y-6 mt-6 lg:mt-12">
+                <div className="grid gap-4">
+                  <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-4 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
+                        <Lock className="w-5 h-5 text-black" />
                       </div>
-                      <h3 className="text-xl font-semibold text-[#D4AF37]">{t('landing.exclusive_content_title')}</h3>
+                      <h3 className="text-lg font-semibold text-[#D4AF37]">{t('landing.exclusive_content_title')}</h3>
                     </div>
-                    <p className="text-[#D4AF37]/70">{t('landing.exclusive_content_description')}</p>
+                    <p className="text-[#D4AF37]/70 text-sm">{t('landing.exclusive_content_description')}</p>
                   </div>
 
-                  <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
-                        <Users className="w-6 h-6 text-black" />
+                  <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-4 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
+                        <Users className="w-5 h-5 text-black" />
                       </div>
-                      <h3 className="text-xl font-semibold text-[#D4AF37]">{t('landing.elite_community')}</h3>
+                      <h3 className="text-lg font-semibold text-[#D4AF37]">{t('landing.elite_community')}</h3>
                     </div>
-                    <p className="text-[#D4AF37]/70">{t('landing.elite_community_description')}</p>
+                    <p className="text-[#D4AF37]/70 text-sm">{t('landing.elite_community_description')}</p>
                   </div>
 
-                  <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
-                        <Zap className="w-6 h-6 text-black" />
+                  <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-4 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-[#D4AF37] to-[#C9A961] rounded-lg flex items-center justify-center">
+                        <Zap className="w-5 h-5 text-black" />
                       </div>
-                      <h3 className="text-xl font-semibold text-[#D4AF37]">{t('landing.secure_platform')}</h3>
+                      <h3 className="text-lg font-semibold text-[#D4AF37]">{t('landing.secure_platform')}</h3>
                     </div>
-                    <p className="text-[#D4AF37]/70">{t('landing.secure_platform_description')}</p>
+                    <p className="text-[#D4AF37]/70 text-sm">{t('landing.secure_platform_description')}</p>
                   </div>
                 </div>
               </div>
