@@ -28,8 +28,8 @@
       "label": "Filtros",
       "active_filters": "Filtros activos:",
       "all": "Todos",
-      "only_images": "Solo imágenes",
-      "only_videos": "Solo videos",
+  "only_images": "Imágenes gratis",
+  "only_videos": "Videos gratis",
       "premium_content": "Contenido premium",
       "clear": "Limpiar"
     },

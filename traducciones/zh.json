@@ -28,8 +28,8 @@
       "label": "筛选",
       "active_filters": "已启用筛选：",
       "all": "全部",
-      "only_images": "仅图片",
-      "only_videos": "仅视频",
+  "only_images": "免费图片",
+  "only_videos": "免费视频",
       "premium_content": "付费内容",
       "clear": "清除"
     },

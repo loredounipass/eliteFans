@@ -28,8 +28,8 @@
       "label": "Filters",
       "active_filters": "Active filters:",
       "all": "All",
-      "only_images": "Only images",
-      "only_videos": "Only videos",
+  "only_images": "Free images",
+  "only_videos": "Free videos",
       "premium_content": "Premium content",
       "clear": "Clear"
     },
