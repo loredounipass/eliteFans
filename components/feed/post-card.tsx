@@ -589,9 +589,10 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   }
 
   return (
-    <Card className="group overflow-hidden border-0 bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-2xl shadow-[#D4AF37]/5 transition-all duration-300 hover:shadow-[#D4AF37]/10 hover:scale-[1.02] rounded-3xl w-full relative">
-      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#D4AF37]/5 via-[#D4AF37]/30 to-[#D4AF37]/5"></div>
-      <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#D4AF37]/5 via-[#D4AF37]/30 to-[#D4AF37]/5"></div>
+  <Card style={{boxShadow: 'inset 0 0 24px rgba(212,175,55,0.015)'}} className="group overflow-hidden bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-md shadow-[#D4AF37]/4 transition-all duration-300 hover:shadow-[#D4AF37]/6 hover:scale-[1.02] rounded-3xl w-full relative border border-[#D4AF37]/8">
+  {/* Bordes verticales más finos y sutiles (gradiente translúcido) */}
+  <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#D4AF37]/20 to-transparent opacity-40"></div>
+  <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#D4AF37]/20 to-transparent opacity-40"></div>
       {/* Header con perfil del creador */}
   <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
         <div className="flex items-center gap-4 flex-1">
@@ -665,6 +666,12 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
 
       {/* Contenido principal */}
       <CardContent className="p-0 relative">
+        {/* Mostrar la descripción arriba del contenido multimedia */}
+        {content.description && (
+          <div className="w-full px-6 py-6 border-b border-[#D4AF37]/10 mb-4">
+            <p className="text-[#D4AF37]/90 leading-relaxed text-sm">{content.description}</p>
+          </div>
+        )}
         {content.type === "locked" ? (
           <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] bg-gradient-to-br from-[#D4AF37]/10 via-black/50 to-black/80 flex items-center justify-center max-h-[820px] sm:max-h-[720px]">
             <div className="absolute inset-0 bg-[url('/placeholder.jpg')] bg-cover bg-center opacity-20 blur-sm"></div>
@@ -728,7 +735,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                   width={1920}
                   height={1080}
                   onLoadingComplete={() => setMediaLoaded(true)}
-                  className={`max-h-[420px] sm:max-h-[500px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                  className={`max-h-[320px] sm:max-h-[420px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
                   sizes="(max-width: 640px) 100vw, 1200px"
                   priority={false}
                 />
@@ -737,7 +744,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 src={content.url || "/placeholder.svg?height=600&width=600"}
                 alt="Post content"
                 onLoad={() => setMediaLoaded(true)}
-                className={`max-h-[520px] sm:max-h-[600px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                className={`max-h-[360px] sm:max-h-[460px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
                 loading="lazy"
               />
                 )}
@@ -822,12 +829,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           </Button>
         </div>
 
-        {/* Descripción del post */}
-        {content.description && (
-          <div className="w-full">
-            <p className="text-[#D4AF37]/90 leading-relaxed text-sm">{content.description}</p>
-          </div>
-        )}
+        {/* (Descripción movida arriba del contenido multimedia) */}
       </CardFooter>
 
       {/* Sección de comentarios */}
@@ -876,8 +878,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         </div>
       )}
       <div className="relative w-full h-1">
-        <div className="absolute left-0 bottom-0 w-1 h-4 bg-[#D4AF37]/20"></div>
-        <div className="absolute right-0 bottom-0 w-1 h-4 bg-[#D4AF37]/20"></div>
+        {/* Remates inferiores más delicados (pequeños y redondeados) */}
+        <div className="absolute left-0 bottom-0 w-px h-3 rounded-full bg-[#D4AF37]/20 opacity-40"></div>
+        <div className="absolute right-0 bottom-0 w-px h-3 rounded-full bg-[#D4AF37]/20 opacity-40"></div>
       </div>
     </Card>
   )
