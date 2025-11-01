@@ -202,7 +202,16 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         setLikes(prevLikes)
         return
       }
-      if (json.like_count != null) setLikes(Number(json.like_count))
+      if (json.like_count != null) {
+        const newCount = Number(json.like_count)
+        setLikes(newCount)
+        // Notify other parts of the UI (profile header, sidebars) that a like count changed
+        try {
+          window.dispatchEvent(new CustomEvent("likes:changed", { detail: { profileId: creatorProfileId, like_count: newCount } }))
+        } catch (e) {
+          // ignore dispatch errors
+        }
+      }
       else if (json.action === "already_liked") setLiked(true)
       else if (json.action === "unliked") setLiked(false)
     } catch (e) {
@@ -735,7 +744,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                   width={1920}
                   height={1080}
                   onLoadingComplete={() => setMediaLoaded(true)}
-                  className={`max-h-[320px] sm:max-h-[420px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                  className={`max-h-[360px] sm:max-h-[480px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
                   sizes="(max-width: 640px) 100vw, 1200px"
                   priority={false}
                 />
@@ -744,7 +753,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 src={content.url || "/placeholder.svg?height=600&width=600"}
                 alt="Post content"
                 onLoad={() => setMediaLoaded(true)}
-                className={`max-h-[360px] sm:max-h-[460px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                  className={`max-h-[400px] sm:max-h-[520px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
                 loading="lazy"
               />
                 )}

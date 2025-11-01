@@ -45,8 +45,8 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
   const [isLoading, setIsLoading] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [showFullBio, setShowFullBio] = useState(false)
   const [followersCount, setFollowersCount] = useState(profile.followers_count || 0)
-  const [followingCount, setFollowingCount] = useState(profile.following_count || 0)
   const [likesCount, setLikesCount] = useState(profile.likes || 0)
 
   const { t } = useTranslation()
@@ -77,6 +77,21 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
   }
 
   const handleFollowChange = (isFollowing: boolean) => setFollowersCount((p) => Math.max(0, p + (isFollowing ? 1 : -1)))
+
+  // Keep likesCount in sync when other components (posts, sidebars) update like counts
+  useEffect(() => {
+    function onLikesChanged(e: any) {
+      const d = e?.detail
+      if (!d) return
+      // Only update if the event is for the profile we're viewing
+      if (d.profileId && String(d.profileId) === String(profile.id)) {
+        if (d.like_count != null) setLikesCount(Number(d.like_count))
+      }
+    }
+
+    window.addEventListener("likes:changed", onLikesChanged)
+    return () => window.removeEventListener("likes:changed", onLikesChanged)
+  }, [profile.id])
 
   const createdDate = new Date(profile.created_at).toLocaleDateString("es-ES", { month: "long", year: "numeric" })
   // Mostrar el "precio justo" (formateado) para mostrar a la derecha del botón de suscripción
@@ -149,7 +164,7 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
                 <div className="text-[#D4AF37]/70 text-xs">{t('profile_header.followers')}</div>
               </div>
               <div id="stats-following" className="text-center">
-                <div className="font-bold text-[#D4AF37] text-base">{followingCount}</div>
+                <div className="font-bold text-[#D4AF37] text-base">{profile.following_count ?? 0}</div>
                 <div className="text-[#D4AF37]/70 text-xs">{t('profile_header.following')}</div>
               </div>
               <div id="stats-subscribers" className="text-center">
@@ -218,38 +233,54 @@ export function ProfileHeader({ profile, isSubscribed: initialIsSubscribed, isOw
             </div>
           </div>
 
-          {/* Bio con efectos */}
+          {/* Bio con efectos — centrada y con truncado tipo 'Leer más' */}
           {profile.bio && (
-            <div className={`mt-4 p-3 rounded-xl bg-black/30 border border-[#D4AF37]/10 transition-all duration-700 delay-800 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <p className="text-[#D4AF37]/90 leading-relaxed">{profile.bio}</p>
+            <div className={`mt-4 transition-all duration-700 delay-800 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              <div className="mx-auto max-w-[68ch] px-4 py-3 rounded-2xl bg-gradient-to-br from-black/30 to-black/20 border border-[#D4AF37]/10 shadow-inner">
+                <p className="text-center text-[#D4AF37]/90 leading-relaxed text-sm md:text-base">
+                  {profile.bio.length > 220 && !showFullBio ? (
+                    <>
+                      {profile.bio.slice(0, 220).trim()}...
+                      <button type="button" onClick={() => setShowFullBio(true)} className="ml-2 text-[#F4BF37] font-semibold hover:underline">Ver más</button>
+                    </>
+                  ) : (
+                    <>
+                      {profile.bio}
+                      {profile.bio.length > 220 && (
+                        <button type="button" onClick={() => setShowFullBio(false)} className="ml-2 text-[#F4BF37] font-semibold hover:underline">Mostrar menos</button>
+                      )}
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
           )}
 
           {/* Social links */}
           {(profile.facebook_url || profile.instagram_url || profile.tiktok_url || profile.x_url || profile.youtube_url) && (
-            <div className={`mt-3 flex items-center gap-3 transition-all duration-700 delay-900 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <div className={`mt-3 flex items-center justify-center mx-auto gap-3 transition-all duration-700 delay-900 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
               {profile.facebook_url && (
-                <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook" className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[#D4AF37]/20 bg-black/20 text-[#D4AF37] hover:bg-[#D4AF37]/8 hover:scale-105 transition-transform">
                   <Facebook className="h-5 w-5" />
                 </a>
               )}
               {profile.instagram_url && (
-                <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram" className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[#D4AF37]/20 bg-black/20 text-[#D4AF37] hover:bg-gradient-to-tr hover:from-[#F4BF37]/10 hover:to-[#D4AF37]/8 hover:scale-105 transition-all">
                   <Instagram className="h-5 w-5" />
                 </a>
               )}
               {profile.tiktok_url && (
-                <a href={profile.tiktok_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                <a href={profile.tiktok_url} target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok" className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[#D4AF37]/20 bg-black/20 text-[#D4AF37] hover:bg-[#D4AF37]/8 hover:scale-105 transition-transform overflow-hidden">
                   <img src="https://cdn.simpleicons.org/tiktok/FFD400" alt="TikTok" className="h-5 w-5" />
                 </a>
               )}
               {profile.x_url && (
-                <a href={profile.x_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                <a href={profile.x_url} target="_blank" rel="noopener noreferrer" aria-label="X / Twitter" title="X" className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[#D4AF37]/20 bg-black/20 text-[#D4AF37] hover:bg-[#D4AF37]/8 hover:scale-105 transition-transform">
                   <Twitter className="h-5 w-5" />
                 </a>
               )}
               {profile.youtube_url && (
-                <a href={profile.youtube_url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37]/90 hover:text-[#F4BF37]">
+                <a href={profile.youtube_url} target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube" className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[#D4AF37]/20 bg-black/20 text-[#D4AF37] hover:bg-[#D4AF37]/8 hover:scale-105 transition-transform">
                   <Youtube className="h-5 w-5" />
                 </a>
               )}
