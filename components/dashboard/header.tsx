@@ -123,7 +123,12 @@ export function DashboardHeader() {
                 <User className="mr-2 h-4 w-4" />
                 {t('account.profile')}
               </DropdownMenuItem>
-              <DropdownMenuItem className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
+              <DropdownMenuItem
+                onClick={() => {
+                  router.push('/dashboard/settings')
+                }}
+                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
+              >
                 <Settings className="mr-2 h-4 w-4" />
                 {t('account.settings')}
               </DropdownMenuItem>

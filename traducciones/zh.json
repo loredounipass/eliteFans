@@ -53,6 +53,9 @@
     "signed_out_title": "已登出",
     "signed_out_description": "您已成功登出。"
   },
+  "settings": {
+    "show_recent": "显示近期活动"
+  },
   "creator_card": {
     "subscribe": "订阅",
     "subscribed": "已订阅",
@@ -180,7 +183,8 @@
   },
   "activity_ui": {
     "new_post": "新帖子",
-    "likes_count": "{{count}} 个点赞"
+    "likes_count": "{{count}} 个点赞",
+    "liked_your_post": "赞了您的帖子"
   },
   "profile_header": {
     "followers": "关注者",

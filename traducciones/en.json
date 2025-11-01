@@ -54,6 +54,9 @@
     "signed_out_title": "Signed out",
     "signed_out_description": "You have successfully signed out."
   },
+  "settings": {
+    "show_recent": "Show Recent Activity"
+  },
   "creator_card": {
     "subscribe": "Subscribe",
     "subscribed": "Subscribed",
@@ -180,7 +183,8 @@
   },
   "activity_ui": {
     "new_post": "New post",
-    "likes_count": "{{count}} likes"
+    "likes_count": "{{count}} likes",
+    "liked_your_post": "liked your post"
   },
   "profile_header": {
     "followers": "followers",

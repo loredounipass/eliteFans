@@ -84,6 +84,9 @@
     "signed_out_title": "Sesión cerrada",
     "signed_out_description": "Has cerrado sesión exitosamente."
   },
+  "settings": {
+    "show_recent": "Mostrar actividad reciente"
+  },
   "creator_card": {
     "subscribe": "Suscribirse",
     "subscribed": "Suscrito",
@@ -179,7 +182,8 @@
   },
   "activity_ui": {
     "new_post": "Nueva publicación",
-    "likes_count": "{{count}} likes"
+    "likes_count": "{{count}} likes",
+    "liked_your_post": "le gustó tu publicación"
   },
   "profile_header": {
     "followers": "seguidores",

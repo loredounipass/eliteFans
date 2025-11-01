@@ -53,6 +53,9 @@
     "signed_out_title": "Вы вышли",
     "signed_out_description": "Вы успешно вышли из системы."
   },
+  "settings": {
+    "show_recent": "Показать недавнюю активность"
+  },
   "creator_card": {
     "subscribe": "Подписаться",
     "subscribed": "Подписаны",
@@ -180,7 +183,8 @@
   },
   "activity_ui": {
     "new_post": "Новый пост",
-    "likes_count": "{{count}} лайков"
+    "likes_count": "{{count}} лайков",
+    "liked_your_post": "понравился ваш пост"
   },
   "profile_header": {
     "followers": "подписчики",

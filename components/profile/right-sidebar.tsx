@@ -45,35 +45,7 @@ export default function RightSidebar({ suggestedCreators, posts, profile }: Righ
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-4 shadow-lg shadow-[#D4AF37]/5">
-          <h3 className="mb-3 text-base font-bold text-[#D4AF37] flex items-center gap-2">
-            <Heart className="h-5 w-5" />
-            {t('profile.sidebar.recent_activity')}
-          </h3>
-          <div className="space-y-3 max-h-[52vh] overflow-y-auto scrollbar-hide pr-2">
-            {(posts || []).map((post: any) => (
-              <div
-                key={post.id}
-                className="flex items-center gap-3 p-2.5 rounded-xl bg-black/30 hover:bg-black/50 transition-all duration-200 cursor-pointer group"
-              >
-                <img
-                  src={profile.avatar_url || "/placeholder-user.jpg"}
-                  alt={profile.username}
-                  className="h-8 w-8 rounded-full object-cover border border-[#D4AF37]/30 group-hover:border-[#D4AF37]/50 transition-all duration-200"
-                />
-                <div className="flex-1">
-                  <p className="text-xs text-[#D4AF37]/80 line-clamp-2">
-                    {post.content || t('activity_ui.new_post')}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-[#D4AF37]/70 mt-1">
-                    <Heart className="h-3 w-3" />
-                    <span>{t('activity_ui.likes_count', { count: post.like_count || 0 })}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Recent Activity moved to Settings page */}
       </div>
     </aside>
   )
