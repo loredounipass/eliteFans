@@ -25,7 +25,6 @@ type PostRow = {
   isOwn?: boolean
 }
 
-// NOTE: Removed hardcoded FEED_LIMIT so the server/API decides how many posts to return.
 
 type CreatorPreview = {
   username?: string

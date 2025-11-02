@@ -26,9 +26,7 @@ interface PostCardProps {
   content: {
     type: "image" | "video" | "locked"
     url?: string
-    // optional high-resolution image url (4K) if available
     highResUrl?: string
-    // optional video sources with resolution metadata
     videoSources?: Array<{ src: string; type?: string; resolution?: number }>
     description: string
     likes: number
@@ -54,7 +52,6 @@ interface Comment {
   like_count?: number
   liking?: boolean
   replies?: Comment[]
-  // depth used for rendering reply indentation; optional
   depth?: number
 }
 
@@ -78,19 +75,19 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   const [coverImage, setCoverImage] = useState<string | null>(null)
   const { toast } = useToast()
   const { t } = useTranslation()
-  // Removed hardcoded comments page size here so API controls pagination/limits.
-
-  // Small helpers to keep render compact and consistent
+  // PEQUEÑOS AUXILIARES: FUNCIONES DE UTILIDAD PARA MANTENER EL RENDER COMPACTO
   const formatDate = (d?: string) => (d ? new Date(d).toLocaleDateString() : "")
+
+
+  // DETERMINAR PROPIEDAD: DEVUELVE TRUE SI EL COMENTARIO PERTENECE AL USUARIO ACTUAL O ES OPTIMISTA
   const isOwner = (c: Comment) => {
-    // A comment is owned by the current user if the profile id matches the current user id
-    // or if it's a temporary optimistic comment with a temp- prefix.
     const pid = c.profiles?.id
     if (!pid) return false
     return (currentUserId && pid === currentUserId) || String(pid).startsWith("temp-")
   }
 
-  // Parse content text into React nodes: plain text, @mentions (internal links) and external URLs
+
+  // PARSEAR CONTENIDO: TRANSFORMA TEXTO EN NODOS REACT, ENLACES Y MENCCIONES
   const parseContentToNodes = (text?: string | null) => {
     if (!text) return null
     const nodes: React.ReactNode[] = []
@@ -106,7 +103,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
       }
 
       if (match[1]) {
-        // mention like @username
+    
         const username = match[1].slice(1)
         nodes.push(
           <Link key={`mention-${idx}`} href={`/profile/${username}`} className="text-sky-400 hover:underline">
@@ -114,7 +111,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           </Link>
         )
       } else if (match[2]) {
-        // url
+        
         const url = match[2]
         nodes.push(
           <a key={`url-${idx}`} href={url} target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">
@@ -131,7 +128,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
       nodes.push(text.slice(lastIndex))
     }
 
-    // Wrap plain string segments in <span> so keys are stable
+    
     return nodes.map((n, i) => (typeof n === "string" ? <span key={`text-${i}`}>{n}</span> : n))
   }
 
@@ -152,7 +149,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     }
   }
 
-  // --- Helpers to reduce repetition and keep behavior identical ---
+
+
+  // POST JSON: AUXILIAR PARA PETICIONES JSON (POST/PATCH/DELETE)
   const postJson = async (url: string, body?: any, method = "POST") => {
     const res = await fetch(url, {
       method,
@@ -163,12 +162,18 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     return { ok: res.ok, json }
   }
 
+
+
+  // OBTENER PROFILE ID: CONSULTA SUPABASE PARA OBTENER ID POR USERNAME
   const getProfileId = async (username: string) => {
     const supabase = getSupabaseBrowserClient()
     const profileRes = await supabase.from("profiles").select("id").eq("username", username).maybeSingle()
     return (profileRes.data as any)?.id ?? null
   }
 
+
+
+  // EFECTO: OBTIENE ESTADO DE 'LIKE' Y CUENTA AL CARGAR EL POST
   useEffect(() => {
     if (!postId) return
     let mounted = true
@@ -185,8 +190,10 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     }
   }, [postId])
 
+
+
+  // EFECTO: CARGA USUARIO ACTUAL Y DATOS DEL CREADOR (AVATAR, SUBSCRIBER COUNT)
   useEffect(() => {
-    // Get current user and creator profile ID
     let mounted = true
     const supabase = getSupabaseBrowserClient()
 
@@ -195,18 +202,17 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
         setCurrentUserId(user.id)
-        
-        // Obtener el avatar_url del usuario actual
+
         const { data: currentUserProfile } = await supabase
           .from('profiles')
           .select('avatar_url')
           .eq('id', user.id)
           .maybeSingle()
-        
+
         if (currentUserProfile && currentUserProfile.avatar_url) {
           setCurrentUserAvatar(currentUserProfile.avatar_url)
         }
-        
+
         const targetId = await getProfileId(creator.username)
         if (targetId) {
           setCreatorProfileId(targetId)
@@ -218,11 +224,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               setCoverImage(pdata.cover_url || null)
             }
           } catch (e) {
-            // ignore profile fetch errors
           }
         }
       } catch (err) {
-        // ignore
       }
     })()
 
@@ -231,13 +235,14 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     }
   }, [creator.username])
 
+
+
+  // MANEJAR LIKE: GESTIONA LIKE OPTIMISTA Y SINCRONIZA CON API
   const handleLike = async () => {
-    // prevent duplicate requests
     if (liking) return
     setLiking(true)
     const prevLiked = liked
     const prevLikes = likes
-    // optimistic UI using previous value
     setLiked((s) => !s)
     setLikes((l) => (prevLiked ? Math.max(0, l - 1) : l + 1))
     try {
@@ -250,11 +255,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
       if (json.like_count != null) {
         const newCount = Number(json.like_count)
         setLikes(newCount)
-        // Notify other parts of the UI (profile header, sidebars) that a like count changed
         try {
           window.dispatchEvent(new CustomEvent("likes:changed", { detail: { profileId: creatorProfileId, like_count: newCount } }))
         } catch (e) {
-          // ignore dispatch errors
         }
       }
       else if (json.action === "already_liked") setLiked(true)
@@ -267,19 +270,20 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     }
   }
 
+
+
+  // ENVIAR COMENTARIO: MANEJA EL ENVÍO, AÑADE OPTIMISMO Y SINCRONIZA CON SERVIDOR
   const handleCommentSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!commentText.trim()) return
     setCommenting(true)
     const prevComments = comments
     setComments((c) => c + 1)
-    // optimistic add to list if visible
     const tempId = `temp-${Date.now()}`
     const tempComment: Comment = {
       id: tempId,
       content: commentText.trim(),
       created_at: new Date().toISOString(),
-      // mark the profile id with the same temp id so isOwner can detect optimistic comments
       profiles: { id: tempId, username: "you", full_name: "You", avatar_url: "" },
       like_count: 0,
       liked: false,
@@ -293,12 +297,10 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         if (showComments) setCommentList((l) => l.filter((c) => c.id !== tempComment.id))
       } else {
         setCommentText("")
-        // Sync comments count from server if available
         if (json && typeof json.comment_count === 'number') {
           setComments(Number(json.comment_count))
         }
         if (showComments && json?.comment) {
-          // Load like info for the new comment
           const newComment = { ...json.comment, like_count: 0, liked: false }
           setCommentList((l) => [newComment, ...l.filter((c) => c.id !== tempComment.id)])
         }
@@ -311,18 +313,19 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     }
   }
 
+
+
+  // CARGAR COMENTARIOS: OBTIENE COMENTARIOS PAGINADOS Y SU INFORMACIÓN DE LIKES
   const loadComments = async (reset = false) => {
     if (!postId) return
     setLoadingComments(true)
     try {
       const offset = reset ? 0 : commentsOffset
-  const q = `/api/comments?postId=${encodeURIComponent(postId)}&offset=${offset}`
+      const q = `/api/comments?postId=${encodeURIComponent(postId)}&offset=${offset}`
       const r = await fetch(q)
       const j = await r.json().catch(() => ({}))
       if (r.ok && j?.comments) {
         const items = j.comments as Comment[]
-        
-        // Load like info for each comment
         const commentsWithLikes = await Promise.all(
           items.map(async (comment) => {
             try {
@@ -339,9 +342,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           })
         )
 
-        // Organize comments with replies
         const organizedComments = organizeCommentsWithReplies(commentsWithLikes)
-        
+
         if (reset) {
           setCommentList(organizedComments)
           setCommentsOffset(items.length)
@@ -351,54 +353,50 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         }
       }
     } catch (err) {
-      // ignore
     } finally {
       setLoadingComments(false)
     }
   }
 
-  // Function to organize comments with replies positioned correctly
+
+
+  // ORGANIZAR RESPUESTAS: ORGANIZA LISTA DE COMENTARIOS POSICIONANDO RESPUESTAS TRAS SUS PADRES
   const organizeCommentsWithReplies = (comments: Comment[]): Comment[] => {
     const commentMap = new Map<string, Comment>()
     const rootComments: Comment[] = []
-    
-    // First pass: create map of all comments
+
     comments.forEach(comment => {
       commentMap.set(comment.id, { ...comment, replies: [] })
     })
-    
-    // Second pass: organize hierarchy
+
     comments.forEach(comment => {
       if (comment.parent_id && commentMap.has(comment.parent_id)) {
-        // This is a reply, don't add to root
         return
       } else {
-        // This is a root comment
         rootComments.push(commentMap.get(comment.id)!)
       }
     })
-    
-    // Third pass: create flat list with replies positioned after parents
+
     const flatList: Comment[] = []
-    
+
     const addCommentAndReplies = (comment: Comment, depth = 0) => {
       flatList.push({ ...comment, depth })
-      
-      // Find and add replies immediately after parent
       const replies = comments.filter(c => c.parent_id === comment.id)
       replies.forEach(reply => {
         addCommentAndReplies(commentMap.get(reply.id)!, depth + 1)
       })
     }
-    
+
     rootComments.forEach(comment => addCommentAndReplies(comment))
-    
+
     return flatList
   }
 
+
+
+  // LIKE DE COMENTARIO: GESTIONA LIKE OPTIMISTA PARA UN COMENTARIO
   const handleCommentLike = async (commentId: string) => {
     try {
-      // optimistic UI: toggle locally
       setCommentList((list) => 
         list.map((c) => 
           c.id === commentId 
@@ -411,7 +409,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
             : c
         )
       )
-      
+
       const { ok, json } = await postJson("/api/comment-likes", { commentId })
       if (ok) {
         setCommentList((list) => 
@@ -427,7 +425,6 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           )
         )
       } else {
-        // Revert optimistic update
         setCommentList((list) => 
           list.map((c) => 
             c.id === commentId 
@@ -442,7 +439,6 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         )
       }
     } catch (err) {
-      // Revert optimistic update
       setCommentList((list) => 
         list.map((c) => 
           c.id === commentId 
@@ -458,6 +454,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     }
   }
 
+
+
+  // ELIMINAR COMENTARIO: BORRA COMENTARIO Y ACTUALIZA CONTADOR
   const handleCommentDelete = async (commentId: string) => {
     try {
       const r = await fetch(`/api/comments?id=${encodeURIComponent(commentId)}`, { method: "DELETE" })
@@ -471,25 +470,28 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         }
       }
     } catch (err) {
-      // ignore
     }
   }
 
+
+// RESPONDER: ESTADO Y FUNCIONES PARA MANEJAR RESPUESTAS A COMENTARIOS
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState("")
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingText, setEditingText] = useState("")
 
+
+
+  // ENVIAR RESPUESTA: ENVÍA UNA RESPUESTA Y LA INSERTA TRAS EL PADRE
   const handleReplySubmit = async (parentId: string) => {
     if (!replyText.trim()) return
     try {
       const { ok, json } = await postJson("/api/comments", { postId, text: replyText.trim(), parentId })
       if (ok && json?.comment) {
-        // Find the parent comment index and insert reply right after it
         setCommentList((l) => {
           const parentIndex = l.findIndex((c) => c.id === parentId)
           if (parentIndex === -1) return [{ ...json.comment, like_count: 0, liked: false }, ...l]
-          
+
           const newList = [...l]
           newList.splice(parentIndex + 1, 0, { ...json.comment, like_count: 0, liked: false })
           return newList
@@ -499,13 +501,14 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         setComments((c) => c + 1)
       }
     } catch (err) {
-      // ignore
     }
   }
 
-  // Map of comments by id for quick parent lookup when rendering replies
-  const commentById = useMemo(() => new Map<string, Comment>(commentList.map(c => [c.id, c])), [commentList])
 
+  
+  // MAPA DE COMENTARIOS: MAPA PARA BÚSQUEDA RÁPIDA DE PADRES
+  const commentById = useMemo(() => new Map<string, Comment>(commentList.map(c => [c.id, c])), [commentList])
+  // RENDERIZAR COMENTARIO: RENDERIZA CADA COMENTARIO INDIVIDUAL CON OPCIONES (EDITAR, ELIMINAR, RESPONDER)
   const renderComment = (c: Comment) => {
     const parent = c.parent_id ? commentById.get(c.parent_id) : undefined
     return (
@@ -537,7 +540,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 <span className="text-xs text-[#D4AF37]/50">{formatDate(c.created_at)}</span>
               )}
 
-              {/* Three-dot popover in header - only visible for the comment owner */}
+              
               {isOwner(c) && (
                 <div className="ml-auto">
                   <Popover>
@@ -563,7 +566,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 </div>
               )}
             </div>
-            {/* Comment content or inline edit */}
+            
             {editingId === c.id ? (
               <div className="flex items-center gap-2 mb-2">
                 <input
@@ -582,7 +585,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
             ) : (
               <div className="flex items-start justify-between mb-2">
                 <p className="text-sm text-[#D4AF37]/90 leading-relaxed">{c.content}</p>
-                {/* secondary popover removed; header popover provides the options */}
+                
               </div>
             )}
             <div className="flex items-center gap-4 text-xs">
@@ -642,15 +645,19 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     )
   }
 
+
+
   return (
+  // RENDERIZADO: COMPONENTE POSTCARD - HEADER, CONTENIDO, FOOTER Y SECCIÓN DE COMENTARIOS
   <Card style={{boxShadow: 'inset 0 0 24px rgba(212,175,55,0.015)'}} className="group overflow-hidden bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-md shadow-[#D4AF37]/4 transition-all duration-300 hover:shadow-[#D4AF37]/6 hover:scale-[1.02] rounded-3xl w-full relative border border-[#D4AF37]/8">
-  {/* Bordes verticales más finos y sutiles (gradiente translúcido) */}
+  
   <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#D4AF37]/20 to-transparent opacity-40"></div>
   <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#D4AF37]/20 to-transparent opacity-40"></div>
-      {/* Header con perfil del creador */}
+      
+    {/* HEADER: INFORMACIÓN DEL CREADOR, AVATAR Y MENÚ */}
   <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
         <div className="flex items-center gap-4 flex-1">
-          {/* Logo + EliteFans label (replaces creator avatar/name) */}
+          
           <div className="flex items-center gap-3">
             <Image src="/favicon.ico" alt="EliteFans" width={48} height={48} className="rounded-md object-cover" />
             <div className="flex flex-col">
@@ -660,7 +667,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               <p className="text-sm text-[#D4AF37]/70">@EliteFans</p>
             </div>
           </div>
-          {/* keep the locked badge if content is premium */}
+          
           {content.type === "locked" && (
             <div className="ml-4 flex items-center gap-1 rounded-full bg-gradient-to-r from-[#D4AF37]/20 to-[#D4AF37]/10 px-2 py-0.5 border border-[#D4AF37]/30">
               <Lock className="h-3 w-3 text-[#D4AF37]" />
@@ -670,7 +677,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Use centralized FollowButton component - only show when not subscribed */}
+          
           <div className="flex items-center gap-2">
             {!isSubscribed && creatorProfileId && (
               <FollowButton 
@@ -679,13 +686,12 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               />
             )}
 
-            {/* Non-functional subscription price button (display only) */}
+            
             {creatorProfileId && subscriptionPrice != null && content.type === 'locked' && (
               <button
                 type="button"
                 className="bg-[#D4AF37] text-black px-2 py-1 rounded-full text-xs font-semibold hover:bg-[#C9A961] transition-all duration-200"
                 onClick={(e) => {
-                  // Intentionally no functionality for now; prevent propagation
                   e.stopPropagation()
                 }}
                 aria-label={`Precio de suscripción ${subscriptionPrice}`}
@@ -728,14 +734,18 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         </div>
       </CardHeader>
 
-      {/* Contenido principal */}
+      
+      {/* CONTENIDO PRINCIPAL: DESCRIPCIÓN Y CONTENIDO MULTIMEDIA (LOCKED / VIDEO / IMAGEN) */}
       <CardContent className="p-0 relative">
-        {/* Mostrar la descripción arriba del contenido multimedia */}
+        
         {content.description && (
           <div className="w-full px-6 py-6 border-b border-[#D4AF37]/10 mb-4">
             <p className="text-white leading-relaxed text-sm">{parseContentToNodes(content.description)}</p>
           </div>
         )}
+
+
+        {/* BLOQUE LOCKED / VIDEO / IMAGEN: RENDERIZA SEGÚN EL TIPO DE CONTENIDO */}
         {content.type === "locked" ? (
           <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] bg-gradient-to-br from-[#D4AF37]/10 via-black/50 to-black/80 flex items-center justify-center max-h-[820px] sm:max-h-[720px]">
             <div className="absolute inset-0 bg-[url('/placeholder.jpg')] bg-cover bg-center opacity-20 blur-sm"></div>
@@ -747,12 +757,15 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               <p className="mb-6 text-[#D4AF37]/80 text-lg max-w-sm mx-auto leading-relaxed">
                 {t('post_card.subscribe_prompt')}
               </p>
-              {/* Botón de desbloqueo removido según solicitud */}
+              
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
           </div>
         ) : content.type === "video" ? (
           <div className="relative w-full flex items-center justify-center bg-black">
+
+
+            {/* BLOQUE VIDEO: REPRODUCTOR DE VIDEO, POSTER Y FUENTES */}
             {!mediaLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/40 to-black/20">
                 <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#D4AF37] border-t-transparent"></div>
@@ -771,7 +784,6 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               poster={content.highResUrl}
             >
               {content.videoSources && content.videoSources.length > 0 ? (
-                // Priorizar la fuente con mayor resolución (si se proporciona)
                 content.videoSources
                   .slice()
                   .sort((a, b) => (b.resolution || 0) - (a.resolution || 0))
@@ -787,6 +799,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           </div>
         ) : (
           <div className="relative w-full flex items-center justify-center bg-black">
+
+            {/* BLOQUE IMAGEN: IMAGEN PRINCIPAL CON POSTER Y MANEJO DE CARGA */}
             {!mediaLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/40 to-black/20">
                 <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#D4AF37] border-t-transparent"></div>
@@ -816,7 +830,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           </div>
         )}
       </CardContent>
-      {/* Creator card: mostrar información del creador encima de las acciones (likes/comments) */}
+      
+      
+      {/* CREATOR CARD: TARJETA CON INFORMACIÓN DEL CREADOR Y COVER */}
       <div className="w-full px-6 pb-4">
         <div className="-mx-6">
           <CreatorCard
@@ -833,9 +849,10 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         </div>
       </div>
 
-      {/* Footer con acciones */}
-      <CardFooter className="flex-col items-start gap-4 px-6 py-4 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
-        {/* Botones de acción */}
+      
+        {/* FOOTER: ACCIONES PRINCIPALES (LIKE, COMENTARIOS, TIP, GUARDAR) */}
+        <CardFooter className="flex-col items-start gap-4 px-6 py-4 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
+        
         <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-1">
             <Button
@@ -897,13 +914,15 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           </Button>
         </div>
 
-        {/* (Descripción movida arriba del contenido multimedia) */}
+        
       </CardFooter>
 
-      {/* Sección de comentarios */}
+      
+      {/* COMENTARIOS: FORMULARIO Y LISTA DE COMENTARIOS */}
       {showComments && (
         <div className="border-t border-[#D4AF37]/20 bg-gradient-to-br from-[#D4AF37]/5 to-transparent">
-          {/* Formulario para nuevo comentario */}
+          
+          {/* FORMULARIO DE COMENTARIO: INPUT DEL USUARIO PARA CREAR UN COMENTARIO */}
           <div className="px-6 py-4 border-b border-[#D4AF37]/10">
             <form onSubmit={handleCommentSubmit} className="flex items-center gap-3">
               <Avatar className="h-8 w-8 border-2 border-[#D4AF37]/30">
@@ -928,7 +947,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
             </form>
           </div>
 
-          {/* Lista de comentarios - UN SOLO CONTENEDOR */}
+          
+          {/* LISTA DE COMENTARIOS: RENDERIZA COMENTARIOS, INDICADOR DE CARGA O MENSAJE VACÍO */}
           <div className="px-6 py-4 max-h-80 overflow-y-auto scrollbar-hide space-y-3">
             {loadingComments && commentList.length === 0 ? (
               <div className="flex items-center justify-center py-8">
@@ -946,7 +966,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         </div>
       )}
       <div className="relative w-full h-1">
-        {/* Remates inferiores más delicados (pequeños y redondeados) */}
+        
         <div className="absolute left-0 bottom-0 w-px h-3 rounded-full bg-[#D4AF37]/20 opacity-40"></div>
         <div className="absolute right-0 bottom-0 w-px h-3 rounded-full bg-[#D4AF37]/20 opacity-40"></div>
       </div>
