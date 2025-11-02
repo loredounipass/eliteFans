@@ -78,6 +78,9 @@
     "following": "已关注",
     "unfollow": "取关",
     "copy": "复制",
+  "send_tip": "打赏",
+  "copied_to_clipboard": "已复制到剪贴板",
+  "open_menu": "打开菜单",
     "delete": "删除",
     "download": "下载",
     "view": "查看",
@@ -132,6 +135,7 @@
   },
   "post_card": {
     "premium_title": "专属内容",
+    "copy_post_link": "复制帖子链接",
     "subscribe_prompt": "订阅以解锁此付费内容并访问所有独家素材"
   },
   "search": {

@@ -79,6 +79,9 @@
     "following": "Following",
     "unfollow": "Unfollow",
     "copy": "Copy",
+    "send_tip": "Send tip",
+  "copied_to_clipboard": "Copied to clipboard",
+  "open_menu": "Open menu",
     "delete": "Delete",
     "download": "Download",
     "view": "View",
@@ -132,6 +135,7 @@
   },
   "post_card": {
     "premium_title": "Exclusive Content",
+    "copy_post_link": "Copy link to post",
     "subscribe_prompt": "Subscribe to unlock this premium content and access all exclusive material"
   },
   "search": {

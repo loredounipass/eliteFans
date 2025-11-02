@@ -109,6 +109,9 @@
     "following": "Siguiendo",
     "unfollow": "Dejar de seguir",
     "copy": "Copiar",
+  "send_tip": "Enviar propina",
+  "copied_to_clipboard": "Copiado al portapapeles",
+  "open_menu": "Abrir menú",
     "delete": "Eliminar",
     "download": "Descargar",
     "view": "Ver",
@@ -162,6 +165,7 @@
   },
   "post_card": {
     "premium_title": "Contenido Exclusivo",
+    "copy_post_link": "Copiar enlace de la publicación",
     "subscribe_prompt": "Suscríbete para desbloquear este contenido premium y acceder a todo el material exclusivo"
   },
   "search": {

@@ -42,15 +42,7 @@ export function DashboardHeader() {
          
         </Link>
         <nav className="flex items-center gap-6">
-          <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
-            <Grid className="h-4 w-4" />
-            <span>{t('dashboard.title')}</span>
-          </Link>
-          <Link href="/feed" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
-            <Home className="h-4 w-4" />
-            <span>{t('feed.title')}</span>
-          </Link>
-          {/* Language selector placed right after Feed with a visible short code */}
+          {/* Language selector - moved before Dashboard */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="text-[#D4AF37] hover:bg-[#D4AF37]/10 flex items-center gap-2">
@@ -99,6 +91,15 @@ export function DashboardHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
+            <Grid className="h-4 w-4" />
+            <span>{t('dashboard.title')}</span>
+          </Link>
+          <Link href="/feed" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
+            <Home className="h-4 w-4" />
+            <span>{t('feed.title')}</span>
+          </Link>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

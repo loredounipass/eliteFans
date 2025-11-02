@@ -9,7 +9,7 @@ import Link from "next/link"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Heart, MessageCircle, Share2, Lock, MoreHorizontal, Bookmark, MoreVertical, Edit3, Trash2 } from "lucide-react"
+import { Heart, MessageCircle, DollarSign, Lock, MoreHorizontal, Bookmark, MoreVertical, Edit3, Trash2 } from "lucide-react"
 import { useTranslation } from 'react-i18next'
 import { useToast } from "@/hooks/use-toast"
 import { CreatorCard } from "@/components/feed/creator-card"
@@ -650,37 +650,23 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
       {/* Header con perfil del creador */}
   <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
         <div className="flex items-center gap-4 flex-1">
-          <div className="relative">
-            <Link href={`/profile/${creator.username}`} className="block">
-              <Avatar className="h-10 w-10 border-2 border-[#D4AF37]/40 shadow-md shadow-[#D4AF37]/15">
-                <AvatarImage src={creator.avatar || "/placeholder.svg"} alt={creator.name} className="object-cover" />
-                <AvatarFallback className="bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#D4AF37] font-bold text-base">
-                  {creator.name[0]}
-                </AvatarFallback>
-              </Avatar>
-            </Link>
-            {isSubscribed && (
-              <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-[#D4AF37] border-2 border-black flex items-center justify-center">
-                <div className="h-2 w-2 rounded-full bg-black"></div>
+          {/* Logo + EliteFans label (replaces creator avatar/name) */}
+          <div className="flex items-center gap-3">
+            <Image src="/favicon.ico" alt="EliteFans" width={48} height={48} className="rounded-md object-cover" />
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-base text-[#D4AF37]">EliteFans</span>
               </div>
-            )}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <Link href={`/profile/${creator.username}`} className="hover:opacity-80 transition-all duration-200">
-                <p className="font-bold text-base text-[#D4AF37] hover:text-[#F4BF37] transition-colors">
-                  {creator.name}
-                </p>
-                <p className="text-sm text-[#D4AF37]/70 hover:text-[#D4AF37]/90 transition-colors">@{creator.username}</p>
-              </Link>
-              {content.type === "locked" && (
-                <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-[#D4AF37]/20 to-[#D4AF37]/10 px-2 py-0.5 border border-[#D4AF37]/30">
-                  <Lock className="h-3 w-3 text-[#D4AF37]" />
-                  <span className="text-[11px] font-semibold text-[#D4AF37]">Premium</span>
-                </div>
-              )}
+              <p className="text-sm text-[#D4AF37]/70">@EliteFans</p>
             </div>
           </div>
+          {/* keep the locked badge if content is premium */}
+          {content.type === "locked" && (
+            <div className="ml-4 flex items-center gap-1 rounded-full bg-gradient-to-r from-[#D4AF37]/20 to-[#D4AF37]/10 px-2 py-0.5 border border-[#D4AF37]/30">
+              <Lock className="h-3 w-3 text-[#D4AF37]" />
+              <span className="text-[11px] font-semibold text-[#D4AF37]">Premium</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -708,13 +694,37 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               </button>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-[#D4AF37]/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-full"
-          >
-            <MoreHorizontal className="h-5 w-5" />
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-[#D4AF37]/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-full"
+                aria-label={t('ui.open_menu') || 'Open menu'}
+              >
+                <MoreHorizontal className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-40">
+              <div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const link = postId ? `${window.location.origin}/feed?postId=${encodeURIComponent(postId)}` : window.location.href
+                      await navigator.clipboard.writeText(link)
+                      toast({ title: t('post_card.copy_post_link'), description: t('ui.copied_to_clipboard') })
+                    } catch (e) {
+                      toast({ title: t('ui.copy') || 'Copy', description: String(e), variant: 'destructive' })
+                    }
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm text-[#D4AF37] hover:bg-[#D4AF37]/5 rounded"
+                >
+                  {t('post_card.copy_post_link')}
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </CardHeader>
 
@@ -863,9 +873,13 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
             <Button
               variant="ghost"
               size="sm"
-              className="gap-2 px-3 py-1.5 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
+              type="button"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
             >
-              <Share2 className="h-4 w-4" />
+              <span className="rounded-full bg-[#D4AF37]/10 p-2">
+                <DollarSign className="h-4 w-4 text-[#D4AF37]" />
+              </span>
+              <span className="font-semibold text-sm">{t('ui.send_tip')}</span>
             </Button>
           </div>
 
