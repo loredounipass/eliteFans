@@ -1,0 +1,259 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Willkommen, {{name}}",
+    "subtitle": "Verwalten Sie Ihre Inhalte und verbinden Sie sich mit Ihren Fans",
+    "stats": {
+      "subscribers": { "title": "Abonnenten", "description": "Abonnenten" },
+      "revenue": { "title": "Gesamteinnahmen", "description": "Gesamteinnahmen" },
+      "likes": { "title": "Gefällt mir", "description": "Gesamtzahl der Likes auf Ihren Beiträgen" },
+      "content_published": { "title": "Veröffentlichte Inhalte", "description": "Anzahl der veröffentlichten Beiträge" }
+    },
+    "quick_actions": {
+      "title": "Schnellaktionen",
+      "upload": { "title": "Inhalte hochladen", "description": "Teilen Sie neue Inhalte mit Ihren Fans", "button": "Hochladen" },
+      "gallery": { "title": "Galerie", "description": "Verwalten Sie Ihre Fotos und Videos", "button": "Galerie anzeigen" },
+      "subscribers": { "title": "Abonnenten", "description": "Verwalten Sie Ihre Community", "button": "Abonnenten anzeigen" }
+    },
+    "recent_activity": { "title": "Letzte Aktivitäten", "empty": "Keine kürzlichen Aktivitäten" }
+  },
+  "feed": {
+    "title": "Feed",
+    "suggested_creators": "Vorgeschlagene Creator",
+    "no_posts_yet": "Noch keine Beiträge",
+    "start_sharing": "Beginnen Sie, großartige Inhalte mit Ihren Followern zu teilen!",
+    "this_creator_no_posts": "Dieser Creator hat noch keine Inhalte veröffentlicht.",
+    "search_placeholder": "Creator suchen",
+    "filters": {
+      "label": "Filter",
+      "active_filters": "Aktive Filter:",
+      "all": "Alle",
+      "only_images": "Kostenlose Bilder",
+      "only_videos": "Kostenlose Videos",
+      "premium_content": "Premium-Inhalte",
+      "clear": "Zurücksetzen"
+    },
+    "sections": {
+      "for_you": "Für dich",
+      "following": "Folge ich",
+      "popular": "Beliebt"
+    },
+    "no_content": "Kein Inhalt",
+    "explore_creators": "Creator entdecken",
+    "posts_in_gallery": "{{count}} Beiträge in deiner Galerie",
+    "filters_active_count": "{{active}} von {{total}} Beiträgen"
+  },
+  "account": {
+    "my_account": "Mein Konto",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "profile_unavailable": "Profil nicht verfügbar",
+    "username_not_found": "Benutzername nicht gefunden",
+    "signed_out_title": "Abgemeldet",
+    "signed_out_description": "Sie wurden erfolgreich abgemeldet."
+  },
+  "settings": {
+    "show_recent": "Letzte Aktivitäten anzeigen"
+  },
+  "creator_card": {
+    "subscribe": "Abonnieren",
+    "subscribed": "Abonniert",
+    "free": "Kostenlos",
+    "copy_link": "Link zum Profil kopieren",
+    "block": "Blockieren",
+    "remove": "Entfernen",
+    "report": "Melden"
+  },
+  "ui": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "close": "Schließen",
+    "loading": "Lädt",
+    "no_results": "Keine Ergebnisse",
+    "load_more": "Mehr laden",
+    "see_more": "Mehr sehen",
+    "follow": "Folgen",
+    "following": "Folge ich",
+    "unfollow": "Entfolgen",
+    "copy": "Kopieren",
+    "send_tip": "Trinkgeld senden",
+    "copied_to_clipboard": "In die Zwischenablage kopiert",
+    "open_menu": "Menü öffnen",
+    "delete": "Löschen",
+    "download": "Herunterladen",
+    "view": "Ansehen",
+    "upload_files": "Dateien hochladen",
+    "subscriptions": "Abonnements",
+    "chat": "Chat",
+    "subscriptions_and_chat": "Abonnements & Chat",
+    "live": "Live",
+    "notifications": "Benachrichtigungen"
+  },
+  "language": {
+    "es": "Spanisch",
+    "en": "Englisch",
+    "chinese": "Mandarin",
+    "russian": "Russisch",
+    "fr": "Französisch",
+    "de": "Deutsch",
+    "pt": "Portugiesisch",
+    "label": "Sprache"
+  },
+  "create_post": {
+    "title": "Beitrag erstellen",
+    "description": "Teilen Sie Inhalte mit Ihren Fans",
+    "uploading": "Dateien werden hochgeladen...",
+    "files_selected": "{{count}} Datei(en) ausgewählt",
+    "upload_files": "Dateien hochladen",
+    "files_label": "Dateien",
+    "content_label": "Inhalt",
+    "publishing": "Veröffentlichen...",
+    "cancel": "Abbrechen",
+    "publish": "Veröffentlichen",
+    "submit_error": "Sie müssen Inhalte oder Dateien hinzufügen",
+    "publish_success": "Ihr Inhalt wurde erfolgreich veröffentlicht",
+    "publish_error": "Veröffentlichung des Inhalts fehlgeschlagen",
+    "placeholder": "Was möchten Sie teilen?",
+    "invalid_files": "Ungültige Dateien",
+    "file_too_large": "Datei zu groß",
+    "exclusive_label": "Exklusiver Inhalt",
+    "exclusive_hint": "Nur für Abonnenten oder Pay-per-View"
+  },
+  "gallery": {
+    "empty_title": "Ihre Galerie ist leer",
+    "empty_description": "Beginnen Sie damit, exklusiven Inhalt für Ihre Follower zu erstellen. Ihr erster Beitrag wartet auf Sie!",
+    "download": "Herunterladen",
+    "no_media": "Keine Medien",
+    "video": "Video",
+    "my_title": "Meine Elite-Galerie",
+    "my_description": "Verwalten und anzeigen Sie alle Ihre exklusiven Inhalte an einem Ort",
+    "stats": {
+      "posts": "Beiträge",
+      "total_likes": "Gesamte Likes",
+      "comments": "Kommentare"
+    },
+    "publication": "Veröffentlichung",
+    "publications": "Veröffentlichungen"
+  },
+  "post_card": {
+    "premium_title": "Exklusiver Inhalt",
+    "copy_post_link": "Link zum Beitrag kopieren",
+    "subscribe_prompt": "Abonnieren Sie, um diesen Premium-Inhalt freizuschalten und auf alle exklusiven Materialien zuzugreifen"
+  },
+  "search": {
+    "no_creators_found": "Keine Creator gefunden"
+  },
+  "gallery_extra": {
+    "exclusive_description": "Verwalten und anzeigen Sie alle Ihre exklusiven Inhalte an einem Ort"
+  },
+  "activity": {
+    "new_like": "Neues Like",
+    "like_description": "@{{username}} hat Ihren Beitrag geliked",
+    "new_subscription": "Neues Abonnement",
+    "subscription_description": "@{{username}} hat abonniert",
+    "payment_received": "Zahlung empfangen",
+    "payment_description": "Sie haben ${{amount}} ({{type}}) von @{{username}} erhalten",
+    "new_comment": "Neuer Kommentar",
+    "comment_description": "@{{username}}: {{content}}"
+  },
+  "profile": {
+    "posts": "Beiträge",
+    "about": "Über",
+    "profile_info": "Profilinformationen",
+    "no_posts_yet": "Noch keine Beiträge",
+    "start_sharing": "Beginnen Sie, großartige Inhalte mit Ihren Followern zu teilen!",
+    "subscriptions": "Abonnements",
+    "chat": "Chat",
+    "sidebar": {
+      "navigation": "Navigation",
+      "posts": "Beiträge",
+      "about": "Über",
+      "messages": "Nachrichten",
+      "statistics": "Statistiken",
+      "similar_creators": "Ähnliche Creator",
+      "recent_activity": "Letzte Aktivitäten"
+    },
+    "labels": {
+      "username": "Benutzername",
+      "full_name": "Vollständiger Name",
+      "subscription_price": "Abo-Preis",
+      "member_since": "Mitglied seit",
+      "bio": "Biografie",
+      "create_first_post": "Erstellen Sie den ersten Beitrag"
+    },
+    "stats": {
+      "subscribers": "Abonnenten",
+      "posts": "Beiträge",
+      "total_likes": "Gesamte Likes"
+    }
+  },
+  "activity_ui": {
+    "new_post": "Neuer Beitrag",
+    "likes_count": "{{count}} Likes",
+    "liked_your_post": "hat Ihren Beitrag geliked"
+  },
+  "profile_header": {
+    "followers": "Follower",
+    "following": "Folge ich",
+    "subscribers": "Abonnenten",
+    "posts": "Beiträge",
+    "likes": "Likes",
+    "edit_profile": "Profil bearbeiten",
+    "processing": "Verarbeitung...",
+    "subscribe_action": "Abonnieren {{price}}",
+    "subscription_price_label": "{{price}}/Monat"
+  },
+  "edit_profile": {
+    "title": "Profil bearbeiten",
+    "description": "Passen Sie Ihr Profil an und machen Sie es einzigartig für Ihre Follower",
+    "change_cover": "Titelbild ändern",
+    "change_avatar": "Avatar ändern",
+    "allowed_formats": "Erlaubte Formate: JPG, PNG, WebP, GIF",
+    "max_size": "Maximale Größe: 5MB",
+    "save_success": "Profil aktualisiert!",
+    "save_error": "Fehler beim Speichern"
+  },
+  "landing": {
+    "sign_in": "Anmelden",
+    "sign_up": "Registrieren",
+    "welcome_title": "Willkommen bei EliteFans!",
+    "welcome_subtitle": "Treten Sie der Premium-Community der Content-Ersteller bei. Entdecken, verbinden und unterstützen Sie Ihre Lieblings-Creator auf einer exklusiven Plattform, die für Sie entwickelt wurde.",
+    "explore_creators": "Creator entdecken",
+    "get_started": "Loslegen",
+    "exclusive_content_title": "Exklusiver Inhalt",
+    "exclusive_content_description": "Zugriff auf Premium- und exklusive Inhalte Ihrer Lieblings-Creator.",
+    "elite_community": "Elite-Community",
+    "elite_community_description": "Treten Sie einer ausgewählten Community von Fans und Creators bei.",
+    "secure_platform": "Sichere Plattform",
+    "secure_platform_description": "Genießen Sie eine sichere und private Erfahrung auf unserer Plattform.",
+    "stats": {
+      "creators_active": "10K+",
+      "creators_active_label": "Aktive Creator",
+      "registered_users": "500K+",
+      "registered_users_label": "Registrierte Nutzer",
+      "contents_shared": "1M+",
+      "contents_shared_label": "Geteilte Inhalte",
+      "support_available": "24/7",
+      "support_available_label": "Support verfügbar"
+    },
+    "why_title": "Warum EliteFans?",
+    "why_exclusive": "Exklusiver Inhalt",
+    "why_exclusive_desc": "Zugriff auf Premium- und exklusive Inhalte Ihrer Lieblings-Creator",
+    "why_community": "Elite-Community",
+    "why_community_desc": "Treten Sie einer ausgewählten Community von Fans und Creators bei",
+    "why_premium_experience": "Premium-Erlebnis",
+    "why_premium_experience_desc": "Genießen Sie eine Plattform, die für das beste Erlebnis entwickelt wurde",
+    "monetize": "Monetarisieren Sie Ihren Inhalt",
+    "monetize_desc": "Creator: Verwandeln Sie Ihre Leidenschaft in nachhaltiges Einkommen",
+    "secure_payments": "Sichere Zahlungen",
+    "secure_payments_desc": "Sichere Transaktionen für Ihre Sicherheit",
+    "vip_support": "VIP-Support",
+    "vip_support_desc": "Personalisierter Support für Creator und Abonnenten",
+    "ready_title": "Bereit, der Elite beizutreten?",
+    "ready_subtitle": "Erstellen Sie noch heute Ihr Konto und entdecken Sie eine Welt exklusiver Inhalte",
+    "register_free": "Kostenlos registrieren",
+    "footer_copyright": "© 2025 EliteFans. Alle Rechte vorbehalten."
+  }
+}

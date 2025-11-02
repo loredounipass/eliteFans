@@ -1,0 +1,259 @@
+{
+  "dashboard": {
+    "title": "Painel",
+    "welcome": "Bem-vindo, {{name}}",
+    "subtitle": "Gerencie seu conteúdo e conecte-se com seus fãs",
+    "stats": {
+      "subscribers": { "title": "Assinantes", "description": "Assinantes" },
+      "revenue": { "title": "Receita total", "description": "Ganhos totais" },
+      "likes": { "title": "Likes", "description": "Total de likes nas suas publicações" },
+      "content_published": { "title": "Conteúdo publicado", "description": "Total de publicações" }
+    },
+    "quick_actions": {
+      "title": "Ações rápidas",
+      "upload": { "title": "Enviar conteúdo", "description": "Compartilhe novo conteúdo com seus fãs", "button": "Enviar agora" },
+      "gallery": { "title": "Galeria", "description": "Gerencie suas fotos e vídeos", "button": "Ver galeria" },
+      "subscribers": { "title": "Assinantes", "description": "Gerencie sua comunidade", "button": "Ver assinantes" }
+    },
+    "recent_activity": { "title": "Atividade recente", "empty": "Nenhuma atividade recente" }
+  },
+  "feed": {
+    "title": "Feed",
+    "suggested_creators": "Criadores sugeridos",
+    "no_posts_yet": "Ainda não há publicações",
+    "start_sharing": "Comece a compartilhar conteúdo incrível com seus seguidores!",
+    "this_creator_no_posts": "Este criador ainda não publicou conteúdo.",
+    "search_placeholder": "Pesquisar criadores",
+    "filters": {
+      "label": "Filtros",
+      "active_filters": "Filtros ativos:",
+      "all": "Todos",
+      "only_images": "Imagens gratuitas",
+      "only_videos": "Vídeos gratuitos",
+      "premium_content": "Conteúdo premium",
+      "clear": "Limpar"
+    },
+    "sections": {
+      "for_you": "Para você",
+      "following": "Seguindo",
+      "popular": "Popular"
+    },
+    "no_content": "Sem conteúdo",
+    "explore_creators": "Explorar criadores",
+    "posts_in_gallery": "{{count}} publicações na sua galeria",
+    "filters_active_count": "{{active}} de {{total}} posts"
+  },
+  "account": {
+    "my_account": "Minha conta",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "logout": "Sair",
+    "profile_unavailable": "Perfil não disponível",
+    "username_not_found": "Nome de usuário não encontrado",
+    "signed_out_title": "Desconectado",
+    "signed_out_description": "Você saiu com sucesso."
+  },
+  "settings": {
+    "show_recent": "Mostrar atividade recente"
+  },
+  "creator_card": {
+    "subscribe": "Assinar",
+    "subscribed": "Assinado",
+    "free": "Grátis",
+    "copy_link": "Copiar link do perfil",
+    "block": "Bloquear",
+    "remove": "Remover",
+    "report": "Denunciar"
+  },
+  "ui": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "loading": "Carregando",
+    "no_results": "Sem resultados",
+    "load_more": "Carregar mais",
+    "see_more": "Ver mais",
+    "follow": "Seguir",
+    "following": "Seguindo",
+    "unfollow": "Deixar de seguir",
+    "copy": "Copiar",
+    "send_tip": "Enviar gorjeta",
+    "copied_to_clipboard": "Copiado para a área de transferência",
+    "open_menu": "Abrir menu",
+    "delete": "Excluir",
+    "download": "Baixar",
+    "view": "Visualizar",
+    "upload_files": "Enviar arquivos",
+    "subscriptions": "Assinaturas",
+    "chat": "Chat",
+    "subscriptions_and_chat": "Assinaturas e Chat",
+    "live": "Live",
+    "notifications": "Notificações"
+  },
+  "language": {
+    "es": "Espanhol",
+    "en": "Inglês",
+    "chinese": "Mandarim",
+    "russian": "Russo",
+    "fr": "Francês",
+    "de": "Alemão",
+    "pt": "Português",
+    "label": "Idioma"
+  },
+  "create_post": {
+    "title": "Criar Publicação",
+    "description": "Compartilhe conteúdo com seus fãs",
+    "uploading": "Enviando arquivos...",
+    "files_selected": "{{count}} arquivo(s) selecionado(s)",
+    "upload_files": "Enviar arquivos",
+    "files_label": "Arquivos",
+    "content_label": "Conteúdo",
+    "publishing": "Publicando...",
+    "cancel": "Cancelar",
+    "publish": "Publicar",
+    "submit_error": "Você deve adicionar conteúdo ou arquivos",
+    "publish_success": "Seu conteúdo foi publicado com sucesso",
+    "publish_error": "Não foi possível publicar o conteúdo",
+    "placeholder": "O que você quer compartilhar?",
+    "invalid_files": "Arquivos inválidos",
+    "file_too_large": "Arquivo muito grande",
+    "exclusive_label": "Conteúdo exclusivo",
+    "exclusive_hint": "Apenas para assinantes ou pay-per-view"
+  },
+  "gallery": {
+    "empty_title": "Sua galeria está vazia",
+    "empty_description": "Comece a criar conteúdo exclusivo para seus seguidores. Sua primeira publicação espera por você!",
+    "download": "Baixar",
+    "no_media": "Sem mídia",
+    "video": "Vídeo",
+    "my_title": "Minha Galeria Elite",
+    "my_description": "Gerencie e visualize todo o seu conteúdo exclusivo em um só lugar",
+    "stats": {
+      "posts": "Publicações",
+      "total_likes": "Total de Likes",
+      "comments": "Comentários"
+    },
+    "publication": "publicação",
+    "publications": "publicações"
+  },
+  "post_card": {
+    "premium_title": "Conteúdo exclusivo",
+    "copy_post_link": "Copiar link da publicação",
+    "subscribe_prompt": "Assine para desbloquear este conteúdo premium e acessar todo o material exclusivo"
+  },
+  "search": {
+    "no_creators_found": "Nenhum criador encontrado"
+  },
+  "gallery_extra": {
+    "exclusive_description": "Gerencie e visualize todo o seu conteúdo exclusivo em um só lugar"
+  },
+  "activity": {
+    "new_like": "Novo Like",
+    "like_description": "@{{username}} curtiu sua publicação",
+    "new_subscription": "Nova Inscrição",
+    "subscription_description": "@{{username}} assinou",
+    "payment_received": "Pagamento recebido",
+    "payment_description": "Você recebeu ${{amount}} ({{type}}) de @{{username}}",
+    "new_comment": "Novo comentário",
+    "comment_description": "@{{username}}: {{content}}"
+  },
+  "profile": {
+    "posts": "Publicações",
+    "about": "Sobre",
+    "profile_info": "Informações do Perfil",
+    "no_posts_yet": "Ainda não há publicações",
+    "start_sharing": "Comece a compartilhar conteúdo incrível com seus seguidores!",
+    "subscriptions": "Assinaturas",
+    "chat": "Chat",
+    "sidebar": {
+      "navigation": "Navegação",
+      "posts": "Publicações",
+      "about": "Sobre",
+      "messages": "Mensagens",
+      "statistics": "Estatísticas",
+      "similar_creators": "Criadores semelhantes",
+      "recent_activity": "Atividade recente"
+    },
+    "labels": {
+      "username": "Nome de usuário",
+      "full_name": "Nome completo",
+      "subscription_price": "Preço da assinatura",
+      "member_since": "Membro desde",
+      "bio": "Biografia",
+      "create_first_post": "Criar primeira publicação"
+    },
+    "stats": {
+      "subscribers": "Assinantes",
+      "posts": "Publicações",
+      "total_likes": "Total de Likes"
+    }
+  },
+  "activity_ui": {
+    "new_post": "Nova publicação",
+    "likes_count": "{{count}} likes",
+    "liked_your_post": "curtiu sua publicação"
+  },
+  "profile_header": {
+    "followers": "seguidores",
+    "following": "seguindo",
+    "subscribers": "assinantes",
+    "posts": "publicações",
+    "likes": "likes",
+    "edit_profile": "Editar perfil",
+    "processing": "Processando...",
+    "subscribe_action": "Assinar {{price}}",
+    "subscription_price_label": "{{price}}/mês"
+  },
+  "edit_profile": {
+    "title": "Editar perfil",
+    "description": "Personalize seu perfil e torne-o único para seus seguidores",
+    "change_cover": "Alterar capa",
+    "change_avatar": "Alterar avatar",
+    "allowed_formats": "Formatos permitidos: JPG, PNG, WebP, GIF",
+    "max_size": "Tamanho máximo: 5MB",
+    "save_success": "Perfil atualizado!",
+    "save_error": "Erro ao salvar"
+  },
+  "landing": {
+    "sign_in": "Entrar",
+    "sign_up": "Registrar-se",
+    "welcome_title": "Bem-vindo ao EliteFans!",
+    "welcome_subtitle": "Junte-se à comunidade premium de criadores de conteúdo. Descubra, conecte-se e apoie seus criadores favoritos em uma plataforma exclusiva projetada para você.",
+    "explore_creators": "Explorar criadores",
+    "get_started": "Começar",
+    "exclusive_content_title": "Conteúdo exclusivo",
+    "exclusive_content_description": "Acesse conteúdo premium e exclusivo dos seus criadores favoritos.",
+    "elite_community": "Comunidade Elite",
+    "elite_community_description": "Junte-se a uma comunidade selecionada de fãs e criadores de conteúdo.",
+    "secure_platform": "Plataforma segura",
+    "secure_platform_description": "Desfrute de uma experiência segura e privada em nossa plataforma.",
+    "stats": {
+      "creators_active": "10K+",
+      "creators_active_label": "Criadores ativos",
+      "registered_users": "500K+",
+      "registered_users_label": "Usuários registrados",
+      "contents_shared": "1M+",
+      "contents_shared_label": "Conteúdos compartilhados",
+      "support_available": "24/7",
+      "support_available_label": "Suporte disponível"
+    },
+    "why_title": "Por que EliteFans?",
+    "why_exclusive": "Conteúdo exclusivo",
+    "why_exclusive_desc": "Acesse conteúdo premium e exclusivo dos seus criadores favoritos",
+    "why_community": "Comunidade Elite",
+    "why_community_desc": "Junte-se a uma comunidade selecionada de fãs e criadores de conteúdo",
+    "why_premium_experience": "Experiência premium",
+    "why_premium_experience_desc": "Desfrute de uma plataforma projetada para oferecer a melhor experiência",
+    "monetize": "Monetize seu conteúdo",
+    "monetize_desc": "Criadores: transforme sua paixão em renda sustentável",
+    "secure_payments": "Pagamentos seguros",
+    "secure_payments_desc": "Transações seguras para sua tranquilidade",
+    "vip_support": "Suporte VIP",
+    "vip_support_desc": "Suporte personalizado para criadores e assinantes",
+    "ready_title": "Pronto para entrar na elite?",
+    "ready_subtitle": "Crie sua conta hoje e descubra um mundo de conteúdo exclusivo",
+    "register_free": "Registrar-se grátis",
+    "footer_copyright": "© 2025 EliteFans. Todos os direitos reservados."
+  }
+}

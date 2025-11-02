@@ -6,6 +6,9 @@ import en from '../traducciones/en.json'
 import es from '../traducciones/es.json'
 import zh from '../traducciones/zh.json'
 import ru from '../traducciones/ru.json'
+import fr from '../traducciones/fr.json'
+import de from '../traducciones/de.json'
+import pt from '../traducciones/pt.json'
 
 // Try to read a previously selected language from localStorage so the
 // user's choice persists across reloads and sessions.
@@ -25,10 +28,13 @@ try {
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources: {
-      en: { translation: en },
-      es: { translation: es },
+    en: { translation: en },
+    es: { translation: es },
   zh: { translation: zh },
   ru: { translation: ru },
+  fr: { translation: fr },
+  de: { translation: de },
+  pt: { translation: pt },
     },
     lng: initialLng,
     fallbackLng: 'es',
