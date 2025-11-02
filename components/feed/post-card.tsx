@@ -655,7 +655,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
   <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#D4AF37]/20 to-transparent opacity-40"></div>
       
     {/* HEADER: INFORMACIÓN DEL CREADOR, AVATAR Y MENÚ */}
-  <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
+  <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3">
         <div className="flex items-center gap-4 flex-1">
           
           <div className="flex items-center gap-3">
@@ -682,7 +682,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
             {!isSubscribed && creatorProfileId && (
               <FollowButton 
                 userId={creatorProfileId}
-                className="text-xs px-2 py-1 rounded-full shadow-md shadow-[#D4AF37]/25 transition-all duration-200 hover:scale-105"
+                className="text-xs px-2 py-1 rounded-full transition-all duration-200 hover:scale-105"
               />
             )}
 
@@ -833,7 +833,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
       
       
       {/* CREATOR CARD: TARJETA CON INFORMACIÓN DEL CREADOR Y COVER */}
-      <div className="w-full px-6 pb-4">
+  <div className="w-full px-6 pb-0 -mt-10">
         <div className="-mx-6">
           <CreatorCard
             name={creator.name}
@@ -852,7 +852,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
 
       
         {/* FOOTER: ACCIONES PRINCIPALES (LIKE, COMENTARIOS, TIP, GUARDAR) */}
-        <CardFooter className="flex-col items-start gap-4 px-6 py-4 bg-gradient-to-r from-[#D4AF37]/5 to-transparent">
+  <CardFooter className="flex-col items-start gap-4 px-6 py-4">
         
         <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-1">
@@ -894,7 +894,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               type="button"
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
             >
-              <span className="rounded-full bg-[#D4AF37]/10 p-2">
+              <span className="rounded-full p-2">
                 <DollarSign className="h-4 w-4 text-[#D4AF37]" />
               </span>
               <span className="font-semibold text-sm">{t('ui.send_tip')}</span>
