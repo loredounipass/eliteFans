@@ -2,6 +2,7 @@
 // USAR <img> SIMPLE PARA EL FAVICON EN LA BARRA DE NAVEGACION
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -24,6 +25,13 @@ export function DashboardHeader() {
   const supabase = getSupabaseBrowserClient()
   const { t } = useTranslation()
   const currentLang = (i18n.language || 'es').substring(0,2).toLowerCase()
+  const [popoverOpen, setPopoverOpen] = useState(false)
+
+  const changeLang = (code: string) => {
+    i18n.changeLanguage(code)
+    try { localStorage.setItem('i18nextLng', code) } catch (e) {}
+    setPopoverOpen(false)
+  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -100,7 +108,7 @@ export function DashboardHeader() {
               </DropdownMenuItem>
               {/* Language popover trigger (no extra separator) */}
               <div className="px-2 py-1">
-                <Popover>
+                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                   <PopoverTrigger asChild>
                     <button aria-label={t('language.label')} className="flex items-center gap-1 text-sm text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-sm px-1 py-1">
                       <Globe className="h-4 w-4" />
@@ -110,7 +118,7 @@ export function DashboardHeader() {
                   <PopoverContent side="left" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
                     <div className="flex flex-col gap-1">
                       <button
-                        onClick={() => { i18n.changeLanguage('es'); try { localStorage.setItem('i18nextLng', 'es') } catch (e) {} }}
+                        onClick={() => changeLang('es')}
                         className={"text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded flex items-center" + (currentLang === 'es' ? ' bg-[#D4AF37]/10 font-semibold' : '')}
                         aria-pressed={currentLang === 'es'}
                       >
@@ -118,7 +126,7 @@ export function DashboardHeader() {
                         {currentLang === 'es' && <Check className="ml-auto h-4 w-4" />}
                       </button>
                       <button
-                        onClick={() => { i18n.changeLanguage('en'); try { localStorage.setItem('i18nextLng', 'en') } catch (e) {} }}
+                        onClick={() => changeLang('en')}
                         className={"text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded flex items-center" + (currentLang === 'en' ? ' bg-[#D4AF37]/10 font-semibold' : '')}
                         aria-pressed={currentLang === 'en'}
                       >
@@ -126,7 +134,7 @@ export function DashboardHeader() {
                         {currentLang === 'en' && <Check className="ml-auto h-4 w-4" />}
                       </button>
                       <button
-                        onClick={() => { i18n.changeLanguage('zh'); try { localStorage.setItem('i18nextLng', 'zh') } catch (e) {} }}
+                        onClick={() => changeLang('zh')}
                         className={"text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded flex items-center" + (currentLang === 'zh' ? ' bg-[#D4AF37]/10 font-semibold' : '')}
                         aria-pressed={currentLang === 'zh'}
                       >
@@ -134,7 +142,7 @@ export function DashboardHeader() {
                         {currentLang === 'zh' && <Check className="ml-auto h-4 w-4" />}
                       </button>
                       <button
-                        onClick={() => { i18n.changeLanguage('ru'); try { localStorage.setItem('i18nextLng', 'ru') } catch (e) {} }}
+                        onClick={() => changeLang('ru')}
                         className={"text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded flex items-center" + (currentLang === 'ru' ? ' bg-[#D4AF37]/10 font-semibold' : '')}
                         aria-pressed={currentLang === 'ru'}
                       >
@@ -142,7 +150,7 @@ export function DashboardHeader() {
                         {currentLang === 'ru' && <Check className="ml-auto h-4 w-4" />}
                       </button>
                       <button
-                        onClick={() => { i18n.changeLanguage('fr'); try { localStorage.setItem('i18nextLng', 'fr') } catch (e) {} }}
+                        onClick={() => changeLang('fr')}
                         className={"text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded flex items-center" + (currentLang === 'fr' ? ' bg-[#D4AF37]/10 font-semibold' : '')}
                         aria-pressed={currentLang === 'fr'}
                       >
@@ -150,7 +158,7 @@ export function DashboardHeader() {
                         {currentLang === 'fr' && <Check className="ml-auto h-4 w-4" />}
                       </button>
                       <button
-                        onClick={() => { i18n.changeLanguage('de'); try { localStorage.setItem('i18nextLng', 'de') } catch (e) {} }}
+                        onClick={() => changeLang('de')}
                         className={"text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded flex items-center" + (currentLang === 'de' ? ' bg-[#D4AF37]/10 font-semibold' : '')}
                         aria-pressed={currentLang === 'de'}
                       >
@@ -158,7 +166,7 @@ export function DashboardHeader() {
                         {currentLang === 'de' && <Check className="ml-auto h-4 w-4" />}
                       </button>
                       <button
-                        onClick={() => { i18n.changeLanguage('pt'); try { localStorage.setItem('i18nextLng', 'pt') } catch (e) {} }}
+                        onClick={() => changeLang('pt')}
                         className={"text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded flex items-center" + (currentLang === 'pt' ? ' bg-[#D4AF37]/10 font-semibold' : '')}
                         aria-pressed={currentLang === 'pt'}
                       >
