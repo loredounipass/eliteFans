@@ -89,6 +89,9 @@
     "subscriptions": "Subscriptions",
     "chat": "Chat",
     "subscriptions_and_chat": "Subscriptions & Chat"
+  ,
+    "live": "Live",
+    "notifications": "Notifications"
   },
   "language": {
     "es": "Español",

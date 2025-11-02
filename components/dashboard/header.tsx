@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { LogOut, Settings, User, Grid, Home, Video, Globe } from "lucide-react"
+import { LogOut, Settings, User, Grid, Home, Video, Bell, Globe } from "lucide-react"
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import i18n from "@/lib/i18n"
 import { useTranslation } from 'react-i18next'
@@ -45,19 +45,25 @@ export function DashboardHeader() {
   <nav className="flex items-center gap-8">
           {/* Language selector moved into My account (see dropdown below) */}
 
-          <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
+          <Link href="/dashboard" className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
             <Grid className="h-4 w-4" />
             <span>{t('dashboard.title')}</span>
           </Link>
-          <Link href="/feed" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
+          <Link href="/feed" className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
             <Home className="h-4 w-4" />
             <span>{t('feed.title')}</span>
           </Link>
 
           {/* Placeholder for future Live feature - no functionality for now */}
-          <div className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
             <Video className="h-4 w-4" />
-            <span>Live</span>
+            <span>{t('ui.live')}</span>
+          </div>
+
+          {/* Placeholder for future Notifications - no functionality for now */}
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
+            <Bell className="h-4 w-4" />
+            <span>{t('ui.notifications')}</span>
           </div>
 
           <DropdownMenu>

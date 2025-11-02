@@ -88,6 +88,9 @@
     "subscriptions": "Подписки",
     "chat": "Чат",
     "subscriptions_and_chat": "Подписки и чат"
+  ,
+    "live": "Live",
+    "notifications": "Уведомления"
   },
   "language": {
     "es": "Испанский",

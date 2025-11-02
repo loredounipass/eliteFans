@@ -88,6 +88,9 @@
     "subscriptions": "订阅",
     "chat": "聊天",
     "subscriptions_and_chat": "订阅与聊天"
+  ,
+    "live": "Live",
+    "notifications": "通知"
   },
   "language": {
     "es": "西班牙语",
