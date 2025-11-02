@@ -22,6 +22,7 @@ interface CreatorCardProps {
   compact?: boolean
   onlyFans?: boolean
   showMenuIcon?: boolean
+  coverRounded?: boolean
 }
 
 export function CreatorCard({
@@ -34,6 +35,7 @@ export function CreatorCard({
   compact = false,
   onlyFans = false,
   showMenuIcon = false,
+  coverRounded = false,
 }: CreatorCardProps) {
   const { t } = useTranslation()
   // Compact style for sidebar suggestions
@@ -41,7 +43,7 @@ export function CreatorCard({
     return (
       <Card className="overflow-hidden border-[#D4AF37]/20 bg-black/50 transition-all hover:border-[#D4AF37]/40 p-1">
         <Link href={`/profile/${username}`}>
-          <div className="relative h-24 w-full rounded-lg overflow-hidden">
+          <div className={`relative h-24 w-full rounded-lg overflow-hidden ${coverRounded ? 'rounded-md' : ''}`}>
             <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
             {/* three-dots menu */}
@@ -67,7 +69,7 @@ export function CreatorCard({
     return (
       <Card className="overflow-hidden rounded-md transition-all border-0 w-[90%] mx-auto" style={{ background: 'black', borderColor: 'var(--color-border)' }}>
         {/* Banner con imagen de cover */}
-        <div className="relative w-full h-20 md:h-28">
+        <div className={`relative w-full h-20 md:h-28 ${coverRounded ? 'rounded-md overflow-hidden' : ''}`}>
           <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/50" />
 
@@ -115,7 +117,7 @@ export function CreatorCard({
   return (
     <Card className="overflow-hidden bg-black/50 transition-all p-1 border-0">
       <Link href={`/profile/${username}`}>
-        <div className="relative h-28 md:h-32 w-full">
+        <div className={`relative h-28 md:h-32 w-full ${coverRounded ? 'rounded-md overflow-hidden' : ''}`}>
           <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
           <MenuOverlay username={username} />

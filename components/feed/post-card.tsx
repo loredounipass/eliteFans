@@ -649,7 +649,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
 
   return (
   // RENDERIZADO: COMPONENTE POSTCARD - HEADER, CONTENIDO, FOOTER Y SECCIÓN DE COMENTARIOS
-  <Card style={{boxShadow: 'inset 0 0 24px rgba(212,175,55,0.015)'}} className="group overflow-hidden bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-md shadow-[#D4AF37]/4 transition-all duration-300 hover:shadow-[#D4AF37]/6 hover:scale-[1.02] rounded-3xl w-full relative border border-[#D4AF37]/8">
+  <Card style={{boxShadow: 'inset 0 0 24px rgba(212,175,55,0.015)'}} className="group overflow-hidden bg-gradient-to-br from-black/90 via-black/95 to-black/90 backdrop-blur-sm shadow-md shadow-[#D4AF37]/4 transition-all duration-300 hover:shadow-[#D4AF37]/6 rounded-3xl w-full relative border border-[#D4AF37]/8">
   
   <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#D4AF37]/20 to-transparent opacity-40"></div>
   <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#D4AF37]/20 to-transparent opacity-40"></div>
@@ -779,7 +779,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               muted
               preload="metadata"
               onLoadedData={() => setMediaLoaded(true)}
-              className={`max-h-[520px] sm:max-h-[600px] w-full h-auto object-contain object-center transition-transform duration-300 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105 video-gold-controls`}
+              className={`max-h-[520px] sm:max-h-[600px] w-full h-auto object-contain object-center transition-transform duration-300 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } video-gold-controls`}
               playsInline
               poster={content.highResUrl}
             >
@@ -813,7 +813,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                   width={1920}
                   height={1080}
                   onLoadingComplete={() => setMediaLoaded(true)}
-                  className={`max-h-[360px] sm:max-h-[480px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                  className={`max-h-[360px] sm:max-h-[480px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' }`}
                   sizes="(max-width: 640px) 100vw, 1200px"
                   priority={false}
                 />
@@ -822,7 +822,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
                 src={content.url || "/placeholder.svg?height=600&width=600"}
                 alt="Post content"
                 onLoad={() => setMediaLoaded(true)}
-                  className={`max-h-[400px] sm:max-h-[520px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' } group-hover:scale-105`}
+                  className={`max-h-[400px] sm:max-h-[520px] w-full h-auto object-contain object-center transition-transform duration-500 ${mediaLoaded ? 'opacity-100' : 'opacity-0' }`}
                 loading="lazy"
               />
                 )}
@@ -840,6 +840,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
             username={creator.username}
             avatar={creator.avatar}
             coverImage={coverImage || content.highResUrl || content.url || "/placeholder.jpg"}
+            coverRounded={true}
             subscribers={subscriberCount ?? 0}
             isSubscribed={!!isSubscribed}
             compact={false}
