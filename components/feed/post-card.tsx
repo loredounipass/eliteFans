@@ -739,7 +739,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
       <CardContent className="p-0 relative">
         
         {content.description && (
-          <div className="w-full px-6 py-6 border-b border-[#D4AF37]/10 mb-4">
+          <div className="w-full px-6 py-6 mb-4">
             <p className="text-white leading-relaxed text-sm">{parseContentToNodes(content.description)}</p>
           </div>
         )}
