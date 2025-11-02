@@ -90,6 +90,51 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
     return (currentUserId && pid === currentUserId) || String(pid).startsWith("temp-")
   }
 
+  // Parse content text into React nodes: plain text, @mentions (internal links) and external URLs
+  const parseContentToNodes = (text?: string | null) => {
+    if (!text) return null
+    const nodes: React.ReactNode[] = []
+    const regex = /(@[A-Za-z0-9_]+)|(https?:\/\/[^\s]+)/g
+    let lastIndex = 0
+    let match: RegExpExecArray | null
+    let idx = 0
+
+    while ((match = regex.exec(text)) !== null) {
+      const matchIndex = match.index
+      if (lastIndex < matchIndex) {
+        nodes.push(text.slice(lastIndex, matchIndex))
+      }
+
+      if (match[1]) {
+        // mention like @username
+        const username = match[1].slice(1)
+        nodes.push(
+          <Link key={`mention-${idx}`} href={`/profile/${username}`} className="text-sky-400 hover:underline">
+            {`@${username}`}
+          </Link>
+        )
+      } else if (match[2]) {
+        // url
+        const url = match[2]
+        nodes.push(
+          <a key={`url-${idx}`} href={url} target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">
+            {url}
+          </a>
+        )
+      }
+
+      lastIndex = matchIndex + match[0].length
+      idx += 1
+    }
+
+    if (lastIndex < text.length) {
+      nodes.push(text.slice(lastIndex))
+    }
+
+    // Wrap plain string segments in <span> so keys are stable
+    return nodes.map((n, i) => (typeof n === "string" ? <span key={`text-${i}`}>{n}</span> : n))
+  }
+
   const saveEdit = async (id: string, text: string) => {
     if (!text.trim()) return false
     try {
@@ -678,7 +723,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
         {/* Mostrar la descripción arriba del contenido multimedia */}
         {content.description && (
           <div className="w-full px-6 py-6 border-b border-[#D4AF37]/10 mb-4">
-            <p className="text-[#D4AF37]/90 leading-relaxed text-sm">{content.description}</p>
+            <p className="text-white leading-relaxed text-sm">{parseContentToNodes(content.description)}</p>
           </div>
         )}
         {content.type === "locked" ? (
