@@ -894,9 +894,9 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
               variant="ghost"
               size="sm"
               type="button"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-[#F4BF37] hover:scale-105 transition-all duration-200"
             >
-              <span className="rounded-full p-2">
+              <span className="rounded-full p-1">
                 <DollarSign className="h-4 w-4 text-[#D4AF37]" />
               </span>
               <span className="font-semibold text-sm">{t('ui.send_tip')}</span>
