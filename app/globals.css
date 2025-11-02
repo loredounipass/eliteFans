@@ -213,3 +213,53 @@
   margin-bottom: -1rem;
 }
 
+/* Apply same rules for all CreatorCard instances */
+.creator-card {
+  --creator-avatar-size: 72px;
+}
+
+.creator-card [data-slot="avatar"] {
+  width: var(--creator-avatar-size) !important;
+  height: var(--creator-avatar-size) !important;
+  min-width: var(--creator-avatar-size) !important;
+  min-height: var(--creator-avatar-size) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  border-width: 3px !important;
+}
+
+.creator-card [data-slot="avatar-image"] {
+  object-fit: cover !important;
+}
+
+/* For onlyFans variant center the avatar over the banner */
+.creator-card.creator-card--onlyfans .absolute.inset-0 {
+  align-items: center !important;
+  padding-bottom: 0.6rem;
+}
+
+.creator-card .relative.-mb-6 {
+  margin-bottom: 0 !important;
+}
+
+.creator-card .relative.-mb-6 > .absolute.-top-2.-left-1 {
+  top: -0.5rem;
+  left: -0.35rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.65rem;
+  border-radius: 9999px;
+}
+
+.creator-card .font-semibold.text-xs {
+  font-size: 1rem !important;
+  line-height: 1.1;
+}
+
+.creator-card p[class~="text-[10px]"] {
+  font-size: 0.85rem !important;
+  margin-top: -0.12rem;
+}
+
+.creator-card .-mb-4 {
+  margin-bottom: -1rem;
+}
+

@@ -41,7 +41,7 @@ export function CreatorCard({
   // Compact style for sidebar suggestions
   if (compact) {
     return (
-      <Card className="overflow-hidden border-[#D4AF37]/20 bg-black/50 transition-all hover:border-[#D4AF37]/40 p-1">
+      <Card className="creator-card creator-card--compact overflow-hidden border-[#D4AF37]/20 bg-black/50 transition-all hover:border-[#D4AF37]/40 p-1">
         <Link href={`/profile/${username}`}>
           <div className={`relative h-24 w-full rounded-lg overflow-hidden ${coverRounded ? 'rounded-md' : ''}`}>
             <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
@@ -67,7 +67,7 @@ export function CreatorCard({
   // OnlyFans-like horizontal thin layout
   if (onlyFans) {
     return (
-      <Card className="overflow-hidden rounded-md transition-all border-0 w-[90%] mx-auto" style={{ background: 'black', borderColor: 'var(--color-border)' }}>
+      <Card className="creator-card creator-card--onlyfans overflow-hidden rounded-md transition-all border-0 w-[90%] mx-auto" style={{ background: 'black', borderColor: 'var(--color-border)' }}>
         {/* Banner con imagen de cover */}
         <div className={`relative w-full h-20 md:h-28 ${coverRounded ? 'rounded-md overflow-hidden' : ''}`}>
           <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />
@@ -115,7 +115,7 @@ export function CreatorCard({
   }
 
   return (
-    <Card className="overflow-hidden bg-black/50 transition-all p-1 border-0">
+    <Card className="creator-card overflow-hidden bg-black/50 transition-all p-1 border-0">
       <Link href={`/profile/${username}`}>
         <div className={`relative h-28 md:h-32 w-full ${coverRounded ? 'rounded-md overflow-hidden' : ''}`}>
           <Image src={coverImage || "/placeholder.jpg"} alt={`${name} cover`} fill className="object-cover" />

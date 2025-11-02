@@ -31,19 +31,21 @@ export function FeedFilters({ onFiltersChange, initialFilters }: FeedFiltersProp
   }, [initialFilters])
 
   const handleFilterChange = (filterType: keyof FilterState) => {
-    const newFilters = { ...filters }
-    
-    // Si se selecciona "Solo imágenes", desactivar "Solo videos"
-    if (filterType === 'onlyImages' && !filters.onlyImages) {
-      newFilters.onlyVideos = false
+    // Single-select behavior: if the clicked filter was already active, clear all;
+    // otherwise activate only the clicked filter and deactivate the others.
+    if (filters[filterType]) {
+      const cleared = { onlyImages: false, onlyVideos: false, premiumContent: false }
+      setFilters(cleared)
+      onFiltersChange(cleared)
+      return
     }
-    
-    // Si se selecciona "Solo videos", desactivar "Solo imágenes"
-    if (filterType === 'onlyVideos' && !filters.onlyVideos) {
-      newFilters.onlyImages = false
+
+    const newFilters = {
+      onlyImages: false,
+      onlyVideos: false,
+      premiumContent: false,
     }
-    
-    newFilters[filterType] = !filters[filterType]
+    newFilters[filterType] = true
     setFilters(newFilters)
     onFiltersChange(newFilters)
   }
