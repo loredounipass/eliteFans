@@ -23,7 +23,7 @@
     "no_posts_yet": "还没有帖子",
     "start_sharing": "开始与您的粉丝分享精彩内容！",
     "this_creator_no_posts": "该创作者尚未发布任何内容。",
-    "search_placeholder": "搜索创作者、内容...",
+  "search_placeholder": "搜索创作者",
     "filters": {
       "label": "筛选",
       "active_filters": "已启用筛选：",

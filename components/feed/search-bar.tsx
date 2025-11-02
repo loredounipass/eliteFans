@@ -130,7 +130,7 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
 
   return (
     <div ref={ref} className={isSidebar ? "relative w-full" : "relative max-w-xl mx-auto"}>
-  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#D4AF37]/50 pointer-events-none" />
+  <Search strokeWidth={1.8} shapeRendering="geometricPrecision" className="absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[#D4AF37] pointer-events-none transform-gpu antialiased z-20" />
 
       <Input
         value={query}
@@ -140,11 +140,11 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
         aria-autocomplete="list"
         aria-expanded={open}
         placeholder={t('feed.search_placeholder')}
-        className="relative z-10 border-[#D4AF37]/30 bg-black/50 backdrop-blur-sm pl-12 pr-12 py-2.5 text-[#D4AF37] placeholder:text-[#D4AF37]/40 focus:border-[#D4AF37]/60 focus:ring-2 focus:ring-[#D4AF37]/20 rounded-full shadow-lg shadow-[#D4AF37]/10"
+        className="relative z-10 border-[#D4AF37]/15 bg-black/40 backdrop-blur-sm pl-14 pr-12 py-2.5 text-[#D4AF37]/85 placeholder:text-[#D4AF37]/25 focus:border-[#D4AF37]/30 focus:ring-1 focus:ring-[#D4AF37]/10 rounded-full shadow-sm shadow-black/40"
       />
 
       <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-        {loading ? <Loader2 className="h-4 w-4 animate-spin text-[#D4AF37]" /> : null}
+        {loading ? <Loader2 className="h-4 w-4 animate-spin text-[#D4AF37]/80" /> : null}
       </div>
 
       {open && (
@@ -158,7 +158,7 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
               {/* scrollable inner area to prevent dropdown from extending to bottom */}
               <div className="max-h-[60vh] overflow-auto">
                 {results.length === 0 && !loading ? (
-                  <div className="p-3 text-sm text-[#D4AF37]/70">{t('search.no_creators_found')}</div>
+                  <div className="p-3 text-sm text-[#D4AF37]/60">{t('search.no_creators_found')}</div>
                 ) : (
                   <ul role="listbox" className="divide-y divide-[#D4AF37]/10">
                     {results.map((u, idx) => (
@@ -169,13 +169,13 @@ export function SearchBar({ isSidebar = false }: { isSidebar?: boolean }) {
                         onMouseDown={(e) => e.preventDefault()} // prevent blur before click
                         onClick={() => goToProfile(u.username)}
                         className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-150 ${
-                          activeIndex === idx ? "bg-[#D4AF37]/12" : "hover:bg-[#D4AF37]/10"
+                          activeIndex === idx ? "bg-[#D4AF37]/10" : "hover:bg-[#D4AF37]/06"
                         }`}
                       >
-                        <img src={u.avatar_url || "/placeholder-user.jpg"} className="h-10 w-10 rounded-full object-cover border border-[#D4AF37]/20" />
+                        <img src={u.avatar_url || "/placeholder-user.jpg"} className="h-10 w-10 rounded-full object-cover border border-[#D4AF37]/10" />
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-[#D4AF37] leading-5 truncate" dangerouslySetInnerHTML={{ __html: highlightMatch(u.full_name || u.username, query) }} />
-                          <div className="text-xs text-[#D4AF37]/70 truncate">@{u.username}</div>
+                          <div className="text-sm font-semibold text-[#D4AF37]/90 leading-5 truncate" dangerouslySetInnerHTML={{ __html: highlightMatch(u.full_name || u.username, query) }} />
+                          <div className="text-xs text-[#D4AF37]/60 truncate">@{u.username}</div>
                         </div>
                       </li>
                     ))}

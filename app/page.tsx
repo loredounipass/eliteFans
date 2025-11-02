@@ -111,14 +111,7 @@ export default function HomePage() {
         <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 pt-16">
           {/* Enhanced Background decoration */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 via-transparent to-transparent" />
-          <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#D4AF37]/8 blur-3xl animate-pulse" />
-          
-          {/* Animated rings */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="w-[800px] h-[800px] border border-[#D4AF37]/10 rounded-full animate-spin" style={{ animationDuration: '20s' }} />
-            <div className="absolute inset-20 border border-[#D4AF37]/5 rounded-full animate-spin" style={{ animationDuration: '15s', animationDirection: 'reverse' }} />
-            <div className="absolute inset-40 border border-[#D4AF37]/3 rounded-full animate-spin" style={{ animationDuration: '25s' }} />
-          </div>
+          {/* Large central light and rings removed to disable pulsing background */}
 
           <div className="relative z-10 mx-auto max-w-6xl">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -128,9 +121,9 @@ export default function HomePage() {
                   <Image
                     src="/elitfans-logo.png"
                     alt="EliteFans Logo"
-                    width={400}
-                    height={150}
-                    className="object-contain hover:scale-105 transition-transform duration-500"
+                    width={300}
+                    height={110}
+                    className="object-contain hover:scale-105 transition-transform duration-500 w-[300px] h-auto"
                     style={{ width: 'auto', height: 'auto' }}
                     priority
                   />
@@ -181,7 +174,7 @@ export default function HomePage() {
               </div>
 
               {/* Right side - Features */}
-              <div className="space-y-6 mt-6 lg:mt-12">
+              <div className="space-y-6">
                 <div className="grid gap-4">
                   <div className="bg-[#D4AF37]/10 backdrop-blur-sm rounded-xl p-4 border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:scale-105">
                     <div className="flex items-center space-x-3 mb-3">
