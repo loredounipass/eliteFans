@@ -155,3 +155,61 @@
     height: 0 !important;
   }
 }
+
+/* PostCard -> CreatorCard overrides (moved from inline styles in post-card.tsx)
+   These rules only target CreatorCard instances rendered inside the PostCard
+   container which adds the `postcard-creator-card` class. Keeping them here
+   reduces inline JSX noise and centralizes styling. */
+.postcard-creator-card {
+  --postcard-avatar-size: 72px; /* tamaño objetivo del avatar */
+}
+
+.postcard-creator-card [data-slot="avatar"] {
+  width: var(--postcard-avatar-size) !important;
+  height: var(--postcard-avatar-size) !important;
+  min-width: var(--postcard-avatar-size) !important;
+  min-height: var(--postcard-avatar-size) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  border-width: 3px !important;
+}
+
+.postcard-creator-card [data-slot="avatar-image"] {
+  object-fit: cover !important;
+}
+
+/* Centrar verticalmente el avatar dentro del banner: ajustar el contenedor absoluto */
+.postcard-creator-card .absolute.inset-0 {
+  align-items: center !important; /* antes items-end */
+  padding-bottom: 0.6rem; /* mantener un poco de espacio inferior */
+}
+
+/* Resetea el margin negativo usado en CreatorCard para permitir el centrado */
+.postcard-creator-card .relative.-mb-6 {
+  margin-bottom: 0 !important;
+}
+
+/* Badge (Free) pequeño sobre avatar: hacerlo más compacto y mejor posicionado */
+.postcard-creator-card .relative.-mb-6 > .absolute.-top-2.-left-1 {
+  top: -0.5rem;
+  left: -0.35rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.65rem;
+  border-radius: 9999px;
+}
+
+/* Nombre y username: agrandar y ajustar espaciado para que coincida con la referencia */
+.postcard-creator-card .font-semibold.text-xs {
+  font-size: 1rem !important; /* nombre más grande */
+  line-height: 1.1;
+}
+
+.postcard-creator-card p[class~="text-[10px]"] {
+  font-size: 0.85rem !important; /* username/handle un poco más grande */
+  margin-top: -0.12rem;
+}
+
+/* Ajuste fino del bloque con -mb-4 usado en creator card */
+.postcard-creator-card .-mb-4 {
+  margin-bottom: -1rem;
+}
+

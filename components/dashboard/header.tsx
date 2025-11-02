@@ -12,7 +12,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { LogOut, Settings, User, Grid, Home, Globe } from "lucide-react"
+import { LogOut, Settings, User, Grid, Home, Video, Globe } from "lucide-react"
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import i18n from "@/lib/i18n"
 import { useTranslation } from 'react-i18next'
 import { useToast } from "@/hooks/use-toast"
@@ -41,56 +42,8 @@ export function DashboardHeader() {
             <img src="/favicon.ico?v=2" alt="EliteFans" width={72} height={72} className="h-[69px] w-[69px] object-contain" />
          
         </Link>
-        <nav className="flex items-center gap-6">
-          {/* Language selector - moved before Dashboard */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-[#D4AF37] hover:bg-[#D4AF37]/10 flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                <span className="text-sm font-semibold">{currentLang}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
-              <DropdownMenuLabel>{t('language.label')}</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-[#D4AF37]/20" />
-              <DropdownMenuItem
-                onClick={() => {
-                  i18n.changeLanguage('es')
-                  try { localStorage.setItem('i18nextLng', 'es') } catch (e) { /* ignore */ }
-                }}
-                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
-              >
-                {t('language.es')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  i18n.changeLanguage('en')
-                  try { localStorage.setItem('i18nextLng', 'en') } catch (e) { /* ignore */ }
-                }}
-                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
-              >
-                {t('language.en')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  i18n.changeLanguage('zh')
-                  try { localStorage.setItem('i18nextLng', 'zh') } catch (e) { /* ignore */ }
-                }}
-                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
-              >
-                {t('language.chinese') || 'Mandarin'}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  i18n.changeLanguage('ru')
-                  try { localStorage.setItem('i18nextLng', 'ru') } catch (e) { /* ignore */ }
-                }}
-                className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]"
-              >
-                {t('language.russian') || 'Russian'}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+  <nav className="flex items-center gap-8">
+          {/* Language selector moved into My account (see dropdown below) */}
 
           <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
             <Grid className="h-4 w-4" />
@@ -100,6 +53,12 @@ export function DashboardHeader() {
             <Home className="h-4 w-4" />
             <span>{t('feed.title')}</span>
           </Link>
+
+          {/* Placeholder for future Live feature - no functionality for now */}
+          <div className="flex items-center gap-2 text-sm font-semibold tracking-wide text-[#D4AF37]/80 transition-colors hover:text-[#D4AF37] uppercase">
+            <Video className="h-4 w-4" />
+            <span>Live</span>
+          </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -133,6 +92,45 @@ export function DashboardHeader() {
                 <Settings className="mr-2 h-4 w-4" />
                 {t('account.settings')}
               </DropdownMenuItem>
+              {/* Language popover trigger (no extra separator) */}
+              <div className="px-2 py-1">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button aria-label={t('language.label')} className="flex items-center gap-1 text-sm text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-sm px-1 py-1">
+                      <Globe className="h-4 w-4" />
+                      <span className="ml-1 text-sm font-medium text-[#D4AF37]/80 uppercase">{currentLang}</span>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="left" className="border-[#D4AF37]/20 bg-black text-[#D4AF37]">
+                    <div className="flex flex-col gap-1">
+                      <button
+                        onClick={() => { i18n.changeLanguage('es'); try { localStorage.setItem('i18nextLng', 'es') } catch (e) {} }}
+                        className="text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded"
+                      >
+                        {t('language.es')}
+                      </button>
+                      <button
+                        onClick={() => { i18n.changeLanguage('en'); try { localStorage.setItem('i18nextLng', 'en') } catch (e) {} }}
+                        className="text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded"
+                      >
+                        {t('language.en')}
+                      </button>
+                      <button
+                        onClick={() => { i18n.changeLanguage('zh'); try { localStorage.setItem('i18nextLng', 'zh') } catch (e) {} }}
+                        className="text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded"
+                      >
+                        {t('language.chinese') || 'Mandarin'}
+                      </button>
+                      <button
+                        onClick={() => { i18n.changeLanguage('ru'); try { localStorage.setItem('i18nextLng', 'ru') } catch (e) {} }}
+                        className="text-sm text-left px-2 py-1 hover:bg-[#D4AF37]/10 rounded"
+                      >
+                        {t('language.russian') || 'Russian'}
+                      </button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
               <DropdownMenuItem onClick={handleLogout} className="focus:bg-[#D4AF37]/10 focus:text-[#D4AF37]">
                 <LogOut className="mr-2 h-4 w-4" />
                 {t('account.logout')}

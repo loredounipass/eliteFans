@@ -834,7 +834,7 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
       
       {/* CREATOR CARD: TARJETA CON INFORMACIÓN DEL CREADOR Y COVER */}
   <div className="w-full px-6 pb-0 -mt-10">
-        <div className="-mx-6">
+        <div className="-mx-6 postcard-creator-card">
           <CreatorCard
             name={creator.name}
             username={creator.username}
@@ -849,6 +849,8 @@ export function PostCard({ postId, creator, content, isSubscribed = false, autop
           />
         </div>
       </div>
+
+      {/* Styles moved to global stylesheet (app/globals.css) to reduce inline code */}
 
       
         {/* FOOTER: ACCIONES PRINCIPALES (LIKE, COMENTARIOS, TIP, GUARDAR) */}
