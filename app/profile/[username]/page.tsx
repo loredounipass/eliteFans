@@ -67,12 +67,25 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   }
 
   // OBTENER CREADORES SUGERIDOS (EXCLUYENDO EL ACTUAL)
-  // Request suggested creators without a hardcoded client-side limit; server will decide defaults
-  const { data: suggestedCreators } = await supabase
+  // OBTENER CREADORES SUGERIDOS (EXCLUYENDO EL ACTUAL)
+  // En algunos entornos la consulta por `is_creator = true` puede devolver 0 resultados
+  // aunque existan perfiles. Usamos la misma estrategia que en el feed: traer todos
+  // los perfiles ordenados por `subscriber_count` y luego priorizamos los marcados
+  // como creadores, excluyendo el perfil actual.
+  const { data: allProfiles } = await supabase
     .from("profiles")
-    .select("username, full_name, avatar_url, cover_url, subscriber_count")
-    .eq("is_creator", true)
-    .neq("id", profile.id)
+    .select("username, full_name, avatar_url, cover_url, subscriber_count, is_creator, id")
+    .order("subscriber_count", { ascending: false, nullsFirst: false })
+
+  let suggestedCreators: any[] = []
+  if (allProfiles && allProfiles.length > 0) {
+    const markedCreators = allProfiles.filter((p: any) => p.is_creator === true)
+    const otherUsers = allProfiles.filter((p: any) => p.is_creator !== true)
+
+    suggestedCreators = [...markedCreators, ...otherUsers]
+      // Excluir el perfil actual por id
+      .filter((p: any) => p.id !== profile.id && p.username)
+  }
 
   return (
     <PrivateRoute>
