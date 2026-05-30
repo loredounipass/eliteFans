@@ -5,6 +5,7 @@ import { FilteredFeed } from "@/components/feed/filtered-feed"
 // Icons and CreatorCarousel are used in sidebar components; imported where needed.
 import RightSidebar from '@/components/feed/right-sidebar'
 import { createServerClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 type PostRow = {
   id: string
@@ -38,7 +39,8 @@ type CreatorPreview = {
 async function getFeedData() {
   const supabase = await createServerClient()
 
-  const { data: posts, error } = await supabase
+  const adminClient = createAdminClient()
+  const { data: posts, error } = await adminClient
     .from("posts")
     .select(`*, profiles:profiles(id, username, full_name, avatar_url, subscription_price)`)
     .order("created_at", { ascending: false })

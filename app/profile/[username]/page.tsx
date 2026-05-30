@@ -3,6 +3,7 @@ import { DashboardHeader } from "@/components/dashboard/header"
 import { ProfileHeader } from "@/components/profile/profile-header"
 import { ProfileTabs } from "@/components/profile/profile-tabs"
 import { createServerClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { notFound } from "next/navigation"
 import { Users, Star, TrendingUp, Heart } from "lucide-react"
 import LeftSidebar from '@/components/profile/left-sidebar'
@@ -31,8 +32,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     notFound()
   }
 
-  // OBTENER PUBLICACIONES DEL CREADOR
-  const { data: posts } = await supabase
+  // OBTENER PUBLICACIONES DEL CREADOR (admin client para saltar RLS y obtener también los posts exclusivos)
+  const adminClient = createAdminClient()
+  const { data: posts } = await adminClient
     .from("posts")
     .select("*")
     .eq("creator_id", profile.id)

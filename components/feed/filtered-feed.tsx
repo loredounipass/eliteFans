@@ -63,7 +63,7 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
 
   const filterPosts = (posts: PostRow[], filters: FilterState) => {
     return posts.filter(post => {
-      // Si no hay filtros activos, mostrar todos los posts
+      // Si no hay filtros activos (filtro "Todos"), mostrar todos los posts sin excepción
       if (!filters.onlyImages && !filters.onlyVideos && !filters.premiumContent) {
         return true
       }
@@ -75,7 +75,7 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
       const hasImageUrls = urls.some(u => imageExt.test(u))
       const hasVideoUrls = urls.some(u => videoExt.test(u))
 
-      // Evaluar match por tipo (imagen/video). Si no hay filtro de tipo activo, se considera match por tipo.
+      // Evaluar match por tipo (imagen/video)
       let passesType = true
       if (filters.onlyImages) {
         passesType = post.media_type === 'image' || hasImageUrls
@@ -83,16 +83,12 @@ export function FilteredFeed({ posts, subscribedCreatorIds, followedCreatorIds }
         passesType = post.media_type === 'video' || hasVideoUrls
       }
 
-      // Evaluar match por premium: si el usuario quiere contenido premium -> debe ser is_locked;
-      // si no quiere premium, entonces excluir posts bloqueados.
-      let passesPremium = true
+      // Evaluar match por premium: solo filtrar si el checkbox premium está activo
       if (filters.premiumContent) {
-        passesPremium = Boolean(post.is_locked)
-      } else {
-        passesPremium = !Boolean(post.is_locked)
+        return passesType && Boolean(post.is_locked)
       }
 
-      return passesType && passesPremium
+      return passesType
     })
   }
 
