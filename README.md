@@ -6,27 +6,60 @@
 
 ## 📸 Screenshots
 
-| | | |
-|:-:|:-:|:-:|
-| **Home** | **Dashboard** | **Post Creation** |
-| ![Home](Screenshots/Home.png) | ![Dashboard](Screenshots/Dashboard.png) | ![Post](Screenshots/Post.png) |
-| **Gallery** | **Feed** | **Feed — Exclusive Content** |
-| ![Gallery](Screenshots/Gallery.png) | ![Feed](Screenshots/Feed.png) | ![Feed Exclusive](Screenshots/Feed-exclusive.png) |
-| **Profile** | | |
-| ![Profile](Screenshots/profile.png) | | |
+### Home
+
+![Home](Screenshots/Home.png)
+
+### Dashboard
+
+![Dashboard](Screenshots/Dashboard.png)
+
+### Post Creation
+
+![Post](Screenshots/Post.png)
+
+### Gallery
+
+![Gallery](Screenshots/Gallery.png)
+
+### Feed
+
+![Feed](Screenshots/Feed.png)
+
+### Feed — Exclusive Content
+
+![Feed — Exclusive Content](Screenshots/Feed-exclusive.png)
+
+### Profile
+
+![Profile](Screenshots/profile.png)
 
 ---
 
 ## 📋 Table of Contents
 
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [Supabase Setup](#supabase-setup)
-- [Local Development](#local-development)
-- [Build & Deploy](#build--deploy)
-- [Troubleshooting](#troubleshooting)
-- [Useful Links](#useful-links)
+- [✨ EliteFans](#-elitefans)
+  - [📸 Screenshots](#-screenshots)
+    - [Home](#home)
+    - [Dashboard](#dashboard)
+    - [Post Creation](#post-creation)
+    - [Gallery](#gallery)
+    - [Feed](#feed)
+    - [Feed — Exclusive Content](#feed--exclusive-content)
+    - [Profile](#profile)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [🔧 Prerequisites](#-prerequisites)
+  - [📦 Installation](#-installation)
+  - [🔐 Environment Variables](#-environment-variables)
+  - [🗄️ Supabase Setup](#️-supabase-setup)
+    - [1) Create a Project](#1-create-a-project)
+    - [2) Database Schema](#2-database-schema)
+    - [3) Storage](#3-storage)
+    - [4) Auth](#4-auth)
+  - [🚀 Local Development](#-local-development)
+  - [🌐 Build \& Deploy](#-build--deploy)
+  - [🐛 Troubleshooting](#-troubleshooting)
+  - [🔗 Useful Links](#-useful-links)
 
 ---
 
