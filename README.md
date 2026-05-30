@@ -1,4 +1,4 @@
-# ✨ EliteFans
+# EliteFans
 
 **EliteFans** is a modern exclusive content platform where creators can publish premium posts, manage subscriptions, and connect with their audience. Built with **Next.js 15**, **Supabase**, and **TypeScript**, it offers a sleek, dark-themed UI with real-time features, role-based access control, and secure media uploads.
 
@@ -34,34 +34,8 @@
 
 ![Profile](Screenshots/profile.png)
 
----
 
-## 📋 Table of Contents
 
-- [✨ EliteFans](#-elitefans)
-  - [📸 Screenshots](#-screenshots)
-    - [Home](#home)
-    - [Dashboard](#dashboard)
-    - [Post Creation](#post-creation)
-    - [Gallery](#gallery)
-    - [Feed](#feed)
-    - [Feed — Exclusive Content](#feed--exclusive-content)
-    - [Profile](#profile)
-  - [📋 Table of Contents](#-table-of-contents)
-  - [🔧 Prerequisites](#-prerequisites)
-  - [📦 Installation](#-installation)
-  - [🔐 Environment Variables](#-environment-variables)
-  - [🗄️ Supabase Setup](#️-supabase-setup)
-    - [1) Create a Project](#1-create-a-project)
-    - [2) Database Schema](#2-database-schema)
-    - [3) Storage](#3-storage)
-    - [4) Auth](#4-auth)
-  - [🚀 Local Development](#-local-development)
-  - [🌐 Build \& Deploy](#-build--deploy)
-  - [🐛 Troubleshooting](#-troubleshooting)
-  - [🔗 Useful Links](#-useful-links)
-
----
 
 ## 🔧 Prerequisites
 
@@ -78,20 +52,25 @@ Make sure you have the following installed:
 
 ```bash
 git clone <your-repo-url>
+
 cd eliteFans
+
 pnpm install
 ```
 
 ---
 
-## 🔐 Environment Variables
+##  Environment Variables
 
 Create a `.env.local` file at the project root with the following variables (values from your Supabase project):
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-anon-key
+
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
 NEXTAUTH_URL=http://localhost:3000
 ```
 
@@ -154,15 +133,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - Set the same environment variables in your platform's dashboard.
 - Keep `SUPABASE_SERVICE_ROLE_KEY` out of client-side bundles.
 
----
-
-## 🐛 Troubleshooting
-
-| Problem | Solution |
-|---------|----------|
-| **Favicon not updating** | Clear browser cache or use an incognito window |
-| **Storage upload RLS errors** | Run `scripts/10_storage_policies.sql` and adapt to your schema |
-| **Auth errors** | Verify `NEXT_PUBLIC_SUPABASE_URL` and anon key are correct |
 
 ---
 
